@@ -1,0 +1,29 @@
+{
+  "name": "darwinia.js",
+  "version": "0.1.0",
+  "description": "Javascript library for darwinia",
+  "main": "lib/index.js",
+  "repository": "git@github.com:darwinia-network/darwinia.js.git",
+  "author": "darwinia-network <hello@darwinia.network>",
+  "license": "GPL-3.0",
+  "private": true,
+  "devDependencies": {
+    "husky": "^4.2.3",
+    "ts-lint": "^4.5.1",
+    "typescript": "^3.8.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint",
+      "pre-push": "npm run lint && npm run build"
+    }
+  },
+  "scripts": {
+    "build": "tsc --strict",
+    "lint": "tslint --project ./tsconfig.json --type-check --fix"
+  },
+  "dependencies": {
+    "@polkadot/util": "^2.7.1",
+    "ethereumjs-util": "^6.2.0"
+  }
+}
