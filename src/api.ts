@@ -60,6 +60,7 @@ export class ExError {
  * @method reset - reset eth relay header
  * @method relay - relay eth relay header
  * @method redeem - redeem ring
+ * @method transfer - transfer ring
  *
  * @property {KeyringPair} account - darwinia account
  * @property {ApiPromise} ap - raw polkadot api
@@ -86,27 +87,25 @@ export class API {
     /**
      * init darwinia api async
      *
-     * @param {Record<string, string>} types - types of darwinia
+     * @param {KeyringPair} account - darwinia account
+     * @param {Record<string, any>} types - types of darwinia
      * @param {String} node - the ws address of darwinia
      */
     public static async new(
-        types: Record<string, string>,
-        node: string,
         account: KeyringPair,
-    ): Promise<API | undefined> {
+        node: string,
+        types: Record<string, any>,
+    ): Promise<API> {
         const api = await ApiPromise.create({
             provider: new WsProvider(node),
             types,
         }).catch((e) => {
             log.err(e);
+            log.err("init polkadot api failed");
         });
 
-        if (api instanceof ApiPromise) {
-            log.ok("init darwinia api succeed");
-            return new API(account, api);
-        } else {
-            log.ex("init polkadot api failed");
-        }
+        log.ok("init darwinia api succeed");
+        return new API(account, (api as ApiPromise));
     }
 
     public ap: ApiPromise;
@@ -213,8 +212,17 @@ export class API {
                             }
                         });
                     }
-                } else if (status.isFinalized) {
-                    log.trace(`Finalized block hash: ${blockHash}`);
+                } else {
+                    if (status.isInvalid) {
+                        log.warn("Invalid Extrinsic");
+                    } else if (status.isRetracted) {
+                        log.warn("Extrinsic Retracted");
+                    } else if (status.isUsurped) {
+                        log.warn("Extrinsic Usupred");
+                    } else if (status.isFinalized) {
+                        log.trace(`Finalized block hash: ${blockHash}`);
+                    }
+
                     resolve({
                         blockHash,
                         exHash: ex.hash.toString(),

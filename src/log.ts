@@ -40,7 +40,7 @@ const ALL_LOGS = [
 ];
 
 /**
- * @description - check if we are under browser
+ * check if we are under browser
  */
 export function isBrowser(): boolean {
     try {
@@ -55,7 +55,7 @@ export function isBrowser(): boolean {
 }
 
 /**
- * @description - infer current env, if we have log limits
+ * infer current env, if we have log limits
  */
 export function loggerEnv(): LoggerEnv {
     let label: string = isBrowser() ?
@@ -81,7 +81,7 @@ export function loggerEnv(): LoggerEnv {
 /**
  * infer if shoud output log
  *
- * @param label Logger - log type
+ * @param {Logger} label - log type
  */
 export function shouldOutputLog(label: Logger): boolean {
     const env: LoggerEnv = loggerEnv();
@@ -113,8 +113,8 @@ export function shouldOutputLog(label: Logger): boolean {
 /**
  * print messages to console, including stdout and stderr(error)
  *
- * @param label string - the log label
- * @param context string - the log context
+ * @param {String} label - the log label
+ * @param {String} context - the log context
  */
 function flush(label: string, context: string): void {
     let str = l + label + r + context;
@@ -126,7 +126,7 @@ function flush(label: string, context: string): void {
 }
 
 /**
- * @param s string - the log out string
+ * @param {String} s - the log out string
  */
 export function log(s: string) {
     if (shouldOutputLog(Logger.Info)) {
@@ -135,7 +135,7 @@ export function log(s: string) {
 }
 
 /**
- * @param s string - the log out string
+ * @param {String} s - the log out string
  */
 log.warn = (s: string): void => {
     if (shouldOutputLog(Logger.Warn)) {
@@ -144,7 +144,7 @@ log.warn = (s: string): void => {
 };
 
 /**
- * @param s string - the log out string
+ * @param {String} s - the log out string
  */
 log.trace = (s: string): void => {
     if (shouldOutputLog(Logger.Trace)) {
@@ -153,7 +153,7 @@ log.trace = (s: string): void => {
 };
 
 /**
- * @param s string - the log out string
+ * @param {String} s - the log out string
  */
 log.wait = (s: string): void => {
     if (shouldOutputLog(Logger.Wait)) {
@@ -162,7 +162,7 @@ log.wait = (s: string): void => {
 };
 
 /**
- * @param s string - the log out string
+ * @param {String} s - the log out string
  */
 log.err = (s: string): void => {
     if (shouldOutputLog(Logger.Error)) {
@@ -171,9 +171,10 @@ log.err = (s: string): void => {
 };
 
 /**
- * log error and quit process,
+ * log error and quit process
+ *
  * @description - only support in nodejs
- * @param s string - the log context
+ * @param {String} s - the log context
  */
 log.ex = (s: string): void => {
     if (shouldOutputLog(Logger.Error)) {
@@ -183,13 +184,10 @@ log.ex = (s: string): void => {
 };
 
 /**
- * log error and quit process,
- * @description - only support in nodejs
- * @param s string - the log context
+ * @param {String} s - the log context
  */
 log.ok = (s: string): void => {
     if (shouldOutputLog(Logger.Ok)) {
         flush(chalk.green("ok"), s);
-        process.exit(1);
     }
 };

@@ -31,7 +31,7 @@
     },
     "scripts": {
         "build": "tsc --strict",
-        "lint": "tsc --strict --noEmit && tslint --project ./tsconfig.json --type-check"
+        "lint": "tsc --strict --noEmit && tslint src/**/*.ts --type-check"
     },
     "husky": {
         "hooks": {
