@@ -4,6 +4,7 @@ import { SubmittableExtrinsic } from "@polkadot/api/types";
 import Keyring from "@polkadot/keyring";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { DispatchError, EventRecord } from "@polkadot/types/interfaces/types";
+import { cryptoWaitReady } from "@polkadot/util-crypto";
 
 import { IDarwiniaEthBlock } from "./block";
 import { log } from "./log";
@@ -49,7 +50,7 @@ export class ExError {
      * convert extrinsic doc into string
      */
     public toString(): string {
-        return `${this.name}.${this.section} - ${this.documentation.join(" ")}`;
+        return `${this.name}.${this.section} - ${this.documentation.join(" ").slice(1)}`;
     }
 }
 
@@ -72,6 +73,7 @@ export class API {
      * @param {String} seed - seed of darwinia account
      */
     public static async seed(seed: string) {
+        await cryptoWaitReady();
         return new Keyring({ type: "sr25519" }).addFromUri(seed);
     }
 
@@ -81,6 +83,7 @@ export class API {
      * @param {String} mnemonic - mnemonic of darwinia account
      */
     public static async memrics(mnemonic: string) {
+        await cryptoWaitReady();
         return new Keyring({ type: "sr25519" }).addFromMnemonic(mnemonic);
     }
 
@@ -90,6 +93,13 @@ export class API {
      * @param {KeyringPair} account - darwinia account
      * @param {Record<string, any>} types - types of darwinia
      * @param {String} node - the ws address of darwinia
+     *
+     * @example
+     * ```js
+     * const cfg = new Config();
+     * const seed = await API.seed(cfg.seed);
+     * const api = await API.new(seed, cfg.node, cfg.types);
+     * ```
      */
     public static async new(
         account: KeyringPair,
@@ -100,19 +110,21 @@ export class API {
             provider: new WsProvider(node),
             types,
         }).catch((e) => {
-            log.err(e);
-            log.err("init polkadot api failed");
+            log.trace(JSON.stringify(e));
+            log.ex("init polkadot api failed");
         });
 
-        log.ok("init darwinia api succeed");
+        log.trace("init darwinia api succeed");
         return new API(account, (api as ApiPromise));
     }
 
+    public account: KeyringPair;
     public ap: ApiPromise;
-    private account: KeyringPair;
 
     /**
      * init darwinia api
+     *
+     * @description please use `API.new` instead
      *
      * @param {KeyringPair} account - darwinia account
      * @param {ApiPromise} ap - raw polkadot api
@@ -123,10 +135,12 @@ export class API {
     }
 
     /**
-     * get the ring balance
+     * get ring balance by darwinia account address
+     *
+     * @param {string} addr - account address of darwinia
      */
-    public async getBalance(): Promise<string> {
-        const account = await this.ap.query.system.account(this.account.address);
+    public async getBalance(addr: string): Promise<string> {
+        const account = await this.ap.query.system.account(addr);
         return account.data.free.toString();
     }
 

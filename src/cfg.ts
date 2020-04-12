@@ -2,6 +2,9 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 
+import rawDj from "./json/dj.json";
+import rawTj from "./json/types.json";
+
 export interface IConfig {
     node: string;
     seed: string;
@@ -42,28 +45,24 @@ export class Config {
         }
 
         // load dj.json
-        let cs: string = "";
+        let dj: IConfig = rawDj;
         if (!fs.existsSync(cfgPath)) {
-            cs = fs.readFileSync("./json/dj.json", "utf8");
-            fs.writeFileSync(cfgPath, cs);
+            fs.writeFileSync(cfgPath, dj);
         } else {
-            cs = fs.readFileSync(cfgPath, "utf8");
+            dj = JSON.parse(fs.readFileSync(cfgPath, "utf8"));
         }
 
         // load types.json
-        let ts: string = "";
-        if (!fs.existsSync(cfgPath)) {
-            ts = fs.readFileSync("./json/types.json", "utf8");
-            fs.writeFileSync(cfgPath, cs);
+        let tj: Record<string, any> = rawTj;
+        if (!fs.existsSync(typesPath)) {
+            fs.writeFileSync(typesPath, tj);
         } else {
-            ts = fs.readFileSync(cfgPath, "utf8");
+            tj = JSON.parse(fs.readFileSync(typesPath, "utf8"));
         }
 
         // load config
-        const cj: IConfig = JSON.parse(cs);
-        const tj: IConfig = JSON.parse(ts);
-        this.node = cj.node;
-        this.seed = cj.seed;
+        this.node = dj.node;
+        this.seed = dj.seed;
         this.types = tj;
     }
 }

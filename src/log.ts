@@ -191,3 +191,16 @@ log.ok = (s: string): void => {
         flush(chalk.green("ok"), s);
     }
 };
+
+/**
+ * log ok and quit process
+ *
+ * @description - only support in nodejs
+ * @param {String} s - the log context
+ */
+log.ox = (s: string): void => {
+    if (shouldOutputLog(Logger.Ok)) {
+        flush(chalk.green("ok"), s);
+        process.exit(0);
+    }
+};

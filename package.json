@@ -1,6 +1,6 @@
 {
     "name": "@darwinia-network/darwinia.js",
-    "version": "0.1.1",
+    "version": "0.1.6",
     "description": "Javascript library for darwinia",
     "main": "lib/index.js",
     "repository": {
@@ -13,24 +13,30 @@
     "publishConfig": {
         "registry": "https://npm.pkg.github.com/"
     },
+    "bin": {
+        "dj": "lib/src/bin/dj.js"
+    },
     "files": [
         "lib/**/*"
     ],
+    "main": "lib/index.js",
     "dependencies": {
         "@polkadot/api": "^1.9.1",
         "@polkadot/keyring": "^2.8.1",
         "@polkadot/util": "^2.7.1",
+        "@polkadot/util-crypto": "^2.7.1",
         "ethereumjs-util": "^6.2.0",
         "yargs": "^15.3.1"
     },
     "devDependencies": {
         "@polkadot/types": "^1.9.1",
+        "@types/yargs": "^15.0.4",
         "husky": "^4.2.3",
         "ts-lint": "^4.5.1",
         "typescript": "^3.8.3"
     },
     "scripts": {
-        "build": "tsc --strict",
+        "build": "tsc --strict && cp -r src/json lib/src/json",
         "lint": "tsc --strict --noEmit && tslint src/**/*.ts --type-check"
     },
     "husky": {
