@@ -1,41 +1,89 @@
-#!/usr/bin/env ts-node
-
-import fs from "fs";
-import path from "path";
 import yargs from "yargs";
 
+import { ExResult } from "../api";
 import { log } from "../log";
-import { autoAPI } from "../utils";
+import { autoAPI, autoWeb3, whereisPj } from "../utils";
+
 
 // main
 (async () => {
-    const pj: Record<string, any> = JSON.parse(fs.readFileSync(
-        path.resolve(__dirname, "../../package.json"), "utf8",
-    ));
+    // enable logger
+    if (process.env.LOGGER === undefined) {
+        process.env.LOGGER = "ALL";
+    }
 
     // parser
     yargs
-        .usage("darwinia.js <hello@darwinia.network>")
+        .usage("dj <hello@darwinia.network>")
         .help("help").alias("help", "h")
-        .version("version", pj.version).alias("version", "V")
-        .command("getBalance", "get balance of darwinia account", async (yargs: yargs.Argv) => {
-            yargs.positional("address", {
-                default: "",
-                describe: [
-                    "address of darwinia account, if empty, will ",
-                    "get balance of your account in `~/.darwinia/dj.json`",
-                ].join(""),
-            });
-        }, async (argv: yargs.Arguments) => {
-            const api = await autoAPI();
-            let addr = (argv.address as string);
-            if (addr === "") {
-                addr = api.account.address;
-            }
+        .version("version", whereisPj().version).alias("version", "V")
+        .command({
+            builder: (yargs: yargs.Argv) => yargs.default("address", ""),
+            command: "balance [address]",
+            describe: "Get balance of darwinia account",
+            handler: async (argv: yargs.Arguments) => {
+                const api = await autoAPI();
+                let addr = (argv.address as string);
+                if (addr === "") {
+                    addr = api.account.address;
+                }
 
-            const balance = await api.getBalance(addr);
-            log.ox(balance + " RING 💰");
-            process.exit(0);
+                const balance = await api.getBalance(addr).catch((e: any) => {
+                    log.err(e);
+                    log.ex("get balance failed");
+                });
+
+                log.ox(balance + " RING 💰");
+            },
+        })
+        .command({
+            builder: (yargs: yargs.Argv) => yargs.default("block", 0),
+            command: "reset [block]",
+            describe: "Reset genesis eth header in darwinia",
+            handler: async (argv: yargs.Arguments) => {
+                const api = await autoAPI();
+                const web3 = await autoWeb3();
+                const block = await web3.getBlock((argv.block as string));
+                log.trace(JSON.stringify(block, null, 2));
+
+                const res = await api.reset(block).catch((e: ExResult) => {
+                    log.ex(e.toString());
+                });
+
+                log.ox(`reset header succeed 📦 - ${(res as ExResult).toString()}`);
+            },
+        })
+        .command({
+            builder: (yargs: yargs.Argv) => yargs.default("block", 1),
+            command: "relay [block]",
+            describe: "Relay eth header to darwinia",
+            handler: async (argv: yargs.Arguments) => {
+                const api = await autoAPI();
+                const web3 = await autoWeb3();
+                const block = await web3.getBlock((argv.block as string));
+                log.trace(JSON.stringify(block, null, 2));
+
+                const res = await api.relay(block).catch((e: ExResult) => {
+                    log.ex(e.toString());
+                });
+
+                log.ox(`relay header succeed 🎉 - ${(res as ExResult).toString()}`);
+            },
+        }).command({
+            builder: {},
+            command: "transfer <address> <amount>",
+            describe: "Relay eth header to darwinia",
+            handler: async (argv: yargs.Arguments) => {
+                const api = await autoAPI();
+                const res = await api.transfer(
+                    (argv.address as string),
+                    (argv.amount as number),
+                ).catch((e: ExResult) => {
+                    log.ex(e.toString());
+                });
+
+                log.ox(`transfer succeed 💰 - ${(res as ExResult).toString()}`);
+            },
         }).argv;
 
     // show help if no inputs

@@ -3,18 +3,18 @@ import { bufferToU8a, u8aToHex } from "@polkadot/util";
 import { rlp } from "ethereumjs-util";
 
 export interface IEthBlock {
-    mixHash: string;
+    mixHash?: string;
     nonce: string | number;
     parentHash: string;
     timestamp: string | number;
     number: string | number;
     miner: string;
     totalDifficulty: string | number;
-    transactionsRoot: string;
+    transactionsRoot?: string;
     sha3Uncles: string;
     extraData: string;
     stateRoot: string;
-    receiptsRoot: string;
+    receiptsRoot?: string;
     transactions: string[];
     uncles: string[];
     logsBloom: string;
@@ -36,11 +36,11 @@ export interface IDarwiniaEthBlock {
     log_bloom: string;
     number: string | number;
     parent_hash: string;
-    receipts_root: string;
+    receipts_root?: string;
     seal: string[];
     state_root: string;
     timestamp: string | number;
-    transaction_root: string;
+    transaction_root?: string;
     uncles_hash: string;
 }
 
@@ -54,7 +54,12 @@ export class Block {
      * @param {IEthBlock} block - Ethereum block
      */
     public static from(block: IEthBlock): Block {
-        const mixh = bufferToU8a(rlp.encode(block.mixHash));
+        let mh = block.mixHash;
+        if (mh === undefined)  {
+            mh = "";
+        }
+
+        const mixh = bufferToU8a(rlp.encode(mh));
         const nonce = bufferToU8a(rlp.encode(block.nonce));
         const seal = [u8aToHex(mixh), u8aToHex(nonce)];
 
@@ -87,11 +92,11 @@ export class Block {
     public log_bloom: string;
     public number: string | number;
     public parent_hash: string;
-    public receipts_root: string;
+    public receipts_root?: string;
     public seal: string[];
     public state_root: string;
     public timestamp: string | number;
-    public transaction_root: string;
+    public transaction_root?: string;
     public uncles_hash: string;
 
     constructor() {

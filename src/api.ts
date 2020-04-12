@@ -9,8 +9,6 @@ import { cryptoWaitReady } from "@polkadot/util-crypto";
 import { IDarwiniaEthBlock } from "./block";
 import { log } from "./log";
 
-export type ExResult = IExOk | ExError;
-
 export interface IErrorDoc {
     name: string;
     section: string;
@@ -23,34 +21,48 @@ export interface IReceipt {
     header_hash: string;
 }
 
-export interface IExOk {
-    blockHash: string;
-    exHash: string;
-}
 
 /**
- * Extrinsic Error
+ * Extrinsic Result
  *
- * @property {String} name - Error name
- * @property {String} section - Error section
- * @property {String} documentation - Error documentation
+ * @property {String} isOk - If extrinsic is ok
+ * @property {String} isErr - If extrinsic is error
+ * @property {String} blockHash - the hash of the block which contains our extrinsic
+ * @property {String} exHash - Extrinsic hash
+ * @property {IErrorDoc | undefined} docs - Extrinsic error doc
  */
-export class ExError {
-    public name: string;
-    public section: string;
-    public documentation: string[];
-
-    constructor(doc: IErrorDoc) {
-        this.name = doc.name;
-        this.section = doc.section;
-        this.documentation = doc.documentation;
-    }
+export class ExResult {
+    public isOk: boolean;
+    public isErr: boolean;
+    public exHash: string;
+    public blockHash: string;
+    public docs?: IErrorDoc;
 
     /**
-     * convert extrinsic doc into string
+     * Extrinsic Result
+     *
+     * @param {String} isOk - if extrinsic is ok
+     * @param {String} blockHash - the hash of the block which contains our extrinsic
+     * @param {String} exHash - Extrinsic hash
+     * @param {IErrorDoc | undefined} docs - Extrinsic error doc
      */
+    constructor(isOk: boolean, blockHash: string, exHash: string, docs?: IErrorDoc) {
+        this.isOk = isOk;
+        this.isErr = !isOk;
+        this.blockHash = blockHash;
+        this.exHash = exHash;
+        this.docs = docs;
+    }
+
     public toString(): string {
-        return `${this.name}.${this.section} - ${this.documentation.join(" ").slice(1)}`;
+        if (this.docs) {
+            return [
+                `${this.docs.name}.${this.docs.section} `,
+                `- ${this.docs.documentation.join(" ").slice(1)}`,
+            ].join("");
+        } else {
+            return this.exHash;
+        }
     }
 }
 
@@ -218,15 +230,28 @@ export class API {
                             );
 
                             if ((r.event.data[0] as DispatchError).isModule) {
-                                let doc = await this.ap.registry.findMetaError(
+                                const doc = await this.ap.registry.findMetaError(
                                     (r.event.data[0] as DispatchError).asModule.toU8a(),
                                 );
-                                let err = new ExError(doc);
+
+                                const err = new ExResult(
+                                    false,
+                                    blockHash,
+                                    ex.hash.toString(),
+                                    doc,
+                                );
+
                                 reject(err);
                             }
                         });
                     }
                 } else {
+                    let res = new ExResult(
+                        false,
+                        blockHash,
+                        ex.hash.toString(),
+                    );
+
                     if (status.isInvalid) {
                         log.warn("Invalid Extrinsic");
                     } else if (status.isRetracted) {
@@ -234,13 +259,10 @@ export class API {
                     } else if (status.isUsurped) {
                         log.warn("Extrinsic Usupred");
                     } else if (status.isFinalized) {
+                        res.isOk = true;
                         log.trace(`Finalized block hash: ${blockHash}`);
+                        resolve(res);
                     }
-
-                    resolve({
-                        blockHash,
-                        exHash: ex.hash.toString(),
-                    });
                 }
             });
         });

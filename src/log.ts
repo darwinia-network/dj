@@ -130,7 +130,7 @@ function flush(label: string, context: string): void {
  */
 export function log(s: string) {
     if (shouldOutputLog(Logger.Info)) {
-        flush(chalk.cyan.dim("info"), s);
+        flush(chalk.cyan.dim("info"), chalk.dim(s));
     }
 }
 
@@ -148,7 +148,7 @@ log.warn = (s: string): void => {
  */
 log.trace = (s: string): void => {
     if (shouldOutputLog(Logger.Trace)) {
-        flush(chalk.dim("trace"), s);
+        flush(chalk.cyan.dim("trace"), chalk.dim(s));
     }
 };
 

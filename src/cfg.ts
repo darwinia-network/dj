@@ -6,8 +6,10 @@ import rawDj from "./json/dj.json";
 import rawTj from "./json/types.json";
 
 export interface IConfig {
+    ethSk: string;
     node: string;
     seed: string;
+    web3: string;
 }
 
 /**
@@ -22,11 +24,13 @@ export interface IConfig {
  */
 export class Config {
     public cfgPath: string;
+    public ethSk: string;
     public node: string;
     public rootPath: string;
     public seed: string;
     public types: Record<string, any>;
     public typesPath: string;
+    public web3: string;
 
     constructor() {
         const home = os.homedir();
@@ -61,8 +65,10 @@ export class Config {
         }
 
         // load config
+        this.ethSk = dj.ethSk;
         this.node = dj.node;
         this.seed = dj.seed;
+        this.web3 = dj.web3;
         this.types = tj;
     }
 }

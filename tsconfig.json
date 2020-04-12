@@ -11,6 +11,7 @@
         "noImplicitAny": true,
         "resolveJsonModule": true,
         "sourceMap": true,
+        "skipLibCheck": true,
         "target": "es6"
     },
     "include": [
