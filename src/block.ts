@@ -2,7 +2,7 @@
 import { bufferToU8a, u8aToHex } from "@polkadot/util";
 import { rlp } from "ethereumjs-util";
 
-export interface EthBlock {
+export interface IEthBlock {
     mixHash: string;
     nonce: string | number;
     parentHash: string;
@@ -26,7 +26,7 @@ export interface EthBlock {
     hash: string;
 }
 
-export interface DarwiniaEthBlock {
+export interface IDarwiniaEthBlock {
     auth: string;
     difficulty: string | number;
     extra_data: string;
@@ -51,9 +51,9 @@ export class Block {
     /**
      * Generate Darwinia style Ethereum block from raw Ethereum block
      *
-     * @param block EthBlock - Ethereum block
+     * @param {IEthBlock} block - Ethereum block
      */
-    public static from(block: EthBlock): Block {
+    public static from(block: IEthBlock): Block {
         const mixh = bufferToU8a(rlp.encode(block.mixHash));
         const nonce = bufferToU8a(rlp.encode(block.nonce));
         const seal = [u8aToHex(mixh), u8aToHex(nonce)];
@@ -115,9 +115,9 @@ export class Block {
     /**
      * convert darwinia block class to json
      *
-     * @returns block DarwiniaEthBlock - darwinia eth block in json
+     * @returns {DarwiniaEthBlock} block - darwinia eth block in json
      */
-    public toJson(): DarwiniaEthBlock {
+    public toJson(): IDarwiniaEthBlock {
         return {
             auth: this.auth,
             difficulty: this.difficulty,
@@ -140,7 +140,7 @@ export class Block {
     /**
      * stringify and pretty darwinia block
      *
-     * @returns block string - darwinia block in string
+     * @returns {String} block - darwinia block in string
      */
     public toString(): string {
         return JSON.stringify(this.toJson(), null, 2);

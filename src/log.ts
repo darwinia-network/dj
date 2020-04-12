@@ -7,6 +7,7 @@ export enum Logger {
     Error,
     Event,
     Info,
+    Ok,
     Trace,
     Wait,
     Warn,
@@ -17,8 +18,26 @@ export enum LoggerEnv {
     Error,
     Info,
     None,
-    Trace,
 }
+
+const FIXED_LOGS = [
+    Logger.Error,
+];
+
+const INFO_LOGS = [
+    Logger.Info,
+    Logger.Ok,
+];
+
+const ALL_LOGS = [
+    Logger.Error,
+    Logger.Event,
+    Logger.Info,
+    Logger.Ok,
+    Logger.Trace,
+    Logger.Wait,
+    Logger.Warn,
+];
 
 /**
  * @description - check if we are under browser
@@ -50,12 +69,12 @@ export function loggerEnv(): LoggerEnv {
     switch (label.toLowerCase()) {
         case "error":
             return LoggerEnv.Error;
-        case "info":
-            return LoggerEnv.Info;
-        case "trace":
-            return LoggerEnv.Trace;
-        default:
+        case "none":
+            return LoggerEnv.None;
+        case "all":
             return LoggerEnv.All;
+        default:
+            return LoggerEnv.Info;
     }
 }
 
@@ -66,17 +85,29 @@ export function loggerEnv(): LoggerEnv {
  */
 export function shouldOutputLog(label: Logger): boolean {
     const env: LoggerEnv = loggerEnv();
+    let logs: Logger[] = FIXED_LOGS;
 
-    if ((env === LoggerEnv.Info &&
-        label !== Logger.Info &&
-        label !== Logger.Error
-    ) || (env === LoggerEnv.Error &&
-        label !== Logger.Error
-        ) || env === LoggerEnv.None) {
-        return false;
+    switch (env) {
+        case LoggerEnv.All:
+            logs = logs.concat(ALL_LOGS);
+            break;
+        case LoggerEnv.None:
+            logs = [];
+            break;
+        case LoggerEnv.Error:
+            break;
+        default:
+            logs = logs.concat(INFO_LOGS);
+            break;
     }
 
-    return true;
+    for (let i in logs) {
+        if (logs[i] === label) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /**
@@ -115,6 +146,15 @@ log.warn = (s: string): void => {
 /**
  * @param s string - the log out string
  */
+log.trace = (s: string): void => {
+    if (shouldOutputLog(Logger.Trace)) {
+        flush(chalk.dim("trace"), s);
+    }
+};
+
+/**
+ * @param s string - the log out string
+ */
 log.wait = (s: string): void => {
     if (shouldOutputLog(Logger.Wait)) {
         flush(chalk.cyan("wait"), s);
@@ -138,6 +178,18 @@ log.err = (s: string): void => {
 log.ex = (s: string): void => {
     if (shouldOutputLog(Logger.Error)) {
         flush(chalk.red("error"), s);
+        process.exit(1);
+    }
+};
+
+/**
+ * log error and quit process,
+ * @description - only support in nodejs
+ * @param s string - the log context
+ */
+log.ok = (s: string): void => {
+    if (shouldOutputLog(Logger.Ok)) {
+        flush(chalk.green("ok"), s);
         process.exit(1);
     }
 };

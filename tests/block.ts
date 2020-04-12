@@ -1,7 +1,7 @@
-import { Block, EthBlock, log } from "../index";
+import { Block, IEthBlock, log } from "../index";
 
 (() => {
-    const JSON: EthBlock = {
+    const JSON: IEthBlock = {
         difficulty: "17171480576",
         extraData: "0x476574682f76312e302e302f6c696e75782f676f312e342e32",
         gasLimit: 5000,

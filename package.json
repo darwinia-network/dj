@@ -9,7 +9,7 @@
     },
     "author": "darwinia-network <hello@darwinia.network>",
     "license": "GPL-3.0",
-        "homepage": "https://github.com/darwinia-network/darwinia.js",
+    "homepage": "https://github.com/darwinia-network/darwinia.js",
     "publishConfig": {
         "registry": "https://npm.pkg.github.com/"
     },
@@ -17,17 +17,21 @@
         "lib/**/*"
     ],
     "dependencies": {
+        "@polkadot/api": "^1.9.1",
+        "@polkadot/keyring": "^2.8.1",
         "@polkadot/util": "^2.7.1",
-        "ethereumjs-util": "^6.2.0"
+        "ethereumjs-util": "^6.2.0",
+        "yargs": "^15.3.1"
     },
     "devDependencies": {
+        "@polkadot/types": "^1.9.1",
         "husky": "^4.2.3",
         "ts-lint": "^4.5.1",
         "typescript": "^3.8.3"
     },
     "scripts": {
         "build": "tsc --strict",
-        "lint": "tslint --project ./tsconfig.json --type-check --fix"
+        "lint": "tsc --strict --noEmit && tslint --project ./tsconfig.json --type-check"
     },
     "husky": {
         "hooks": {
