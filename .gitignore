@@ -1,8 +1,5 @@
-# auto-gen
-/lib/**/*
-/node_modules/**/*
-/.log
-
-# local tmp files
-/yarn.lock
 **/*.DS_Store
+**/*.lock
+**/*.log
+**/*lib
+**/*node_modules

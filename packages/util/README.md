@@ -1,71 +1,9 @@
-<h1 align="center">
-𝒹𝒶𝓇𝓌𝒾𝓃𝒾𝒶.𝒿𝓈
-</h1>
-
-[![Node.js CI][workflow-badge]][github]
+# @darwinia/util
 
 ## SPEC
 
-Gather common javascript usages for darwinia.
+Utils for developing darwinia javascript library.
 
-## NOTE
-
-**Please make sure you have added github npm registry to your `~/.npmrc`** for `@darwinia-network`, for example:
-
-```npmrc
-// add github registry for `@darwinia-network`
-@darwinia-network:registry=https://npm.pkg.github.com
-registry=https://registry.npmjs.org/
-//...
-```
-
-## CLI
-
-Install darwinia.js globally
-
-```shell
-yarn global add @darwinia-network/darwinia.js
-```
-
-Input <kbd>dj</kbd> to your command-line.
-
-```text
- 𝝺 ts-node src/bin/dj.ts            
-dj <hello@darwinia.network>
-
-Commands:
-  dj.ts balance [address]            Get balance of darwinia account
-  dj.ts config [edit]                show config
-  dj.ts reset [block]                Reset genesis eth header in darwinia
-  dj.ts relay [block]                Relay eth header to darwinia
-  dj.ts transfer <address> <amount>  Relay eth header to darwinia
-
-Options:
-  --help, -h     Show help                                             [boolean]
-  --version, -V  Show version number                                   [boolean]
-```
-
-## Library
-
-### API
-
-```javascript
-import { autoAPI } from "@darwinia-network/darwinia.js";
-
-(async () => {
-    const api = await autoAPI();
-    const balance = await api.getBalance(api.account.address);
-    log(balance);
-})();
-```
-
-| method     | params                         | return          |
-|------------|--------------------------------|-----------------|
-| getBalance | (addr: string)                 | balance: string |
-| reset      | (block: string/number)         | res: ExResult   |
-| relay      | (block: string/number)         | res: ExResult   |
-| transfer   | (addr: string, amount: number) | res: ExResult   |
-| redeem     | (receipt: IReceipt)            | res: ExResult   |
 
 ### Config
 
@@ -146,6 +84,4 @@ Available Enviroments: `[ALL, INFO]`
 
 GPL-3.0
 
-[github]: https://github.com/darwinia-network/darwinia.js
-[workflow-badge]: https://github.com/darwinia-network/darwinia.js/workflows/Node.js%20CI/badge.svg
 [types.json]: https://github.com/darwinia-network/darwinia/blob/master/runtime/crab/types.json

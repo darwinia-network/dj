@@ -88,12 +88,10 @@ files will generate automatically.
 
 ```json
 {
-  "eth": {
-    "node": "",
-    "secret": ""
-  },
-  "node": "ws://0.0.0.0:9944",
-  "seed": "//Alice"
+    "ethSk": "",
+    "node": "ws://0.0.0.0:9944",
+    "seed": "//Alice",
+    "web3": ""
 }
 ```
 
