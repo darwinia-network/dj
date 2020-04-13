@@ -98,12 +98,10 @@ export class Config {
      * print config to string
      */
     public toString(): string {
-        return [
-            `ethSk    ${this.eth.secret}`,
-            `node     ${this.node}`,
-            `seed     ${this.seed}`,
-            `web3     ${this.eth.node}`,
-            `\n<config path>: ${this.path.conf}`,
-        ].join("\n");
+        return JSON.stringify(
+            fs.readFileSync(this.path.conf, "utf8"),
+            null,
+            2
+        );
     }
 }

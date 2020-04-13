@@ -1,11 +1,8 @@
 #!/usr/bin/env node
 import child_process from "child_process";
+import { autoAPI, autoWeb3, ExResult } from "@darwinia/api";
+import { Config, log, whereisPj } from "@darwinia/util";
 import yargs from "yargs";
-
-import { ExResult } from "../api";
-import { Config } from "../cfg";
-import { log } from "../log";
-import { autoAPI, autoWeb3, whereisPj } from "../utils";
 
 
 // main
@@ -47,11 +44,11 @@ import { autoAPI, autoWeb3, whereisPj } from "../utils";
                 const cfg = new Config();
 
                 if ((argv.edit as boolean)) {
-                    child_process.spawnSync("vi", [cfg.cfgPath], {
+                    child_process.spawnSync("vi", [cfg.path.conf], {
                         stdio: "inherit",
                     });
                 } else {
-                    log.n(cfg.toString());
+                    log.n(JSON.parse(cfg.toString()));
                 }
             },
         })

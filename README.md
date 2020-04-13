@@ -8,18 +8,8 @@
 
 Gather common javascript usages for darwinia.
 
-## NOTE
 
-**Please make sure you have added github npm registry to your `~/.npmrc`** for `@darwinia-network`, for example:
-
-```npmrc
-// add github registry for `@darwinia-network`
-@darwinia-network:registry=https://npm.pkg.github.com
-registry=https://registry.npmjs.org/
-//...
-```
-
-## CLI
+## @darwinia/dj
 
 Install darwinia.js globally
 
@@ -45,9 +35,8 @@ Options:
   --version, -V  Show version number                                   [boolean]
 ```
 
-## Library
 
-### API
+## @darwinia/api
 
 ```javascript
 import { autoAPI } from "@darwinia-network/darwinia.js";
@@ -66,6 +55,8 @@ import { autoAPI } from "@darwinia-network/darwinia.js";
 | relay      | (block: string/number)         | res: ExResult   |
 | transfer   | (addr: string, amount: number) | res: ExResult   |
 | redeem     | (receipt: IReceipt)            | res: ExResult   |
+
+## @darwinia/util
 
 ### Config
 

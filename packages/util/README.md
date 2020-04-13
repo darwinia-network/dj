@@ -1,5 +1,7 @@
 # @darwinia/util
 
+[![Node.js CI][workflow-badge]][github]
+
 ## SPEC
 
 Utils for developing darwinia javascript library.
@@ -84,4 +86,6 @@ Available Enviroments: `[ALL, INFO]`
 
 GPL-3.0
 
+[github]: https://github.com/darwinia-network/darwinia.js
+[workflow-badge]: https://github.com/darwinia-network/darwinia.js/workflows/Node.js%20CI/badge.svg
 [types.json]: https://github.com/darwinia-network/darwinia/blob/master/runtime/crab/types.json

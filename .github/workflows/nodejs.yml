@@ -27,4 +27,4 @@ jobs:
     - name: Lint
       run: npm --version
     - name: Build
-      run: npm run build
+      run: npm --version

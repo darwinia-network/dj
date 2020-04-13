@@ -244,7 +244,7 @@ export class API {
                         });
                     }
                 } else {
-                    let res = new ExResult(
+                    const res = new ExResult(
                         false,
                         blockHash,
                         ex.hash.toString(),
