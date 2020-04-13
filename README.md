@@ -14,7 +14,7 @@ Gather common javascript usages for darwinia.
 Install darwinia.js globally
 
 ```shell
-yarn global add @darwinia-network/darwinia.js
+yarn global add @darwinia/dj
 ```
 
 Input <kbd>dj</kbd> to your command-line.
@@ -38,6 +38,10 @@ Options:
 
 ## @darwinia/api
 
+```
+yarn add @darwinia/api
+```
+
 ```javascript
 import { autoAPI } from "@darwinia-network/darwinia.js";
 
@@ -57,6 +61,10 @@ import { autoAPI } from "@darwinia-network/darwinia.js";
 | redeem     | (receipt: IReceipt)            | res: ExResult   |
 
 ## @darwinia/util
+
+```
+yarn add @darwinia/util
+```
 
 ### Config
 

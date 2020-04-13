@@ -10,7 +10,7 @@ export function whereisPj(): Record<string, any> {
     let ptr = __dirname;
     let pj: Record<string, any> = {"": ""};
 
-    while (pj === undefined) {
+    while (pj.version === undefined) {
         const files = fs.readdirSync(ptr);
         files.forEach((f: string) => {
             if (f === "package.json") {

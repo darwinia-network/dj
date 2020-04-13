@@ -13,17 +13,17 @@ import yargs from "yargs";
     }
 
     // parser
-    yargs
+    const _ = yargs
         .usage("dj <hello@darwinia.network>")
         .help("help").alias("help", "h")
         .version("version", whereisPj().version).alias("version", "V")
         .command({
-            builder: (yargs: yargs.Argv) => yargs.default("address", ""),
+            builder: (argv: yargs.Argv) => argv.default("address", ""),
             command: "balance [address]",
             describe: "Get balance of darwinia account",
-            handler: async (argv: yargs.Arguments) => {
+            handler: async (args: yargs.Arguments) => {
                 const api = await autoAPI();
-                let addr = (argv.address as string);
+                let addr = (args.address as string);
                 if (addr === "") {
                     addr = api.account.address;
                 }
@@ -37,13 +37,13 @@ import yargs from "yargs";
             },
         })
         .command({
-            builder: (yargs: yargs.Argv) => yargs.default("edit", false),
+            builder: (argv: yargs.Argv) => argv.default("edit", false),
             command: "config [edit]",
             describe: "show config",
-            handler: (argv: yargs.Arguments) => {
+            handler: (args: yargs.Arguments) => {
                 const cfg = new Config();
 
-                if ((argv.edit as boolean)) {
+                if ((args.edit as boolean)) {
                     child_process.spawnSync("vi", [cfg.path.conf], {
                         stdio: "inherit",
                     });
@@ -53,13 +53,13 @@ import yargs from "yargs";
             },
         })
         .command({
-            builder: (yargs: yargs.Argv) => yargs.default("block", 0),
+            builder: (argv: yargs.Argv) => argv.default("block", 0),
             command: "reset [block]",
             describe: "Reset genesis eth header in darwinia",
-            handler: async (argv: yargs.Arguments) => {
+            handler: async (args: yargs.Arguments) => {
                 const api = await autoAPI();
                 const web3 = await autoWeb3();
-                const block = await web3.getBlock((argv.block as string));
+                const block = await web3.getBlock((args.block as string));
                 log.trace(JSON.stringify(block, null, 2));
 
                 const res = await api.reset(block).catch((e: ExResult) => {
@@ -70,13 +70,13 @@ import yargs from "yargs";
             },
         })
         .command({
-            builder: (yargs: yargs.Argv) => yargs.default("block", 1),
+            builder: (argv: yargs.Argv) => argv.default("block", 1),
             command: "relay [block]",
             describe: "Relay eth header to darwinia",
-            handler: async (argv: yargs.Arguments) => {
+            handler: async (args: yargs.Arguments) => {
                 const api = await autoAPI();
                 const web3 = await autoWeb3();
-                const block = await web3.getBlock((argv.block as string));
+                const block = await web3.getBlock((args.block as string));
                 log.trace(JSON.stringify(block, null, 2));
 
                 const res = await api.relay(block).catch((e: ExResult) => {
@@ -89,11 +89,11 @@ import yargs from "yargs";
             builder: {},
             command: "transfer <address> <amount>",
             describe: "Relay eth header to darwinia",
-            handler: async (argv: yargs.Arguments) => {
+            handler: async (args: yargs.Arguments) => {
                 const api = await autoAPI();
                 const res = await api.transfer(
-                    (argv.address as string),
-                    (argv.amount as number),
+                    (args.address as string),
+                    (args.amount as number),
                 ).catch((e: ExResult) => {
                     log.ex(e.toString());
                 });

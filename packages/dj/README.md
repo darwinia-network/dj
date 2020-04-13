@@ -2,14 +2,11 @@
 
 [![Node.js CI][workflow-badge]][github]
 
-## SPEC
-
 darwinia.js command-line tools
 
+## Usage
 
-## DJ
-
-Install darwinia.js globally
+Install `dj` globally
 
 ```shell
 yarn global add @darwinia/dj

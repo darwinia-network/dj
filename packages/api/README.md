@@ -1,6 +1,6 @@
-<h1 align="center">
-𝒹𝒶𝓇𝓌𝒾𝓃𝒾𝒶.𝒿𝓈
-</h1>
+# @darwinia/api
+
+[![Node.js CI][workflow-badge]][github]
 
 ## SPEC
 
@@ -31,4 +31,6 @@ import { autoAPI } from "@darwinia-network/darwinia.js";
 
 GPL-3.0
 
-[types.json]: https://github.com/darwinia-network/darwinia/blob/master/runtime/crab/types.json
+[github]: https://github.com/darwinia-network/darwinia.js
+[workflow-badge]: https://github.com/darwinia-network/darwinia.js/workflows/Node.js%20CI/badge.svg
+
