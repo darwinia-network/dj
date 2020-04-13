@@ -27,7 +27,7 @@ export interface IEthBlock {
 }
 
 export interface IDarwiniaEthBlock {
-    auth: string;
+    author: string;
     difficulty: string | number;
     extra_data: string;
     hash: string;
@@ -40,7 +40,7 @@ export interface IDarwiniaEthBlock {
     seal: string[];
     state_root: string;
     timestamp: string | number;
-    transaction_root?: string;
+    transactions_root?: string;
     uncles_hash: string;
 }
 
@@ -64,7 +64,7 @@ export class Block {
         const seal = [u8aToHex(mixh), u8aToHex(nonce)];
 
         const darwiniaBlock = new Block();
-        darwiniaBlock.auth = block.miner;
+        darwiniaBlock.author = block.miner;
         darwiniaBlock.difficulty = block.difficulty;
         darwiniaBlock.extra_data = block.extraData;
         darwiniaBlock.gas_limit = block.gasLimit;
@@ -77,13 +77,13 @@ export class Block {
         darwiniaBlock.seal = seal;
         darwiniaBlock.state_root = block.stateRoot;
         darwiniaBlock.timestamp = block.timestamp;
-        darwiniaBlock.transaction_root = block.transactionsRoot;
+        darwiniaBlock.transactions_root = block.transactionsRoot;
         darwiniaBlock.uncles_hash = block.sha3Uncles;
 
         return darwiniaBlock;
     }
 
-    public auth: string;
+    public author: string;
     public difficulty: string | number;
     public extra_data: string;
     public hash: string;
@@ -96,11 +96,11 @@ export class Block {
     public seal: string[];
     public state_root: string;
     public timestamp: string | number;
-    public transaction_root?: string;
+    public transactions_root?: string;
     public uncles_hash: string;
 
     constructor() {
-        this.auth = "";
+        this.author = "";
         this.difficulty = 0;
         this.extra_data = "";
         this.hash = "";
@@ -113,7 +113,7 @@ export class Block {
         this.seal = [];
         this.state_root = "";
         this.timestamp = 0;
-        this.transaction_root = "";
+        this.transactions_root = "";
         this.uncles_hash = "";
     }
 
@@ -124,7 +124,7 @@ export class Block {
      */
     public toJson(): IDarwiniaEthBlock {
         return {
-            auth: this.auth,
+            author: this.author,
             difficulty: this.difficulty,
             extra_data: this.extra_data,
             gas_limit: this.gas_limit,
@@ -137,7 +137,7 @@ export class Block {
             seal: this.seal,
             state_root: this.state_root,
             timestamp: this.timestamp,
-            transaction_root: this.transaction_root,
+            transactions_root: this.transactions_root,
             uncles_hash: this.uncles_hash,
         };
     }

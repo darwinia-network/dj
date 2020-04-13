@@ -4,6 +4,7 @@ import path from "path";
 
 import rawDj from "./json/dj.json";
 import rawTj from "./json/types.json";
+import { log } from "./log";
 
 export interface IConfig {
     ethSk: string;
@@ -34,18 +35,18 @@ export class Config {
 
     constructor() {
         const home = os.homedir();
-        const rootPath = path.resolve(home, ".darwinia");
-        const cfgPath = path.resolve(rootPath, "dj.json");
-        const typesPath = path.resolve(rootPath, "types.json");
+        const root = path.resolve(home, ".darwinia");
+        const cfgPath = path.resolve(root, "dj.json");
+        const typesPath = path.resolve(root, "types.json");
 
         // init pathes
         this.cfgPath = cfgPath;
-        this.rootPath = rootPath;
+        this.rootPath = root;
         this.typesPath = typesPath;
 
         // check root dir
-        if (!fs.existsSync(home)) {
-            fs.mkdirSync(home, { recursive: true });
+        if (!fs.existsSync(root)) {
+            fs.mkdirSync(root, { recursive: true });
         }
 
         // load dj.json
@@ -70,5 +71,34 @@ export class Config {
         this.seed = dj.seed;
         this.web3 = dj.web3;
         this.types = tj;
+
+        // warnings
+        if (this.web3 === "") {
+            log.warn([
+                "web3 node has not been configured, ",
+                "edit `~/.darwinia/dj.json` if it is required",
+            ].join(""));
+        }
+
+        if (this.ethSk === "") {
+            log.warn([
+                "eth secret key has not been configured, ",
+                "edit `~/.darwinia/dj.json` if it is required",
+            ].join(""));
+        }
+    }
+
+
+    /**
+     * print config to string
+     */
+    public toString(): string {
+        return [
+            `ethSk    ${this.ethSk}`,
+            `node     ${this.node}`,
+            `seed     ${this.seed}`,
+            `web3     ${this.web3}`,
+            `\n<config path>: ${this.cfgPath}`,
+        ].join("\n");
     }
 }

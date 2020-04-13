@@ -1,6 +1,9 @@
+#!/usr/bin/env node
+import child_process from "child_process";
 import yargs from "yargs";
 
 import { ExResult } from "../api";
+import { Config } from "../cfg";
 import { log } from "../log";
 import { autoAPI, autoWeb3, whereisPj } from "../utils";
 
@@ -34,6 +37,22 @@ import { autoAPI, autoWeb3, whereisPj } from "../utils";
                 });
 
                 log.ox(balance + " RING 💰");
+            },
+        })
+        .command({
+            builder: (yargs: yargs.Argv) => yargs.default("edit", false),
+            command: "config [edit]",
+            describe: "show config",
+            handler: (argv: yargs.Arguments) => {
+                const cfg = new Config();
+
+                if ((argv.edit as boolean)) {
+                    child_process.spawnSync("vi", [cfg.cfgPath], {
+                        stdio: "inherit",
+                    });
+                } else {
+                    log.n(cfg.toString());
+                }
             },
         })
         .command({

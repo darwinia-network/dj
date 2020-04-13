@@ -1,6 +1,6 @@
 {
     "name": "@darwinia-network/darwinia.js",
-    "version": "0.1.8",
+    "version": "0.1.11",
     "description": "Javascript library for darwinia",
     "main": "lib/index.js",
     "repository": {

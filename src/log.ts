@@ -204,3 +204,12 @@ log.ox = (s: string): void => {
         process.exit(0);
     }
 };
+
+/**
+ * common log - console.log
+ *
+ * @param {Any} s - the log context
+ */
+log.n = (s: any): void => {
+    console.log(s);
+};

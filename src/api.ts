@@ -254,10 +254,13 @@ export class API {
 
                     if (status.isInvalid) {
                         log.warn("Invalid Extrinsic");
+                        reject(res);
                     } else if (status.isRetracted) {
                         log.warn("Extrinsic Retracted");
+                        reject(res);
                     } else if (status.isUsurped) {
                         log.warn("Extrinsic Usupred");
+                        reject(res);
                     } else if (status.isFinalized) {
                         res.isOk = true;
                         log.trace(`Finalized block hash: ${blockHash}`);
