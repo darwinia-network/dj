@@ -1,8 +1,8 @@
 {
   "private": false,
-  "name": "@darwinia/util",
-  "version": "0.1.1",
-  "description": "Util for developing darwinia javascript library.",
+  "name": "@darwinia/api",
+  "version": "0.1.0",
+  "description": "High-level darwinia.js api",
   "homepage": "https://github.com/darwinia-network/darwinia.js",
   "repository": {
     "type": "git",
@@ -15,6 +15,8 @@
     "lib/**/*"
   ],
   "dependencies": {
+    "@darwinia/util": "^0.1.1",
+    "@polkadot/api": "^1.10.1",
     "@polkadot/util": "^2.7.1",
     "chalk": "^4.0.0",
     "ethereumjs-util": "^6.2.0"

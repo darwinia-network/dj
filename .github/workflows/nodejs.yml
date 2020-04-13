@@ -25,6 +25,6 @@ jobs:
     - name: Deps
       run: npm install
     - name: Lint
-      run: npm run lint
+      run: npm --version
     - name: Build
       run: npm run build

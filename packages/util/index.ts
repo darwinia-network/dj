@@ -1,9 +1,12 @@
-import { Block } from "./src/block";
+import { Block, IEthBlock, IDarwiniaEthBlock } from "./src/block";
 import { Config } from "./src/cfg";
 import { log } from "./src/log";
+import { whereisPj } from "./src/pj";
 
 export {
     Block,
     Config,
-    log
+    IDarwiniaEthBlock, IEthBlock,
+    log,
+    whereisPj,
 }

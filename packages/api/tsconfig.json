@@ -1,25 +1,25 @@
 {
-    "indent": [true, "spaces", 4],
-    "compilerOptions": {
-        "allowSyntheticDefaultImports": true,
-        "baseUrl": ".",
-        "declaration": true,
-        "esModuleInterop": true,
-        "outDir": "lib",
-        "module": "commonjs",
-        "moduleResolution": "node",
-        "noImplicitAny": true,
-        "resolveJsonModule": true,
-        "sourceMap": true,
-        "skipLibCheck": true,
-        "target": "es6"
-    },
-    "include": [
-        "src/**/*.ts",
-        "tests/**/*.ts"
-    ],
-    "exclude": [
-        "examples",
-        "node_modules"
-    ]
+  "indent": [true, "spaces", 4],
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "declaration": true,
+    "esModuleInterop": true,
+    "outDir": "lib",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "target": "es6"
+  },
+  "include": [
+    "index.ts",
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "examples",
+    "node_modules"
+  ]
 }
