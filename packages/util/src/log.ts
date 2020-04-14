@@ -136,32 +136,6 @@ export function log(s: string) {
     }
 }
 
-/**
- * @param {String} s - the log out string
- */
-log.warn = (s: string): void => {
-    if (shouldOutputLog(Logger.Warn)) {
-        flush(chalk.yellow("warn"), s);
-    }
-};
-
-/**
- * @param {String} s - the log out string
- */
-log.trace = (s: string): void => {
-    if (shouldOutputLog(Logger.Trace)) {
-        flush(chalk.cyan.dim("trace"), chalk.dim(s));
-    }
-};
-
-/**
- * @param {String} s - the log out string
- */
-log.wait = (s: string): void => {
-    if (shouldOutputLog(Logger.Wait)) {
-        flush(chalk.cyan("wait"), s);
-    }
-};
 
 /**
  * @param {String} s - the log out string
@@ -171,6 +145,18 @@ log.err = (s: string): void => {
         flush(chalk.red("error"), s);
     }
 };
+
+/**
+ * common log - console.log
+ *
+ * @param {Any} s - the log context
+ */
+log.event = (s: any): void => {
+    if (shouldOutputLog(Logger.Error)) {
+        flush(chalk.magenta("event"), s);
+    }
+};
+
 
 /**
  * log error and quit process
@@ -185,6 +171,17 @@ log.ex = (s: string): void => {
     }
 };
 
+
+/**
+ * common log - console.log
+ *
+ * @param {Any} msg - the log context
+ */
+log.n = (msg: any): void => {
+    console.log(msg);
+};
+
+
 /**
  * @param {String} s - the log context
  */
@@ -193,6 +190,7 @@ log.ok = (s: string): void => {
         flush(chalk.green("ok"), s);
     }
 };
+
 
 /**
  * log ok and quit process
@@ -207,11 +205,32 @@ log.ox = (s: string): void => {
     }
 };
 
+
 /**
- * common log - console.log
- *
- * @param {Any} s - the log context
+ * @param {String} s - the log out string
  */
-log.n = (s: any): void => {
-    console.log(s);
+log.trace = (s: string): void => {
+    if (shouldOutputLog(Logger.Trace)) {
+        flush(chalk.cyan.dim("trace"), chalk.dim(s));
+    }
+};
+
+
+/**
+ * @param {String} s - the log out string
+ */
+log.wait = (s: string): void => {
+    if (shouldOutputLog(Logger.Wait)) {
+        flush(chalk.cyan("wait"), s);
+    }
+};
+
+
+/**
+ * @param {String} s - the log out string
+ */
+log.warn = (s: string): void => {
+    if (shouldOutputLog(Logger.Warn)) {
+        flush(chalk.yellow("warn"), s);
+    }
 };
