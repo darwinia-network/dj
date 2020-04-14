@@ -1,11 +1,8 @@
 #!/usr/bin/env node
 import child_process from "child_process";
+import { autoAPI, autoWeb3, ExResult } from "@darwinia/api";
+import { Config, log, whereisPj } from "@darwinia/util";
 import yargs from "yargs";
-
-import { ExResult } from "../api";
-import { Config } from "../cfg";
-import { log } from "../log";
-import { autoAPI, autoWeb3, whereisPj } from "../utils";
 
 
 // main
@@ -16,17 +13,17 @@ import { autoAPI, autoWeb3, whereisPj } from "../utils";
     }
 
     // parser
-    yargs
+    const _ = yargs
         .usage("dj <hello@darwinia.network>")
         .help("help").alias("help", "h")
         .version("version", whereisPj().version).alias("version", "V")
         .command({
-            builder: (yargs: yargs.Argv) => yargs.default("address", ""),
+            builder: (argv: yargs.Argv) => argv.default("address", ""),
             command: "balance [address]",
             describe: "Get balance of darwinia account",
-            handler: async (argv: yargs.Arguments) => {
+            handler: async (args: yargs.Arguments) => {
                 const api = await autoAPI();
-                let addr = (argv.address as string);
+                let addr = (args.address as string);
                 if (addr === "") {
                     addr = api.account.address;
                 }
@@ -40,29 +37,29 @@ import { autoAPI, autoWeb3, whereisPj } from "../utils";
             },
         })
         .command({
-            builder: (yargs: yargs.Argv) => yargs.default("edit", false),
+            builder: (argv: yargs.Argv) => argv.default("edit", false),
             command: "config [edit]",
             describe: "show config",
-            handler: (argv: yargs.Arguments) => {
+            handler: (args: yargs.Arguments) => {
                 const cfg = new Config();
 
-                if ((argv.edit as boolean)) {
-                    child_process.spawnSync("vi", [cfg.cfgPath], {
+                if ((args.edit as boolean)) {
+                    child_process.spawnSync("vi", [cfg.path.conf], {
                         stdio: "inherit",
                     });
                 } else {
-                    log.n(cfg.toString());
+                    log.n(JSON.parse(cfg.toString()));
                 }
             },
         })
         .command({
-            builder: (yargs: yargs.Argv) => yargs.default("block", 0),
+            builder: (argv: yargs.Argv) => argv.default("block", 0),
             command: "reset [block]",
             describe: "Reset genesis eth header in darwinia",
-            handler: async (argv: yargs.Arguments) => {
+            handler: async (args: yargs.Arguments) => {
                 const api = await autoAPI();
                 const web3 = await autoWeb3();
-                const block = await web3.getBlock((argv.block as string));
+                const block = await web3.getBlock((args.block as string));
                 log.trace(JSON.stringify(block, null, 2));
 
                 const res = await api.reset(block).catch((e: ExResult) => {
@@ -73,13 +70,13 @@ import { autoAPI, autoWeb3, whereisPj } from "../utils";
             },
         })
         .command({
-            builder: (yargs: yargs.Argv) => yargs.default("block", 1),
+            builder: (argv: yargs.Argv) => argv.default("block", 1),
             command: "relay [block]",
             describe: "Relay eth header to darwinia",
-            handler: async (argv: yargs.Arguments) => {
+            handler: async (args: yargs.Arguments) => {
                 const api = await autoAPI();
                 const web3 = await autoWeb3();
-                const block = await web3.getBlock((argv.block as string));
+                const block = await web3.getBlock((args.block as string));
                 log.trace(JSON.stringify(block, null, 2));
 
                 const res = await api.relay(block).catch((e: ExResult) => {
@@ -92,11 +89,11 @@ import { autoAPI, autoWeb3, whereisPj } from "../utils";
             builder: {},
             command: "transfer <address> <amount>",
             describe: "Relay eth header to darwinia",
-            handler: async (argv: yargs.Arguments) => {
+            handler: async (args: yargs.Arguments) => {
                 const api = await autoAPI();
                 const res = await api.transfer(
-                    (argv.address as string),
-                    (argv.amount as number),
+                    (args.address as string),
+                    (args.amount as number),
                 ).catch((e: ExResult) => {
                     log.ex(e.toString());
                 });

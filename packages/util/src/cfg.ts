@@ -6,43 +6,46 @@ import rawDj from "./json/dj.json";
 import rawTj from "./json/types.json";
 import { log } from "./log";
 
+export interface IConfigPath {
+    conf: string;
+    root: string;
+    types: string;
+}
+
+export interface IEthConfig {
+    node: string;
+    secret: string;
+}
+
 export interface IConfig {
-    ethSk: string;
+    eth: IEthConfig;
     node: string;
     seed: string;
-    web3: string;
 }
 
 /**
  * darwinia.js config
  *
- * @property {String} cfgPath - the path of `dj.json`
+ * @property {IEthConfig} eth - darwinia eth config
+ * @property {IConfigPath} path - darwinia config paths
  * @property {String} node - darwinia node address
- * @property {String} rootPath - the path of `.darwinia`
  * @property {String} seed - darwinia account seed
- * @property {Record<string, any>} types - darwinia types
- * @property {String} typesPath - this path of `types.json`
  */
 export class Config {
-    public cfgPath: string;
-    public ethSk: string;
-    public node: string;
-    public rootPath: string;
-    public seed: string;
-    public types: Record<string, any>;
-    public typesPath: string;
-    public web3: string;
+    eth: IEthConfig;
+    path: IConfigPath;
+    node: string;
+    seed: string;
+    types: Record<string, any>;
 
     constructor() {
         const home = os.homedir();
         const root = path.resolve(home, ".darwinia");
-        const cfgPath = path.resolve(root, "dj.json");
-        const typesPath = path.resolve(root, "types.json");
+        const conf = path.resolve(root, "dj.json");
+        const types = path.resolve(root, "types.json");
 
         // init pathes
-        this.cfgPath = cfgPath;
-        this.rootPath = root;
-        this.typesPath = typesPath;
+        this.path = { conf, root, types };
 
         // check root dir
         if (!fs.existsSync(root)) {
@@ -51,36 +54,38 @@ export class Config {
 
         // load dj.json
         let dj: IConfig = rawDj;
-        if (!fs.existsSync(cfgPath)) {
-            fs.writeFileSync(cfgPath, dj);
+        if (!fs.existsSync(conf)) {
+            fs.writeFileSync(conf, JSON.stringify(dj, null, 2));
         } else {
-            dj = JSON.parse(fs.readFileSync(cfgPath, "utf8"));
+            dj = JSON.parse(fs.readFileSync(conf, "utf8"));
         }
 
         // load types.json
         let tj: Record<string, any> = rawTj;
-        if (!fs.existsSync(typesPath)) {
-            fs.writeFileSync(typesPath, tj);
+        if (!fs.existsSync(types)) {
+            fs.writeFileSync(types, JSON.stringify(tj, null, 2));
         } else {
-            tj = JSON.parse(fs.readFileSync(typesPath, "utf8"));
+            tj = JSON.parse(fs.readFileSync(types, "utf8"));
         }
 
         // load config
-        this.ethSk = dj.ethSk;
+        this.eth = {
+            node: dj.eth.node,
+            secret: dj.eth.secret,
+        }
         this.node = dj.node;
         this.seed = dj.seed;
-        this.web3 = dj.web3;
         this.types = tj;
 
         // warnings
-        if (this.web3 === "") {
+        if (this.eth.node === "") {
             log.warn([
                 "web3 node has not been configured, ",
                 "edit `~/.darwinia/dj.json` if it is required",
             ].join(""));
         }
 
-        if (this.ethSk === "") {
+        if (this.eth.secret === "") {
             log.warn([
                 "eth secret key has not been configured, ",
                 "edit `~/.darwinia/dj.json` if it is required",
@@ -93,12 +98,10 @@ export class Config {
      * print config to string
      */
     public toString(): string {
-        return [
-            `ethSk    ${this.ethSk}`,
-            `node     ${this.node}`,
-            `seed     ${this.seed}`,
-            `web3     ${this.web3}`,
-            `\n<config path>: ${this.cfgPath}`,
-        ].join("\n");
+        return JSON.stringify(
+            fs.readFileSync(this.path.conf, "utf8"),
+            null,
+            2
+        );
     }
 }

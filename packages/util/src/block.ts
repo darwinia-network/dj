@@ -49,6 +49,15 @@ export interface IDarwiniaEthBlock {
  */
 export class Block {
     /**
+     * Parse EthBlock to DarwiniaEthBlock
+     *
+     * @param {IEthBlock} block - Ethereum block
+     */
+    public static parse(block: IEthBlock): IDarwiniaEthBlock {
+        return Block.from(block).toJson();
+    }
+
+    /**
      * Generate Darwinia style Ethereum block from raw Ethereum block
      *
      * @param {IEthBlock} block - Ethereum block
@@ -120,7 +129,7 @@ export class Block {
     /**
      * convert darwinia block class to json
      *
-     * @returns {DarwiniaEthBlock} block - darwinia eth block in json
+     * @return {DarwiniaEthBlock} block - darwinia eth block in json
      */
     public toJson(): IDarwiniaEthBlock {
         return {
@@ -145,7 +154,7 @@ export class Block {
     /**
      * stringify and pretty darwinia block
      *
-     * @returns {String} block - darwinia block in string
+     * @return {String} block - darwinia block in string
      */
     public toString(): string {
         return JSON.stringify(this.toJson(), null, 2);

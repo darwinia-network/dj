@@ -1,13 +1,11 @@
 /* tslint:disable:variable-name */
+import { IDarwiniaEthBlock, log } from "@darwinia/util";
 import { ApiPromise, SubmittableResult, WsProvider } from "@polkadot/api";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import Keyring from "@polkadot/keyring";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { DispatchError, EventRecord } from "@polkadot/types/interfaces/types";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
-
-import { IDarwiniaEthBlock } from "./block";
-import { log } from "./log";
 
 export interface IErrorDoc {
     name: string;
@@ -246,7 +244,7 @@ export class API {
                         });
                     }
                 } else {
-                    let res = new ExResult(
+                    const res = new ExResult(
                         false,
                         blockHash,
                         ex.hash.toString(),

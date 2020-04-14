@@ -101,7 +101,7 @@ export function shouldOutputLog(label: Logger): boolean {
             break;
     }
 
-    for (let i in logs) {
+    for (const i in logs) {
         if (logs[i] === label) {
             return true;
         }
@@ -117,7 +117,7 @@ export function shouldOutputLog(label: Logger): boolean {
  * @param {String} context - the log context
  */
 function flush(label: string, context: string): void {
-    let str = l + label + r + context;
+    const str = l + label + r + context;
     if (label === "error") {
         console.error(str);
     } else {
@@ -126,6 +126,8 @@ function flush(label: string, context: string): void {
 }
 
 /**
+ * Envorinment logger
+ *
  * @param {String} s - the log out string
  */
 export function log(s: string) {

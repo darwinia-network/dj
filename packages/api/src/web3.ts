@@ -1,6 +1,5 @@
 import EWeb3 from "web3";
-import { Block, IDarwiniaEthBlock, IEthBlock } from "./block";
-import { log } from "./log";
+import { Block, IDarwiniaEthBlock, IEthBlock, log } from "@darwinia/util";
 
 /**
  * @class Web3 - web3 api wrapper
@@ -31,7 +30,6 @@ export class Web3 {
     public async getBlock(block: string | number): Promise<IDarwiniaEthBlock> {
         log.trace(`fetch block ${block} from ethereum...`);
         const eBlock: IEthBlock = await this.web3.eth.getBlock(block);
-        const dBlock: Block = Block.from(eBlock);
-        return dBlock.toJson();
+        return Block.parse(eBlock);
     }
 }

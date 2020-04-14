@@ -1,70 +1,11 @@
-<h1 align="center">
-𝒹𝒶𝓇𝓌𝒾𝓃𝒾𝒶.𝒿𝓈
-</h1>
+# @darwinia/util
 
 [![Node.js CI][workflow-badge]][github]
 
 ## SPEC
 
-Gather common javascript usages for darwinia.
+Utils for developing darwinia javascript library.
 
-
-## @darwinia/dj
-
-Install darwinia.js globally
-
-```shell
-yarn global add @darwinia/dj
-```
-
-Input <kbd>dj</kbd> to your command-line.
-
-```text
- 𝝺 ts-node src/bin/dj.ts            
-dj <hello@darwinia.network>
-
-Commands:
-  dj.ts balance [address]            Get balance of darwinia account
-  dj.ts config [edit]                show config
-  dj.ts reset [block]                Reset genesis eth header in darwinia
-  dj.ts relay [block]                Relay eth header to darwinia
-  dj.ts transfer <address> <amount>  Relay eth header to darwinia
-
-Options:
-  --help, -h     Show help                                             [boolean]
-  --version, -V  Show version number                                   [boolean]
-```
-
-
-## @darwinia/api
-
-```
-yarn add @darwinia/api
-```
-
-```javascript
-import { autoAPI } from "@darwinia-network/darwinia.js";
-
-(async () => {
-    const api = await autoAPI();
-    const balance = await api.getBalance(api.account.address);
-    log(balance);
-})();
-```
-
-| method     | params                         | return          |
-|------------|--------------------------------|-----------------|
-| getBalance | (addr: string)                 | balance: string |
-| reset      | (block: string/number)         | res: ExResult   |
-| relay      | (block: string/number)         | res: ExResult   |
-| transfer   | (addr: string, amount: number) | res: ExResult   |
-| redeem     | (receipt: IReceipt)            | res: ExResult   |
-
-## @darwinia/util
-
-```
-yarn add @darwinia/util
-```
 
 ### Config
 
