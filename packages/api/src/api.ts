@@ -119,9 +119,6 @@ export class API {
         const api = await ApiPromise.create({
             provider: new WsProvider(node),
             types,
-        }).catch((e) => {
-            log.trace(JSON.stringify(e));
-            log.ex("init polkadot api failed");
         });
 
         log.trace("init darwinia api succeed");
@@ -207,6 +204,11 @@ export class API {
      */
     private async blockFinalized(ex: SubmittableExtrinsic<"promise">): Promise<ExResult> {
         let blockHash = "";
+        const res = new ExResult(
+            false,
+            blockHash,
+            ex.hash.toString(),
+        );
 
         return await new Promise((resolve, reject) => {
             ex.signAndSend(this.account, {}, (sr: SubmittableResult) => {
@@ -227,6 +229,13 @@ export class API {
                                     r.event.data.toString(),
                             );
 
+                            if (r.event.method.indexOf("Failed")) {
+                                log.err("transaction failed");
+                                res.isOk = false;
+                                res.isErr = true;
+                                reject(res);
+                            }
+
                             if ((r.event.data[0] as DispatchError).isModule) {
                                 const doc = await this.ap.registry.findMetaError(
                                     (r.event.data[0] as DispatchError).asModule.toU8a(),
@@ -244,12 +253,6 @@ export class API {
                         });
                     }
                 } else {
-                    const res = new ExResult(
-                        false,
-                        blockHash,
-                        ex.hash.toString(),
-                    );
-
                     if (status.isInvalid) {
                         log.warn("Invalid Extrinsic");
                         reject(res);

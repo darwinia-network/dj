@@ -8,34 +8,6 @@
 
 Gather common javascript usages for darwinia.
 
-
-## @darwinia/dj
-
-Install darwinia.js globally
-
-```shell
-yarn global add @darwinia/dj
-```
-
-Input <kbd>dj</kbd> to your command-line.
-
-```text
- 𝝺 ts-node src/bin/dj.ts            
-dj <hello@darwinia.network>
-
-Commands:
-  dj.ts balance [address]            Get balance of darwinia account
-  dj.ts config [edit]                show config
-  dj.ts reset [block]                Reset genesis eth header in darwinia
-  dj.ts relay [block]                Relay eth header to darwinia
-  dj.ts transfer <address> <amount>  Relay eth header to darwinia
-
-Options:
-  --help, -h     Show help                                             [boolean]
-  --version, -V  Show version number                                   [boolean]
-```
-
-
 ## @darwinia/api
 
 ```
@@ -59,6 +31,59 @@ import { autoAPI } from "@darwinia-network/darwinia.js";
 | relay      | (block: string/number)         | res: ExResult   |
 | transfer   | (addr: string, amount: number) | res: ExResult   |
 | redeem     | (receipt: IReceipt)            | res: ExResult   |
+
+
+## @darwinia/ctl
+
+Install `@darwinia/ctl` globally
+
+```shell
+yarn global add @darwinia/ctl
+```
+
+Input <kbd>dj</kbd> to your command-line.
+
+```text
+dactle <hello@darwinia.network>
+
+Commands:
+  dactle config [edit]  show config
+  dactle crash          keep sending txes to ethereum and save the container
+                        blocks
+  dactle fetcher        keep fetching eth blocks to local storage
+  dactle relay          keep relaying eth headers to darwinia
+
+Options:
+  --help, -h     Show help                                             [boolean]
+  --version, -V  Show version number                                   [boolean]
+```
+
+## @darwinia/dj
+
+Install `@darwinia/dj` globally
+
+```shell
+yarn global add @darwinia/dj
+```
+
+Input <kbd>dj</kbd> to your command-line.
+
+```text
+ 𝝺 dj
+dj <hello@darwinia.network>
+
+Commands:
+  dj balance [address]            Get balance of darwinia account
+  dj config [edit]                show config
+  dj reset [block]                Reset genesis eth header in darwinia
+  dj relay [block]                Relay eth header to darwinia
+  dj transfer <address> <amount>  Relay eth header to darwinia
+
+Options:
+  --help, -h     Show help                                             [boolean]
+  --version, -V  Show version number                                   [boolean]
+```
+
 
 ## @darwinia/util
 

@@ -18,4 +18,3 @@ export async function autoWeb3(): Promise<Web3> {
     const cfg = new Config();
     return new Web3(cfg.eth.node, cfg.eth.secret);
 }
-
