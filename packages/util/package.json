@@ -17,6 +17,13 @@
  "dependencies": {
   "@polkadot/util": "^2.7.1",
   "chalk": "^4.0.0",
-  "ethereumjs-util": "^6.2.0"
+  "ethereumjs-util": "^6.2.0",
+  "got": "^10.7.0",
+  "progress": "^2.0.3",
+  "tar": "^6.0.1"
+ },
+ "scripts": {
+  "build": "tsc --strict",
+  "lint": "tsc --noEmit && tslint --project ./tsconfig.json"
  }
 }

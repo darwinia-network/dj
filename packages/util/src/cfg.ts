@@ -2,8 +2,8 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 
-import rawDj from "./json/dj.json";
-import rawTj from "./json/types.json";
+import rawDj from "./static/dj.json";
+import rawTj from "./static/types.json";
 import { log } from "./log";
 
 export interface IConfigPath {
@@ -21,21 +21,6 @@ export interface IDatabaseConfig {
 export interface IEthConfig {
     node: string;
     secret: string;
-}
-
-export interface IGrammerFaucetCommand {
-    supply: number;
-    amount: number;
-    interval: number;
-}
-
-export interface IGrammerCommands {
-    faucet: IGrammerFaucetCommand;
-}
-
-export interface IGrammerConfig {
-    commands: IGrammerCommands;
-    port: number;
 }
 
 export interface IConfig {
@@ -56,8 +41,6 @@ export interface IConfig {
  */
 export class Config {
     eth: IEthConfig;
-    db: IDatabaseConfig;
-    grammer: IGrammerConfig;
     path: IConfigPath;
     node: string;
     seed: string;
