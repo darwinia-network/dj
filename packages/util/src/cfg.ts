@@ -1,11 +1,18 @@
+import child_process from "child_process";
 import fs from "fs";
 import os from "os";
 import path from "path";
 
 import rawDj from "./static/dj.json";
 import rawTj from "./static/types.json";
+import { download } from "./download";
 import { log } from "./log";
 
+// constants
+const TYPES_URL = "https://raw.githubusercontent.com/darwinia-network/darwinia/master/runtime/crab/types.json"
+
+
+// interfaces
 export interface IConfigPath {
     conf: string;
     db: IDatabaseConfig;
@@ -114,6 +121,22 @@ export class Config {
         }
     }
 
+
+    /**
+     * edit dj.json
+     */
+    public async edit(): Promise<void> {
+        child_process.spawnSync("vi", [this.path.conf], {
+            stdio: "inherit",
+        });
+    }
+
+    /**
+     * update types.json
+     */
+    public async updateTypes(): Promise<void> {
+        await download(this.path.root, TYPES_URL, "types.json");
+    }
 
     /**
      * print config to string

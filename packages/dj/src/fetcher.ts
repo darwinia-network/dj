@@ -2,7 +2,7 @@
 import * as path from "path";
 import { Config, IDarwiniaEthBlock, log } from "@darwinia/util";
 import { autoWeb3, Web3 } from "@darwinia/api";
-import Service from "./service";
+import { Service } from "./service";
 
 export interface IFetcherConfig {
     conf: Config;

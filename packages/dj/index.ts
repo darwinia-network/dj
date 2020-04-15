@@ -1,8 +1,11 @@
 #!/usr/bin/env node
-import child_process from "child_process";
 import { autoAPI, autoWeb3, ExResult } from "@darwinia/api";
-import { Config, log, whereisPj } from "@darwinia/util";
+import { Config, IDarwiniaEthBlock, log, whereisPj } from "@darwinia/util";
+import { execSync } from "child_process";
 import yargs from "yargs";
+import Crash from "./src/crash";
+import Fetcher from "./src/fetcher";
+import Relay from "./src/relay";
 
 
 // main
@@ -37,18 +40,63 @@ import yargs from "yargs";
             },
         })
         .command({
-            builder: (argv: yargs.Argv) => argv.default("edit", false),
+            builder: (argv: yargs.Argv) => {
+                return argv.positional("edit", {
+                    alias: "e",
+                    describe: "edit the config of darwinia.js",
+                    default: false,
+                    type: "boolean",
+                }).positional("update", {
+                    alias: "u",
+                    describe: "update the types.json of darwinia.js",
+                    default: false,
+                    type: "boolean",
+                });
+            },
             command: "config [edit]",
             describe: "show config",
             handler: (args: yargs.Arguments) => {
                 const cfg = new Config();
 
                 if ((args.edit as boolean)) {
-                    child_process.spawnSync("vi", [cfg.path.conf], {
-                        stdio: "inherit",
-                    });
+                    cfg.edit();
+                } else if ((args.update as boolean)) {
+                    cfg.updateTypes();
                 } else {
                     log.n(JSON.parse(cfg.toString()));
+                }
+            },
+        })
+        .command({
+            builder: (argv: yargs.Argv) => {
+                return argv.positional('service', {
+                    choices: ["crash", "relay", "fetcher"],
+                    required: true,
+                }).option("daemon", {
+                    alias: "d",
+                    default: false,
+                    type: "boolean",
+                });
+            },
+            command: "keep <service>",
+            describe: "trigger services",
+            handler: async (args: yargs.Arguments) => {
+                if ((args.daemon as boolean)) {
+                    execSync(`pm2 start dj -- keep ${args.service}`);
+                } else {
+                    switch ((args.service as string)) {
+                        case "crash":
+                            const crash = await Crash.new();
+                            await crash.forever();
+                        case "crash":
+                            const fetcher = await Fetcher.new();
+                            await fetcher.forever();
+                        case "relay":
+                            const relay = await Relay.new();
+                            await relay.forever();
+                        default:
+                            break;
+                    }
                 }
             },
         })
@@ -70,20 +118,41 @@ import yargs from "yargs";
             },
         })
         .command({
-            builder: (argv: yargs.Argv) => argv.default("block", 1),
+            builder: (argv: yargs.Argv) => {
+                return argv.positional("block", {
+                    default: undefined,
+                    describe: "block hash or block height"
+                }).option("finalize", {
+                    alias: "f",
+                    default: false,
+                    describe: "should wait for finalizing",
+                    type: "boolean",
+                });
+            },
             command: "relay [block]",
             describe: "Relay eth header to darwinia",
             handler: async (args: yargs.Arguments) => {
                 const api = await autoAPI();
                 const web3 = await autoWeb3();
-                const block = await web3.getBlock((args.block as string));
-                log.trace(JSON.stringify(block, null, 2));
+                if (!args.block) {
+                    const bestHeaderHash = await api._.query.ethRelay.bestHeaderHash();
+                    const last = await web3.getBlock(bestHeaderHash.toString());
+                    args.block = last.number;
+                }
 
-                const res = await api.relay(block).catch((e: ExResult) => {
+                const block = await web3.getBlock((args.block as number));
+                const res = await api.relay(
+                    (block as IDarwiniaEthBlock), (args.finalize as boolean),
+                ).catch((e: ExResult) => {
                     log.ex(e.toString());
                 });
 
-                log.ox(`relay header succeed 🎉 - ${(res as ExResult).toString()}`);
+                if (block) {
+                    log.ox(`relay header succeed 🎉 - ${(res as ExResult).toString()}`);
+                } else {
+                    log.ok(`our extrinsic is contained in block ${(res as ExResult).blockHash}`);
+                    log.ox(`our extrinsic hash is ${(res as ExResult).exHash}`);
+                }
             },
         }).command({
             builder: {},
@@ -98,7 +167,7 @@ import yargs from "yargs";
                     log.ex(e.toString());
                 });
 
-                log.ox(`transfer succeed 💰 - ${(res as ExResult).toString()}`);
+                log.ox("transfer succeed 💰 - " + (res as ExResult).toString());
             },
         }).argv;
 

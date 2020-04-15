@@ -51,7 +51,6 @@ export class ExResult {
         this.exHash = exHash;
         this.docs = docs;
     }
-
     public toString(): string {
         if (this.docs) {
             return [
@@ -126,7 +125,7 @@ export class API {
     }
 
     public account: KeyringPair;
-    public ap: ApiPromise;
+    public _: ApiPromise;
 
     /**
      * init darwinia api
@@ -138,7 +137,7 @@ export class API {
      */
     constructor(account: KeyringPair, ap: ApiPromise) {
         this.account = account;
-        this.ap = ap;
+        this._ = ap;
     }
 
     /**
@@ -147,7 +146,7 @@ export class API {
      * @param {string} addr - account address of darwinia
      */
     public async getBalance(addr: string): Promise<string> {
-        const account = await this.ap.query.system.account(addr);
+        const account = await this._.query.system.account(addr);
         return account.data.free.toString();
     }
 
@@ -157,7 +156,7 @@ export class API {
      * @param {DarwiniaEthBlock} block - darwinia style eth block
      */
     public async redeem(receipt: IReceipt): Promise<ExResult> {
-        const ex: SubmittableExtrinsic<"promise"> = this.ap.tx.ethRelay.redeem({
+        const ex: SubmittableExtrinsic<"promise"> = this._.tx.ethRelay.redeem({
             Ring: receipt,
         });
         return await this.blockFinalized(ex);
@@ -167,10 +166,14 @@ export class API {
      * relay darwinia header
      *
      * @param {DarwiniaEthBlock} block - darwinia style eth block
+     * @param {Bool} inBlock - if resolve when inBlock
      */
-    public async relay(block: IDarwiniaEthBlock): Promise<ExResult> {
-        const ex: SubmittableExtrinsic<"promise"> = this.ap.tx.ethRelay.relayHeader(block);
-        return await this.blockFinalized(ex);
+    public async relay(
+        block: IDarwiniaEthBlock,
+        inBlock?: boolean,
+    ): Promise<ExResult> {
+        const ex: SubmittableExtrinsic<"promise"> = this._.tx.ethRelay.relayHeader(block);
+        return await this.blockFinalized(ex, inBlock);
     }
 
     /**
@@ -179,7 +182,7 @@ export class API {
      * @param {DarwiniaEthBlock} block - darwinia style eth block
      */
     public async reset(block: IDarwiniaEthBlock): Promise<ExResult> {
-        const ex: SubmittableExtrinsic<"promise"> = this.ap.tx.ethRelay.resetGenesisHeader(
+        const ex: SubmittableExtrinsic<"promise"> = this._.tx.ethRelay.resetGenesisHeader(
             block, block.difficulty,
         );
 
@@ -193,7 +196,7 @@ export class API {
      * @param {Number} amount - transfer amount
      */
     public async transfer(addr: string, amount: number): Promise<ExResult> {
-        const ex = this.ap.tx.balances.transfer(addr, amount);
+        const ex = this._.tx.balances.transfer(addr, amount);
         return await this.blockFinalized(ex);
     }
 
@@ -201,12 +204,15 @@ export class API {
      * block requests till block finalized
      *
      * @param {SubmittableExtrinsic<"promise">} ex - extrinsic
+     * @param {Boolean} inBlock - if resolve when inBlock
      */
-    private async blockFinalized(ex: SubmittableExtrinsic<"promise">): Promise<ExResult> {
-        let blockHash = "";
+    private async blockFinalized(
+        ex: SubmittableExtrinsic<"promise">,
+        inBlock?: boolean,
+    ): Promise<ExResult> {
         const res = new ExResult(
             false,
-            blockHash,
+            "",
             ex.hash.toString(),
         );
 
@@ -219,7 +225,12 @@ export class API {
                 log.trace(status.toString());
 
                 if (status.isInBlock) {
-                    blockHash = status.asInBlock.toHex().toString();
+                    res.blockHash = status.asInBlock.toHex().toString();
+                    if (inBlock) {
+                        res.isOk = true;
+                        resolve(res);
+                    }
+
                     if (events) {
                         events.forEach(async (r: EventRecord) => {
                             log.trace(
@@ -229,7 +240,7 @@ export class API {
                                     r.event.data.toString(),
                             );
 
-                            if (r.event.method.indexOf("Failed")) {
+                            if (r.event.method.indexOf("Failed") > -1) {
                                 log.err("transaction failed");
                                 res.isOk = false;
                                 res.isErr = true;
@@ -237,18 +248,11 @@ export class API {
                             }
 
                             if ((r.event.data[0] as DispatchError).isModule) {
-                                const doc = await this.ap.registry.findMetaError(
+                                res.docs = await this._.registry.findMetaError(
                                     (r.event.data[0] as DispatchError).asModule.toU8a(),
                                 );
 
-                                const err = new ExResult(
-                                    false,
-                                    blockHash,
-                                    ex.hash.toString(),
-                                    doc,
-                                );
-
-                                reject(err);
+                                reject(res);
                             }
                         });
                     }
@@ -264,7 +268,7 @@ export class API {
                         reject(res);
                     } else if (status.isFinalized) {
                         res.isOk = true;
-                        log.trace(`Finalized block hash: ${blockHash}`);
+                        log.trace(`Finalized block hash: ${res.blockHash}`);
                         resolve(res);
                     }
                 }

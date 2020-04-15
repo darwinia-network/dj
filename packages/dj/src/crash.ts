@@ -4,7 +4,7 @@
  * block data will save at `${config.root}/crash_block.db`
  * with `sqlite3`.
  */
-import Service from "./service";
+import { Service } from "./service";
 import abi from "./json/abi.json";
 import * as path from "path";
 import { autoWeb3, Web3 } from "@darwinia/api";
@@ -79,7 +79,7 @@ export default class Crash extends Service {
         this.alive = false;
         this.receipt = 0;
         this.sent = 0;
-        this.addr = this.web3.web3.eth.accounts.wallet[0].address;
+        this.addr = this.web3._.eth.accounts.wallet[0].address;
         this.contract = burn(this.web3, this.addr);
         log.trace(dbPath);
     }

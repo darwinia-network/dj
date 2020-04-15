@@ -4,7 +4,7 @@
  * exiting process.
  */
 import Fetcher from "./fetcher";
-import Service from "./service";
+import { Service } from "./service";
 import { API, autoAPI } from "@darwinia/api";
 import { Config, IDarwiniaEthBlock, log } from "@darwinia/util";
 
@@ -56,7 +56,7 @@ export default class Relay extends Service {
         this.alive = true;
 
         // set safe block, if it is zero use lucky 7 or safe * 2 in darwinia
-        const safe = await this.api.ap.query.ethRelay.numberOfBlocksSafe();
+        const safe = await this.api._.query.ethRelay.numberOfBlocksSafe();
         const n = Number(safe.toString());
         if (n !== 0) {
             this.safe = n * 2;
@@ -118,8 +118,8 @@ export default class Relay extends Service {
      * - restart this process from error
      */
     private async startFromBestHeaderHash(): Promise<IDarwiniaEthBlock> {
-        const bestHeaderHash = await this.api.ap.query.ethRelay.bestHeaderHash();
-        const last = await this.fetcher.web3.web3.eth.getBlock(bestHeaderHash.toString());
+        const bestHeaderHash = await this.api._.query.ethRelay.bestHeaderHash();
+        const last = await this.fetcher.web3._.eth.getBlock(bestHeaderHash.toString());
         return await this.fetcher.getBlock((last.number as number) + 1);
     }
 }
