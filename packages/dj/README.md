@@ -15,15 +15,15 @@ yarn global add @darwinia/dj
 Input <kbd>dj</kbd> to your command-line.
 
 ```text
- 𝝺 dj
 dj <hello@darwinia.network>
 
 Commands:
-  dj.ts balance [address]            Get balance of darwinia account
-  dj.ts config [edit]                show config
-  dj.ts reset [block]                Reset genesis eth header in darwinia
-  dj.ts relay [block]                Relay eth header to darwinia
-  dj.ts transfer <address> <amount>  Relay eth header to darwinia
+  dj balance [address]            Get balance of darwinia account
+  dj config [edit]                show config
+  dj keep <service>               trigger services
+  dj reset [block]                Reset genesis eth header in darwinia
+  dj relay [block]                Relay eth header to darwinia
+  dj transfer <address> <amount>  Transfer to darwinia account
 
 Options:
   --help, -h     Show help                                             [boolean]

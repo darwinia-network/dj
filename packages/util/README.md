@@ -29,11 +29,21 @@ files will generate automatically.
 ```json
 {
   "eth": {
-    "node": "",
-    "secret": ""
+    "node": "",                  // ethereum node url, you can input an infura url
+    "secret": ""                 // ethereum secret key, used for crash service
   },
-  "node": "ws://0.0.0.0:9944",
-  "seed": "//Alice"
+  "grammer": {                   // this field is for grammer server
+    "commands": {
+      "faucet": {
+        "supply": 400,
+        "amount": 1000,
+        "interval": 24
+      }
+    },
+    "port": 1439
+  },
+  "node": "ws://0.0.0.0:9944",   // darwinia node, should start with `ws://`
+  "seed": "//Alice"              // darwinia account seed
 }
 ```
 

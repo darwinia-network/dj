@@ -8,162 +8,52 @@
 
 Gather common javascript usages for darwinia.
 
-## @darwinia/api
 
-```
-yarn add @darwinia/api
-```
+| type      | name                                        |
+|-----------|---------------------------------------------|
+| cmd-tools | [@darwinia/dj](./packages/dj/README.md)     |
+| library   | [@darwinia/api](./packages/api/README.md)   |
+| library   | [@darwinia/util](./packages/util/README.md) |
 
-```javascript
-import { autoAPI } from "@darwinia-network/darwinia.js";
-
-(async () => {
-    const api = await autoAPI();
-    const balance = await api.getBalance(api.account.address);
-    log(balance);
-})();
-```
-
-| method     | params                         | return          |
-|------------|--------------------------------|-----------------|
-| getBalance | (addr: string)                 | balance: string |
-| reset      | (block: string/number)         | res: ExResult   |
-| relay      | (block: string/number)         | res: ExResult   |
-| transfer   | (addr: string, amount: number) | res: ExResult   |
-| redeem     | (receipt: IReceipt)            | res: ExResult   |
-
-
-## @darwinia/ctl
-
-Install `@darwinia/ctl` globally
-
-```shell
-yarn global add @darwinia/ctl
-```
-
-Input <kbd>dj</kbd> to your command-line.
-
-```text
-dactle <hello@darwinia.network>
-
-Commands:
-  dactle config [edit]  show config
-  dactle crash          keep sending txes to ethereum and save the container
-                        blocks
-  dactle fetcher        keep fetching eth blocks to local storage
-  dactle relay          keep relaying eth headers to darwinia
-
-Options:
-  --help, -h     Show help                                             [boolean]
-  --version, -V  Show version number                                   [boolean]
-```
-
-## @darwinia/dj
-
-Install `@darwinia/dj` globally
-
-```shell
-yarn global add @darwinia/dj
-```
-
-Input <kbd>dj</kbd> to your command-line.
-
-```text
- 𝝺 dj
-dj <hello@darwinia.network>
-
-Commands:
-  dj balance [address]            Get balance of darwinia account
-  dj config [edit]                show config
-  dj reset [block]                Reset genesis eth header in darwinia
-  dj relay [block]                Relay eth header to darwinia
-  dj transfer <address> <amount>  Relay eth header to darwinia
-
-Options:
-  --help, -h     Show help                                             [boolean]
-  --version, -V  Show version number                                   [boolean]
-```
-
-
-## @darwinia/util
-
-```
-yarn add @darwinia/util
-```
 
 ### Config
 
-```javascript
-import { API, Config } from "@darwinia-network/darwinia.js";
-
-/**
- * @return {API} api - generate API automatically
- */
-export async function autoAPI(): Promise<API> {
-    const cfg = new Config();
-    const seed = await API.seed(cfg.seed);
-    return await API.new(seed, cfg.node, cfg.types);
-}
-
-```
-
-The config root of `darwinia.js` is at `~/.darwinia`, once you `new Config()`, the config
-files will generate automatically.
+The config part is used by all projects building with `darwinia.js`, 
+we strongly recommand you to read this sample before you starting your
+`darwinia.js` trip!
 
 ```json
+// ~/.darwinia/dj.json
 {
   "eth": {
-    "node": "",
-    "secret": ""
+    "node": "",                  // ethereum node url, you can input an infura url
+    "secret": ""                 // ethereum secret key, used for crash service
   },
-  "node": "ws://0.0.0.0:9944",
-  "seed": "//Alice"
+  "grammer": {                   // this field is for grammer server
+    "commands": {
+      "faucet": {
+        "supply": 400,
+        "amount": 1000,
+        "interval": 24
+      }
+    },
+    "port": 1439
+  },
+  "node": "ws://0.0.0.0:9944",   // darwinia node, should start with `ws://`
+  "seed": "//Alice"              // darwinia account seed
 }
 ```
 
-BTW, the `types.json` in at `~/.darwinia/types.json`, update it if we are outdated, the source
-of `types.json` is [here][types.json]
 
-### Logger
+### For Developers
 
-```javascript
-import { log } from "@darwinia-network/darwinia.js";
+If you want to use `darwinia.js` developing your own `darwinia.js` based, you might
+want to try `@darwinia/api` and `@darwinia/util`.
 
-(() => {
-    log.ox("Javascript is the best programming language!");
-})();
-```
 
-| method    | param       | description                       |
-|-----------|-------------|-----------------------------------|
-| log       | (s: string) | info log                          |
-| log.err   | (s: string) | error log                         |
-| log.ex    | (s: string) | log error and exit process with 1 |
-| log.ok    | (s: string) | ok log                            |
-| log.ox    | (s: string) | log ok and exit process with 0    |
-| log.trace | (s: string) | trace log                         |
-| log.wait  | (s: string) | wait log                          |
-| log.warn  | (s: string) | warn log                          |
+### For Testers and Users
 
-#### LoggerEnv
-
-Magic logger, the logger in `darwinia.js` is just like `env_logger` in Rust, you can set your
-logger environment by `LOGGER=XXX` for darwinia.js programs.
-
-Available Enviroments: `[ALL, INFO]`
-
-+ ALL
-  + Logger.Error,
-  + Logger.Event,
-  + Logger.Info,
-  + Logger.Ok,
-  + Logger.Trace,
-  + Logger.Wait,
-  + Logger.Warn,
-+ INFO
-  + Logger.Info
-  + Logger.Ok
-  + Logger.Error
+If you want to test darwinia using `darwinia.js`, check the `@darwinia/dj` project.
 
 
 ## LICENSE
