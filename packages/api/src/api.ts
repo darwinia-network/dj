@@ -172,6 +172,7 @@ export class API {
         block: IDarwiniaEthBlock,
         inBlock?: boolean,
     ): Promise<ExResult> {
+        log.event(`relay block ${block.number} to darwinia...`);
         const ex: SubmittableExtrinsic<"promise"> = this._.tx.ethRelay.relayHeader(block);
         return await this.blockFinalized(ex, inBlock);
     }
@@ -208,7 +209,7 @@ export class API {
      */
     private async blockFinalized(
         ex: SubmittableExtrinsic<"promise">,
-        inBlock?: boolean,
+        inFinialize?: boolean,
     ): Promise<ExResult> {
         const res = new ExResult(
             false,
@@ -226,7 +227,8 @@ export class API {
 
                 if (status.isInBlock) {
                     res.blockHash = status.asInBlock.toHex().toString();
-                    if (inBlock) {
+                    if (!inFinialize) {
+                        log.trace("inBlock relay mode");
                         res.isOk = true;
                         resolve(res);
                     }

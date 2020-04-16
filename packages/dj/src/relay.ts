@@ -69,16 +69,16 @@ export default class Relay extends Service {
         // service loop
         while (this.alive) {
             await this.shouldStopFetcher((next.number as number));
-            const res = await this.api.relay(next);
+            const res = await this.api.relay(next, true);
 
             // to next loop
             if (!res.isOk) {
-                log.warn(res.toString());
+                log.err(res.toString());
                 next = await this.startFromBestHeaderHash();
             } else {
                 log.ok(`relay eth header ${next.number} succeed!`);
-                log.trace(`\tcurrent darwinia eth height is ${next.number}`);
-                log.trace(`\tcurrent the max height of local storage is ${this.fetcher.max}`);
+                log.trace(`current darwinia eth height is:             ${next.number}`);
+                log.trace(`current the max height of local storage is: ${this.fetcher.max}`);
                 next = await this.fetcher.getBlock((next.number as number) + 1);
             }
         }
@@ -98,12 +98,12 @@ export default class Relay extends Service {
         if (
             (this.fetcher.max >= this.safe + n) && this.fetcher.status()
         ) {
-            log.warn(`stop`);
+            log.event("fetcher - stop");
             await this.fetcher.stop();
         } else if (
             (this.fetcher.max < this.safe + n) && !this.fetcher.status()
         ) {
-            log.warn(`start`);
+            log.event("fetcher - start");
             if (!this.fetcher.status()) {
                 this.fetcher.start(n);
             }
@@ -118,6 +118,7 @@ export default class Relay extends Service {
      * - restart this process from error
      */
     private async startFromBestHeaderHash(): Promise<IDarwiniaEthBlock> {
+        log("start from the lastest eth header of darwinia...");
         const bestHeaderHash = await this.api._.query.ethRelay.bestHeaderHash();
         const last = await this.fetcher.web3._.eth.getBlock(bestHeaderHash.toString());
         return await this.fetcher.getBlock((last.number as number) + 1);

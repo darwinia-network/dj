@@ -25,7 +25,7 @@
     "typescript": "^3.8.3"
   },
   "scripts": {
-    "deps": "lerna exec npm i",
+    "deps": "lerna exec yarn",
     "build": "lerna run build",
     "lint": "lerna run lint"
   },
@@ -34,5 +34,10 @@
       "pre-commit": "git add . && lerna run lint",
       "pre-push": "lerna run build"
     }
+  },
+  "dependencies": {
+    "@darwinia/api": "file:packages/api",
+    "@darwinia/dj": "file:packages/dj",
+    "@darwinia/util": "file:packages/util"
   }
 }

@@ -9,7 +9,7 @@ import { download } from "./download";
 import { log } from "./log";
 
 // constants
-const TYPES_URL = "https://raw.githubusercontent.com/darwinia-network/darwinia/master/runtime/crab/types.json"
+export const TYPES_URL = "https://raw.githubusercontent.com/darwinia-network/darwinia/master/runtime/crab/types.json"
 
 
 // interfaces

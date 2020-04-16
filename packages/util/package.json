@@ -1,7 +1,6 @@
 {
- "private": false,
  "name": "@darwinia/util",
- "version": "0.1.4",
+ "version": "0.1.6",
  "description": "Util for developing darwinia javascript library.",
  "homepage": "https://github.com/darwinia-network/darwinia.js",
  "repository": {
@@ -19,8 +18,7 @@
   "chalk": "^4.0.0",
   "ethereumjs-util": "^6.2.0",
   "got": "^10.7.0",
-  "progress": "^2.0.3",
-  "tar": "^6.0.1"
+  "progress": "^2.0.3"
  },
  "scripts": {
   "build": "tsc --strict",

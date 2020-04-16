@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { autoAPI, autoWeb3, ExResult } from "@darwinia/api";
-import { Config, IDarwiniaEthBlock, log, whereisPj } from "@darwinia/util";
+import { Config, chalk, IDarwiniaEthBlock, log, whereisPj, TYPES_URL } from "@darwinia/util";
 import { execSync } from "child_process";
 import yargs from "yargs";
 import Crash from "./src/crash";
@@ -55,13 +55,16 @@ import Relay from "./src/relay";
             },
             command: "config [edit]",
             describe: "show config",
-            handler: (args: yargs.Arguments) => {
+            handler: async (args: yargs.Arguments) => {
                 const cfg = new Config();
 
                 if ((args.edit as boolean)) {
                     cfg.edit();
                 } else if ((args.update as boolean)) {
-                    cfg.updateTypes();
+                    await cfg.updateTypes().catch((e: any) => {
+                        log.err("network connection fail, please check your network: ");
+                        log(`you can download types.json from ${chalk.cyan.underline()}`);
+                    });
                 } else {
                     log.n(JSON.parse(cfg.toString()));
                 }
@@ -125,7 +128,7 @@ import Relay from "./src/relay";
                 }).option("finalize", {
                     alias: "f",
                     default: false,
-                    describe: "should wait for finalizing",
+                    describe: "should wait for finalizing?",
                     type: "boolean",
                 });
             },
@@ -137,7 +140,7 @@ import Relay from "./src/relay";
                 if (!args.block) {
                     const bestHeaderHash = await api._.query.ethRelay.bestHeaderHash();
                     const last = await web3.getBlock(bestHeaderHash.toString());
-                    args.block = last.number;
+                    args.block = (last.number as number) + 1;
                 }
 
                 const block = await web3.getBlock((args.block as number));
@@ -147,11 +150,11 @@ import Relay from "./src/relay";
                     log.ex(e.toString());
                 });
 
-                if (block) {
+                if (args.finalize) {
                     log.ox(`relay header succeed 🎉 - ${(res as ExResult).toString()}`);
                 } else {
-                    log.ok(`our extrinsic is contained in block ${(res as ExResult).blockHash}`);
-                    log.ox(`our extrinsic hash is ${(res as ExResult).exHash}`);
+                    log.ok(`the tx is contained in block ${(res as ExResult).blockHash}`);
+                    log.ox(chalk.cyan.underline(`https://crab.subscan.io/extrinsic/${(res as ExResult).exHash}`));
                 }
             },
         }).command({
