@@ -71,8 +71,8 @@ export class Config {
         };
 
         // check database dir - the deepest
-        if (!fs.existsSync(root)) {
-            fs.mkdirSync(root, { recursive: true });
+        if (!fs.existsSync(db)) {
+            fs.mkdirSync(db, { recursive: true });
         }
 
         // load dj.json

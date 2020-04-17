@@ -10,12 +10,7 @@ import * as handlers from "./src/cmds";
  * @param {any} e - error
  */
 function anyErrorYouLike(cms: string, e: any) {
-    let s = e;
-    if (e instanceof Object) {
-        s = JSON.stringify(e);
-    }
-
-    log.err(s);
+    log.err(e);
     log.ex(`${cms} failed`);
 }
 

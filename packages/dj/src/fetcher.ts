@@ -50,10 +50,8 @@ export default class Fetcher extends Service {
         const conf = new Config();
         const web3 = await autoWeb3();
 
-        const dbPath = path.resolve(
-            conf.path.root,
-            "database/relay_blocks.db",
-        );
+
+        const dbPath = path.resolve(conf.path.db.fetcher);
 
         // init sqlite3 to save blocks
         const knex = require("knex")({
@@ -69,13 +67,23 @@ export default class Fetcher extends Service {
         log.trace(dbPath);
 
         // knex infos
-        const max = await knex("blocks").max("height");
-        const count = await knex("blocks").count("height");
+        let count = 0;
+        let max = 0;
+
+        try {
+            const countQuery = await knex("blocks").count("height");
+            const maxQuery = await knex("blocks").max("height");
+            count = countQuery[0]["count(`height`)"];
+            max = maxQuery[0]["max(`height`)"];
+        } catch(e) {
+            log("init fetcher database...");
+        }
+
         return new Fetcher({
             conf,
-            count: count[0]["count(`height`)"],
+            count,
             knex,
-            max: max[0]["max(`height`)"],
+            max,
             web3,
         });
     }
@@ -110,14 +118,22 @@ export default class Fetcher extends Service {
      * @return {IDarwiniaEthBlock} block - darwinia style eth block
      */
     public async getBlock(height: number): Promise<IDarwiniaEthBlock> {
-        const tx = await this.knex("blocks")
-            .select("*")
-            .whereRaw(`blocks.height = ${height}`);
+        log.trace(`geting block ${height} from fetcher db...`);
 
-        if (tx.length === 0) {
+        try {
+            const tx = await this.knex("blocks")
+                .select("*")
+                .whereRaw(`blocks.height = ${height}`).catch(async () => {
+                    return await this.web3.getBlock(height);
+                });
+            if (tx.length === 0) {
+                return await this.web3.getBlock(height);
+            } else {
+                return JSON.parse(tx[0].block);
+            }
+        } catch (e) {
+            log.warn(e);
             return await this.web3.getBlock(height);
-        } else {
-            return JSON.parse(tx[0].block);
         }
     }
 
