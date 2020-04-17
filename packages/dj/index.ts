@@ -1,9 +1,23 @@
 #!/usr/bin/env node
-import child_process from "child_process";
-import { autoAPI, autoWeb3, ExResult } from "@darwinia/api";
-import { Config, log, whereisPj } from "@darwinia/util";
+import { log, whereisPj } from "@darwinia/util";
 import yargs from "yargs";
+import * as handlers from "./src/cmds";
 
+/**
+ * Output error syntax sugar
+ *
+ * @param {String} cmd - command string
+ * @param {any} e - error
+ */
+function anyErrorYouLike(cms: string, e: any) {
+    let s = e;
+    if (e instanceof Object) {
+        s = JSON.stringify(e);
+    }
+
+    log.err(s);
+    log.ex(`${cms} failed`);
+}
 
 // main
 (async () => {
@@ -22,34 +36,50 @@ import yargs from "yargs";
             command: "balance [address]",
             describe: "Get balance of darwinia account",
             handler: async (args: yargs.Arguments) => {
-                const api = await autoAPI();
-                let addr = (args.address as string);
-                if (addr === "") {
-                    addr = api.account.address;
-                }
-
-                const balance = await api.getBalance(addr).catch((e: any) => {
-                    log.err(e);
-                    log.ex("get balance failed");
-                });
-
-                log.ox(balance + " RING 💰");
+                await handlers.balanceHandler(args).catch(
+                    (e: any) => anyErrorYouLike("get balance", e),
+                );
             },
         })
         .command({
-            builder: (argv: yargs.Argv) => argv.default("edit", false),
+            builder: (argv: yargs.Argv) => {
+                return argv.positional("edit", {
+                    alias: "e",
+                    describe: "edit the config of darwinia.js",
+                    default: false,
+                    type: "boolean",
+                }).positional("update", {
+                    alias: "u",
+                    describe: "update the types.json of darwinia.js",
+                    default: false,
+                    type: "boolean",
+                });
+            },
             command: "config [edit]",
             describe: "show config",
-            handler: (args: yargs.Arguments) => {
-                const cfg = new Config();
-
-                if ((args.edit as boolean)) {
-                    child_process.spawnSync("vi", [cfg.path.conf], {
-                        stdio: "inherit",
-                    });
-                } else {
-                    log.n(JSON.parse(cfg.toString()));
-                }
+            handler: async (args: yargs.Arguments) => {
+                await handlers.edithandler(args).catch(
+                    (e: any) => anyErrorYouLike("edit config", e),
+                );
+            },
+        })
+        .command({
+            builder: (argv: yargs.Argv) => {
+                return argv.positional('service', {
+                    choices: ["crash", "relay", "fetcher"],
+                    required: true,
+                }).option("daemon", {
+                    alias: "d",
+                    default: false,
+                    type: "boolean",
+                });
+            },
+            command: "keep <service>",
+            describe: "trigger services",
+            handler: async (args: yargs.Arguments) => {
+                await handlers.keepHandler(args).catch(
+                    (e: any) => anyErrorYouLike("start service", e),
+                );
             },
         })
         .command({
@@ -57,52 +87,42 @@ import yargs from "yargs";
             command: "reset [block]",
             describe: "Reset genesis eth header in darwinia",
             handler: async (args: yargs.Arguments) => {
-                const api = await autoAPI();
-                const web3 = await autoWeb3();
-                const block = await web3.getBlock((args.block as string));
-                log.trace(JSON.stringify(block, null, 2));
-
-                const res = await api.reset(block).catch((e: ExResult) => {
-                    log.ex(e.toString());
-                });
-
-                log.ox(`reset header succeed 📦 - ${(res as ExResult).toString()}`);
+                await handlers.resetHandler(args).catch(
+                    (e: any) => anyErrorYouLike("rest header", e),
+                );
             },
         })
         .command({
-            builder: (argv: yargs.Argv) => argv.default("block", 1),
+            builder: (argv: yargs.Argv) => {
+                return argv.positional("block", {
+                    default: undefined,
+                    describe: "block hash or block height"
+                }).option("finalize", {
+                    alias: "f",
+                    default: false,
+                    describe: "should wait for finalizing?",
+                    type: "boolean",
+                });
+            },
             command: "relay [block]",
             describe: "Relay eth header to darwinia",
             handler: async (args: yargs.Arguments) => {
-                const api = await autoAPI();
-                const web3 = await autoWeb3();
-                const block = await web3.getBlock((args.block as string));
-                log.trace(JSON.stringify(block, null, 2));
-
-                const res = await api.relay(block).catch((e: ExResult) => {
-                    log.ex(e.toString());
-                });
-
-                log.ox(`relay header succeed 🎉 - ${(res as ExResult).toString()}`);
+                await handlers.relayHandler(args).catch(
+                    (e: any) => anyErrorYouLike("relay block", e),
+                );
             },
         }).command({
             builder: {},
             command: "transfer <address> <amount>",
             describe: "Relay eth header to darwinia",
             handler: async (args: yargs.Arguments) => {
-                const api = await autoAPI();
-                const res = await api.transfer(
-                    (args.address as string),
-                    (args.amount as number),
-                ).catch((e: ExResult) => {
-                    log.ex(e.toString());
-                });
-
-                log.ox(`transfer succeed 💰 - ${(res as ExResult).toString()}`);
+                await handlers.transferHandler(args).catch(
+                    (e: any) => anyErrorYouLike("transfer", e),
+                );
             },
         }).argv;
 
-    // show help if no inputs
+    // show help if no inputso
     if (process.argv.length < 3) {
         yargs.showHelp();
     }

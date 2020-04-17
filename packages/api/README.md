@@ -8,6 +8,10 @@ High-level darwinia.js api
 
 ## Usage
 
+```
+yarn add @darwinia/api
+```
+
 ```javascript
 import { autoAPI } from "@darwinia-network/darwinia.js";
 

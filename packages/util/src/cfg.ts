@@ -1,15 +1,28 @@
+import child_process from "child_process";
 import fs from "fs";
 import os from "os";
 import path from "path";
 
-import rawDj from "./json/dj.json";
-import rawTj from "./json/types.json";
+import rawDj from "./static/dj.json";
+import rawTj from "./static/types.json";
+import { download } from "./download";
 import { log } from "./log";
 
+// constants
+export const TYPES_URL = "https://raw.githubusercontent.com/darwinia-network/darwinia/master/runtime/crab/types.json"
+
+
+// interfaces
 export interface IConfigPath {
     conf: string;
+    db: IDatabaseConfig;
     root: string;
     types: string;
+}
+
+export interface IDatabaseConfig {
+    crash: string;
+    fetcher: string;
 }
 
 export interface IEthConfig {
@@ -26,8 +39,10 @@ export interface IConfig {
 /**
  * darwinia.js config
  *
- * @property {IEthConfig} eth - darwinia eth config
  * @property {IConfigPath} path - darwinia config paths
+ * @property {IDatabaseConfig} db - darwinia database config
+ * @property {IEthConfig} eth - darwinia eth config
+ * @property {IGrammerConfig} grammer - darwinia grammer config
  * @property {String} node - darwinia node address
  * @property {String} seed - darwinia account seed
  */
@@ -43,11 +58,19 @@ export class Config {
         const root = path.resolve(home, ".darwinia");
         const conf = path.resolve(root, "dj.json");
         const types = path.resolve(root, "types.json");
+        const grammer = path.resolve(root, "grammer.yml");
+
+        // database
+        const db = path.resolve(root, "database");
+        const crash = path.resolve(db, "crash.db");
+        const fetcher = path.resolve(db, "fetcher.db");
 
         // init pathes
-        this.path = { conf, root, types };
+        this.path = {
+            conf, db: { crash, fetcher }, root, types
+        };
 
-        // check root dir
+        // check database dir - the deepest
         if (!fs.existsSync(root)) {
             fs.mkdirSync(root, { recursive: true });
         }
@@ -66,6 +89,11 @@ export class Config {
             fs.writeFileSync(types, JSON.stringify(tj, null, 2));
         } else {
             tj = JSON.parse(fs.readFileSync(types, "utf8"));
+        }
+
+        // migrate grammer.yml
+        if (!fs.existsSync(grammer)) {
+            fs.copyFileSync(path.resolve(__dirname, "static/grammer.yml"), grammer);
         }
 
         // load config
@@ -93,6 +121,22 @@ export class Config {
         }
     }
 
+
+    /**
+     * edit dj.json
+     */
+    public async edit(): Promise<void> {
+        child_process.spawnSync("vi", [this.path.conf], {
+            stdio: "inherit",
+        });
+    }
+
+    /**
+     * update types.json
+     */
+    public async updateTypes(): Promise<void> {
+        await download(this.path.root, TYPES_URL, "types.json");
+    }
 
     /**
      * print config to string

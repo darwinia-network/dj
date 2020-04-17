@@ -2,7 +2,7 @@
 import * as path from "path";
 import { Config, IDarwiniaEthBlock, log } from "@darwinia/util";
 import { autoWeb3, Web3 } from "@darwinia/api";
-import Service from "./service";
+import { Service } from "./service";
 
 export interface IFetcherConfig {
     conf: Config;
@@ -150,7 +150,6 @@ export default class Fetcher extends Service {
      * We can restart `Fetcher` just by runing `this.start()` again.
      */
     public async stop(): Promise<void> {
-        log.trace("stop fetcher process...");
         this.alive = false;
     }
 
@@ -197,7 +196,6 @@ export default class Fetcher extends Service {
             // keep fetching
             this.max = height;
             if (this.alive) {
-                log.warn("alive");
                 await this.fetch(height + 1);
             }
         } else {
@@ -211,7 +209,7 @@ export default class Fetcher extends Service {
      * @param {Number} height - ethereum block height
      */
     private async restart(height: number) {
-        log.trace("reached the lastest block, sleep for 10 seconds");
+        log.warn("reached the lastest block, sleep for 10 seconds");
         await new Promise(async () => setTimeout(async () => {
             await this.fetch(height);
         }, 10000));
