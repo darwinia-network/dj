@@ -1,7 +1,7 @@
 {
   "private": false,
   "name": "@darwinia/dj",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "High-level darwinia.js api",
   "homepage": "https://github.com/darwinia-network/darwinia.js",
   "repository": {
@@ -18,8 +18,8 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "@darwinia/api": "^0.1.8",
-    "@darwinia/util": "^0.1.8",
+    "@darwinia/api": "^0.1.9",
+    "@darwinia/util": "^0.1.9",
     "chalk": "^4.0.0",
     "knex": "^0.20.14",
     "sqlite3": "^4.1.1",

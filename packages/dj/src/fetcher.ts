@@ -30,7 +30,7 @@ export default class Fetcher extends Service {
     public static async checkTable(knex: any, start?: number) {
         const exists = await knex.schema.hasTable("blocks");
         if (!exists) {
-            knex.schema.createTable("blocks", (table: any) => {
+            await knex.schema.createTable("blocks", (table: any) => {
                 table.integer("height").unique();
                 table.string("block").unique();
             });
