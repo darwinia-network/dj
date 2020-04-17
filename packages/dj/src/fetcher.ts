@@ -67,23 +67,14 @@ export default class Fetcher extends Service {
         log.trace(dbPath);
 
         // knex infos
-        let count = 0;
-        let max = 0;
-
-        try {
-            const countQuery = await knex("blocks").count("height");
-            const maxQuery = await knex("blocks").max("height");
-            count = countQuery[0]["count(`height`)"];
-            max = maxQuery[0]["max(`height`)"];
-        } catch(e) {
-            log("init fetcher database...");
-        }
+        const max = await knex("blocks").max("height");
+        const count = await knex("blocks").count("height");
 
         return new Fetcher({
             conf,
-            count,
+            count: count[0]["count(`height`)"],
             knex,
-            max,
+            max: max[0]["max(`height`)"],
             web3,
         });
     }
@@ -118,22 +109,15 @@ export default class Fetcher extends Service {
      * @return {IDarwiniaEthBlock} block - darwinia style eth block
      */
     public async getBlock(height: number): Promise<IDarwiniaEthBlock> {
-        log.trace(`geting block ${height} from fetcher db...`);
-
-        try {
-            const tx = await this.knex("blocks")
-                .select("*")
-                .whereRaw(`blocks.height = ${height}`).catch(async () => {
-                    return await this.web3.getBlock(height);
-                });
-            if (tx.length === 0) {
+        const tx = await this.knex("blocks")
+            .select("*")
+            .whereRaw(`blocks.height = ${height}`).catch(async () => {
                 return await this.web3.getBlock(height);
-            } else {
-                return JSON.parse(tx[0].block);
-            }
-        } catch (e) {
-            log.warn(e);
+            });
+        if (tx.length === 0) {
             return await this.web3.getBlock(height);
+        } else {
+            return JSON.parse(tx[0].block);
         }
     }
 
