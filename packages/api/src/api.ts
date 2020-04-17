@@ -208,7 +208,7 @@ export class API {
      * @param {SubmittableExtrinsic<"promise">} ex - extrinsic
      * @param {Boolean} inBlock - if resolve when inBlock
      */
-    public async blockFinalized(
+    private async blockFinalized(
         ex: SubmittableExtrinsic<"promise">,
         inFinialize?: boolean,
     ): Promise<ExResult> {

@@ -112,13 +112,6 @@ export class Config {
                 "edit `~/.darwinia/dj.json` if it is required",
             ].join(""));
         }
-
-        if (this.eth.secret === "") {
-            log.warn([
-                "eth secret key has not been configured, ",
-                "edit `~/.darwinia/dj.json` if it is required",
-            ].join(""));
-        }
     }
 
 

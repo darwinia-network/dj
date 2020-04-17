@@ -45,6 +45,13 @@ export default class Crash extends Service {
             ].join(""));
         }
 
+        if (conf.eth.secret === "") {
+            log.ex([
+                "eth secret key is required for crash service, ",
+                "please edit `~/.darwinia/dj.json` to add it on",
+            ].join(""));
+        }
+
         return new Crash(conf, web3);
     }
 
@@ -60,10 +67,7 @@ export default class Crash extends Service {
     constructor(config: Config, web3: Web3) {
         super();
         this.config = config;
-        const dbPath = path.resolve(
-            config.path.root,
-            "database/relay_blocks.db",
-        );
+        const dbPath = path.resolve(config.path.db.crash);
 
         // init sqlite3 to save txs
         this.knex = require("knex")({
