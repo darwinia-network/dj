@@ -120,6 +120,15 @@ function anyErrorYouLike(cms: string, e: any) {
                     (e: any) => anyErrorYouLike("transfer", e),
                 );
             },
+        }).command({
+            builder: {},
+            command: "proof <number>",
+            describe: "Get Proof for block",
+            handler: async (args: yargs.Arguments) => {
+                await handlers.proofHandler(args).catch(
+                    (e: any) => anyErrorYouLike("proof", e),
+                );
+            },
         }).argv;
 
     // show help if no inputso

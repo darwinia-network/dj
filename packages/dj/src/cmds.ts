@@ -8,6 +8,7 @@ import {Arguments} from "yargs";
 import Crash from "./crash";
 import Fetcher from "./fetcher";
 import Relay from "./relay";
+import {autoEthashProof} from "@darwinia/ethhashproof";
 
 
 /**
@@ -133,4 +134,18 @@ export async function transferHandler(args: Arguments) {
     });
 
     log.ox("transfer succeed 💰 - " + (res as ExResult).toString());
+}
+
+/**
+ * @param {Arguments} args - yarg args
+ */
+export async function proofHandler(args: Arguments) {
+    const api = await autoEthashProof();
+    const res = await api.getProof(
+        (args.number as number),
+    ).catch((e: ExResult) => {
+        log.ex(e.toString());
+    });
+
+    log.ox("proof succeed 🎉  - result:\n" + JSON.stringify(res));
 }
