@@ -1,19 +1,23 @@
 import child_process from "child_process";
+import chalk from "chalk";
 import fs from "fs";
 import os from "os";
 import path from "path";
 
+import { download, downloadTar } from "./download";
+import { log } from "./log";
+import { DoubleNodeWithMerkleProof, getProof } from "./proof";
 import rawDj from "./static/dj.json";
 import rawTj from "./static/types.json";
-import { download } from "./download";
-import { log } from "./log";
+
 
 // constants
-export const TYPES_URL = "https://raw.githubusercontent.com/darwinia-network/darwinia/master/runtime/crab/types.json"
-
+export const TYPES_URL = "https://raw.githubusercontent.com/darwinia-network/darwinia/master/runtime/crab/crab_types.json"
+export const ETHASHPROOF_URL_OSX = "https://github.com/darwinia-network/darwinia.js/releases/download/ethproofhash/ethproofhash-osx.tar.gz"
 
 // interfaces
 export interface IConfigPath {
+    bin: string;
     conf: string;
     db: IDatabaseConfig;
     root: string;
@@ -56,6 +60,7 @@ export class Config {
     constructor() {
         const home = os.homedir();
         const root = path.resolve(home, ".darwinia");
+        const bin = path.resolve(root, "bin");
         const conf = path.resolve(root, "dj.json");
         const types = path.resolve(root, "types.json");
         const grammer = path.resolve(root, "grammer.yml");
@@ -67,8 +72,13 @@ export class Config {
 
         // init pathes
         this.path = {
-            conf, db: { crash, fetcher }, root, types
+            bin, conf, db: { crash, fetcher }, root, types
         };
+
+        // check database dir - the deepest
+        if (!fs.existsSync(bin)) {
+            fs.mkdirSync(bin, { recursive: true });
+        }
 
         // check database dir - the deepest
         if (!fs.existsSync(db)) {
@@ -129,6 +139,35 @@ export class Config {
      */
     public async updateTypes(): Promise<void> {
         await download(this.path.root, TYPES_URL, "types.json");
+    }
+
+    /**
+     * download ethashproof binaries
+     */
+    public async downloadEthashProofBins(): Promise<void> {
+        if (os.type() === "Darwin") {
+            await downloadTar(this.path.bin, ETHASHPROOF_URL_OSX, "ethashproof");
+        } else {
+            log.ex([
+                "only support downloading darwin binaries for now, you can ",
+                `go to ${chalk.cyan.underline("https://github.com/darwinia-network/ethashproof")} `,
+                `and compile the cmds into ${this.path.bin} your self.`
+            ].join(""));
+        }
+    }
+
+
+    /**
+     * proof eth block
+     */
+    public async proofBlock(blockNumber: number): Promise<DoubleNodeWithMerkleProof[]> {
+        const relayer = path.resolve(this.path.bin, "relayer");
+        if (!fs.existsSync(relayer)) {
+            log.event("download eth hash proof binaries.");
+            await this.downloadEthashProofBins();
+        }
+
+        return await getProof(blockNumber, relayer);
     }
 
     /**

@@ -111,9 +111,8 @@ export default class Fetcher extends Service {
     public async getBlock(height: number): Promise<IDarwiniaEthBlock> {
         const tx = await this.knex("blocks")
             .select("*")
-            .whereRaw(`blocks.height = ${height}`).catch(async () => {
-                return await this.web3.getBlock(height);
-            });
+            .whereRaw(`blocks.height = ${height}`);
+
         if (tx.length === 0) {
             return await this.web3.getBlock(height);
         } else {
