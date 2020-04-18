@@ -1,6 +1,6 @@
 {
  "name": "@darwinia/util",
- "version": "0.1.5",
+ "version": "0.1.11",
  "description": "Util for developing darwinia javascript library.",
  "homepage": "https://github.com/darwinia-network/darwinia.js",
  "repository": {
@@ -18,6 +18,7 @@
   "chalk": "^4.0.0",
   "ethereumjs-util": "^6.2.0",
   "got": "^10.7.0",
+  "javascript-stringify": "^2.0.1",
   "progress": "^2.0.3"
  },
  "scripts": {

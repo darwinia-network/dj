@@ -71,8 +71,8 @@ export class Config {
         };
 
         // check database dir - the deepest
-        if (!fs.existsSync(root)) {
-            fs.mkdirSync(root, { recursive: true });
+        if (!fs.existsSync(db)) {
+            fs.mkdirSync(db, { recursive: true });
         }
 
         // load dj.json
@@ -109,13 +109,6 @@ export class Config {
         if (this.eth.node === "") {
             log.warn([
                 "web3 node has not been configured, ",
-                "edit `~/.darwinia/dj.json` if it is required",
-            ].join(""));
-        }
-
-        if (this.eth.secret === "") {
-            log.warn([
-                "eth secret key has not been configured, ",
                 "edit `~/.darwinia/dj.json` if it is required",
             ].join(""));
         }

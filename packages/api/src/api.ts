@@ -51,6 +51,7 @@ export class ExResult {
         this.exHash = exHash;
         this.docs = docs;
     }
+
     public toString(): string {
         if (this.docs) {
             return [
@@ -170,11 +171,11 @@ export class API {
      */
     public async relay(
         block: IDarwiniaEthBlock,
-        inBlock?: boolean,
+        inFinalize?: boolean,
     ): Promise<ExResult> {
         log.event(`relay block ${block.number} to darwinia...`);
-        const ex: SubmittableExtrinsic<"promise"> = this._.tx.ethRelay.relayHeader(block);
-        return await this.blockFinalized(ex, inBlock);
+        const ex: SubmittableExtrinsic<"promise"> = this._.tx.ethRelay.relayHeader(block, []);
+        return await this.blockFinalized(ex, inFinalize);
     }
 
     /**

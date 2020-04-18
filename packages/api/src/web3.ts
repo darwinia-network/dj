@@ -19,7 +19,9 @@ export class Web3 {
      */
     constructor(node: string, priv: string) {
         this._ = new EWeb3(new EWeb3.providers.HttpProvider(node));
-        this._.eth.accounts.wallet.add(priv);
+        if (priv.length > 0) {
+            this._.eth.accounts.wallet.add(priv);
+        }
     }
 
     /**

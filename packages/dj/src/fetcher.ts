@@ -30,7 +30,7 @@ export default class Fetcher extends Service {
     public static async checkTable(knex: any, start?: number) {
         const exists = await knex.schema.hasTable("blocks");
         if (!exists) {
-            knex.schema.createTable("blocks", (table: any) => {
+            await knex.schema.createTable("blocks", (table: any) => {
                 table.integer("height").unique();
                 table.string("block").unique();
             });
@@ -50,10 +50,8 @@ export default class Fetcher extends Service {
         const conf = new Config();
         const web3 = await autoWeb3();
 
-        const dbPath = path.resolve(
-            conf.path.root,
-            "database/relay_blocks.db",
-        );
+
+        const dbPath = path.resolve(conf.path.db.fetcher);
 
         // init sqlite3 to save blocks
         const knex = require("knex")({
@@ -71,6 +69,7 @@ export default class Fetcher extends Service {
         // knex infos
         const max = await knex("blocks").max("height");
         const count = await knex("blocks").count("height");
+
         return new Fetcher({
             conf,
             count: count[0]["count(`height`)"],
@@ -112,8 +111,9 @@ export default class Fetcher extends Service {
     public async getBlock(height: number): Promise<IDarwiniaEthBlock> {
         const tx = await this.knex("blocks")
             .select("*")
-            .whereRaw(`blocks.height = ${height}`);
-
+            .whereRaw(`blocks.height = ${height}`).catch(async () => {
+                return await this.web3.getBlock(height);
+            });
         if (tx.length === 0) {
             return await this.web3.getBlock(height);
         } else {

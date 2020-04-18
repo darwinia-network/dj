@@ -4,6 +4,7 @@ import path from "path";
 /**
  * where is my `package.json` ?
  *
+ * @param {String} name - package name
  * @return {Object} package.json - find package.json
  */
 export function whereisPj(): Record<string, any> {

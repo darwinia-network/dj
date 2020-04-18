@@ -1,4 +1,5 @@
 import chalk from "chalk";
+import { stringify } from "javascript-stringify";
 
 const l = chalk.dim("[ ");
 const r = chalk.dim(" ]: ");
@@ -116,12 +117,23 @@ export function shouldOutputLog(label: Logger): boolean {
  * @param {String} label - the log label
  * @param {String} context - the log context
  */
-function flush(label: string, context: string): void {
-    const str = l + label + r + context;
-    if (label === "error") {
-        console.error(str);
+function flush(label: string, context: any): void {
+    let plain = l + label + r;
+
+    if (typeof(context) === "string") {
+        plain += context;
+    } else if (typeof(context) === "object"  && Object.keys(context).length > 0) {
+        plain += JSON.stringify(context);
     } else {
-        console.log(str);
+        plain += stringify(context);
+    }
+
+    // output
+    const sl = stringify(label);
+    if (sl && sl.indexOf("error") > -1) {
+        console.error(plain);
+    } else {
+        console.log(plain);
     }
 }
 
@@ -130,7 +142,7 @@ function flush(label: string, context: string): void {
  *
  * @param {String} s - the log out string
  */
-export function log(s: string) {
+export function log(s: any) {
     if (shouldOutputLog(Logger.Info)) {
         flush(chalk.cyan.dim("info"), chalk.dim(s));
     }
@@ -140,7 +152,7 @@ export function log(s: string) {
 /**
  * @param {String} s - the log out string
  */
-log.err = (s: string): void => {
+log.err = (s: any): void => {
     if (shouldOutputLog(Logger.Error)) {
         flush(chalk.red("error"), s);
     }
@@ -164,7 +176,7 @@ log.event = (s: any): void => {
  * @description - only support in nodejs
  * @param {String} s - the log context
  */
-log.ex = (s: string): void => {
+log.ex = (s: any): void => {
     if (shouldOutputLog(Logger.Error)) {
         flush(chalk.red("error"), s);
         process.exit(1);
@@ -185,7 +197,7 @@ log.n = (msg: any): void => {
 /**
  * @param {String} s - the log context
  */
-log.ok = (s: string): void => {
+log.ok = (s: any): void => {
     if (shouldOutputLog(Logger.Ok)) {
         flush(chalk.green("ok"), s);
     }
@@ -198,7 +210,7 @@ log.ok = (s: string): void => {
  * @description - only support in nodejs
  * @param {String} s - the log context
  */
-log.ox = (s: string): void => {
+log.ox = (s: any): void => {
     if (shouldOutputLog(Logger.Ok)) {
         flush(chalk.green("ok"), s);
         process.exit(0);
@@ -209,7 +221,7 @@ log.ox = (s: string): void => {
 /**
  * @param {String} s - the log out string
  */
-log.trace = (s: string): void => {
+log.trace = (s: any): void => {
     if (shouldOutputLog(Logger.Trace)) {
         flush(chalk.cyan.dim("trace"), chalk.dim(s));
     }
@@ -219,7 +231,7 @@ log.trace = (s: string): void => {
 /**
  * @param {String} s - the log out string
  */
-log.wait = (s: string): void => {
+log.wait = (s: any): void => {
     if (shouldOutputLog(Logger.Wait)) {
         flush(chalk.cyan("wait"), s);
     }
@@ -229,7 +241,7 @@ log.wait = (s: string): void => {
 /**
  * @param {String} s - the log out string
  */
-log.warn = (s: string): void => {
+log.warn = (s: any): void => {
     if (shouldOutputLog(Logger.Warn)) {
         flush(chalk.yellow("warn"), s);
     }
