@@ -1,5 +1,5 @@
 /* tslint:disable:variable-name */
-import { IDarwiniaEthBlock, log } from "@darwinia/util";
+import { IDoubleNodeWithMerkleProof, IDarwiniaEthBlock, log } from "@darwinia/util";
 import { ApiPromise, SubmittableResult, WsProvider } from "@polkadot/api";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import Keyring from "@polkadot/keyring";
@@ -171,10 +171,11 @@ export class API {
      */
     public async relay(
         block: IDarwiniaEthBlock,
+        proof: IDoubleNodeWithMerkleProof[],
         inFinalize?: boolean,
     ): Promise<ExResult> {
         log.event(`relay block ${block.number} to darwinia...`);
-        const ex: SubmittableExtrinsic<"promise"> = this._.tx.ethRelay.relayHeader(block, []);
+        const ex: SubmittableExtrinsic<"promise"> = this._.tx.ethRelay.relayHeader(block, proof);
         return await this.blockFinalized(ex, inFinalize);
     }
 

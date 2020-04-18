@@ -6,7 +6,7 @@
 import Fetcher from "./fetcher";
 import { Service } from "./service";
 import { API, autoAPI } from "@darwinia/api";
-import { Config, IDarwiniaEthBlock, log } from "@darwinia/util";
+import { BlockWithProof, Config, log } from "@darwinia/util";
 
 
 /**
@@ -64,22 +64,22 @@ export default class Relay extends Service {
 
         // keep relay
         let next = await this.startFromBestHeaderHash();
-        log.trace(`the next height is ${next.number}`);
+        log.trace(`the next height is ${next[0].number}`);
 
         // service loop
         while (this.alive) {
-            await this.shouldStopFetcher((next.number as number));
-            const res = await this.api.relay(next, true);
+            await this.shouldStopFetcher((next[0].number as number));
+            const res = await this.api.relay(next[0], next[1], true);
 
             // to next loop
             if (!res.isOk) {
                 log.err(res.toString());
                 next = await this.startFromBestHeaderHash();
             } else {
-                log.ok(`relay eth header ${next.number} succeed!`);
-                log.trace(`current darwinia eth height is:             ${next.number}`);
+                log.ok(`relay eth header ${next[0].number} succeed!`);
+                log.trace(`current darwinia eth height is:             ${next[0].number}`);
                 log.trace(`current the max height of local storage is: ${this.fetcher.max}`);
-                next = await this.fetcher.getBlock((next.number as number) + 1);
+                next = await this.fetcher.getBlock((next[0].number as number) + 1);
             }
         }
     }
@@ -117,7 +117,7 @@ export default class Relay extends Service {
      * - first start this process
      * - restart this process from error
      */
-    private async startFromBestHeaderHash(): Promise<IDarwiniaEthBlock> {
+    private async startFromBestHeaderHash(): Promise<BlockWithProof> {
         log("start from the lastest eth header of darwinia...");
         const bestHeaderHash = await this.api._.query.ethRelay.bestHeaderHash();
         const last = await this.fetcher.web3._.eth.getBlock(bestHeaderHash.toString());

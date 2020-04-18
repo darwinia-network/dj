@@ -1,7 +1,7 @@
 import { execSync } from "child_process";
 import Web3Utils from "web3-utils";
 
-export interface DoubleNodeWithMerkleProof {
+export interface IDoubleNodeWithMerkleProof {
     dag_nodes: string[],
     proof: string[],
 }
@@ -11,7 +11,7 @@ export interface DoubleNodeWithMerkleProof {
  */
 export async function getProof(
     blockNumber: number, binPath: string,
-): Promise<DoubleNodeWithMerkleProof[]> {
+): Promise<IDoubleNodeWithMerkleProof[]> {
     const output: string = execSync(
         `${binPath} ${blockNumber} | sed -e '1,/Json output/d'`
     ).toString();

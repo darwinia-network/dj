@@ -2,6 +2,7 @@ import { autoAPI, autoWeb3, ExResult } from "@darwinia/api";
 import { execSync } from "child_process";
 import {
     Config, chalk, IDarwiniaEthBlock,
+    IDoubleNodeWithMerkleProof,
     log, TYPES_URL,
 } from "@darwinia/util";
 import {Arguments} from "yargs";
@@ -96,6 +97,7 @@ export async function resetHandler(args: Arguments) {
 export async function relayHandler(args: Arguments) {
     const api = await autoAPI();
     const web3 = await autoWeb3();
+    const cfg = new Config();
     if (!args.block) {
         const bestHeaderHash = await api._.query.ethRelay.bestHeaderHash();
         const last = await web3.getBlock(bestHeaderHash.toString());
@@ -103,8 +105,11 @@ export async function relayHandler(args: Arguments) {
     }
 
     const block = await web3.getBlock((args.block as number));
+    const proof = await cfg.proofBlock((args.block as number));
     const res = await api.relay(
-        (block as IDarwiniaEthBlock), (args.finalize as boolean),
+        (block as IDarwiniaEthBlock),
+        (proof as IDoubleNodeWithMerkleProof[]),
+        (args.finalize as boolean),
     ).catch((e: ExResult) => {
         log.ex(e.toString());
     });

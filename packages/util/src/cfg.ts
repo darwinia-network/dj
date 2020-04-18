@@ -6,7 +6,7 @@ import path from "path";
 
 import { download, downloadTar } from "./download";
 import { log } from "./log";
-import { DoubleNodeWithMerkleProof, getProof } from "./proof";
+import { IDoubleNodeWithMerkleProof, getProof } from "./proof";
 import rawDj from "./static/dj.json";
 import rawTj from "./static/types.json";
 
@@ -160,7 +160,7 @@ export class Config {
     /**
      * proof eth block
      */
-    public async proofBlock(blockNumber: number): Promise<DoubleNodeWithMerkleProof[]> {
+    public async proofBlock(blockNumber: number): Promise<IDoubleNodeWithMerkleProof[]> {
         const relayer = path.resolve(this.path.bin, "relayer");
         if (!fs.existsSync(relayer)) {
             log.event("download eth hash proof binaries.");
