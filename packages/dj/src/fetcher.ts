@@ -1,4 +1,5 @@
 /* tslint:disable:no-var-requires */
+import Koa from "koa";
 import * as path from "path";
 import { BlockWithProof, Config, IDarwiniaEthBlock, log } from "@darwinia/util";
 import { autoWeb3, Web3 } from "@darwinia/api";
@@ -82,6 +83,7 @@ export default class Fetcher extends Service {
 
     public max: number;
     public count: number;
+    public port: number;
     public web3: Web3;
     protected alive: boolean;
     protected config: Config;
@@ -95,11 +97,12 @@ export default class Fetcher extends Service {
      */
     constructor(config: IFetcherConfig) {
         super();
+        this.alive = false;
         this.config = config.config;
         this.count = config.count;
         this.knex = config.knex;
-        this.alive = false;
         this.max = config.max;
+        this.port = 0;
         this.web3 = config.web3;
     }
 
@@ -123,6 +126,35 @@ export default class Fetcher extends Service {
     }
 
     /**
+     * Serve the fetcher service
+     *
+     * @example GET `/block/{number}`
+     */
+    public async serve(port: number): Promise<void> {
+        // start the fetcher
+        this.start();
+
+        // start server
+        const app = new Koa();
+        app.use(async (ctx) => {
+            const block = ctx.url.match(/\/block\/(\d+)/);
+            if (block) {
+                const num: string = block[1];
+                const pair = await this.getBlock(Number(num));
+                const dBlock = pair[0];
+                (dBlock as any).proof = pair[1];
+
+                ctx.body = dBlock;
+            } else {
+                ctx.body = "hello";
+            }
+        });
+
+        log(`fetcher server start at ${port}`);
+        app.listen(port);
+    }
+
+    /**
      * Alive block and tx to sqlite
      *
      * @param {Number} start - the start height of etherebum block
@@ -133,7 +165,11 @@ export default class Fetcher extends Service {
 
         if (start === undefined) {
             const max = await this.knex("blocks").max("height");
-            dimStart = max[0]["max(`height`)"];
+            if (max[0]["max(`height`)"]) {
+                dimStart = max[0]["max(`height`)"];
+            } else {
+                dimStart = 0;
+            }
         } else {
             dimStart = start;
         }
@@ -189,10 +225,11 @@ export default class Fetcher extends Service {
         if (block) {
             log.trace(`got block ${block.number} - ${block.hash}`);
             log.trace(`\t${JSON.stringify(block)}`);
+            const proof = await this.config.proofBlock((block.number as number));
             await this.knex("blocks").insert({
                 block: JSON.stringify(block),
                 height,
-                proof: JSON.stringify(this.config.proofBlock((block.number as number)))
+                proof: JSON.stringify(proof),
             });
 
             // keep fetching

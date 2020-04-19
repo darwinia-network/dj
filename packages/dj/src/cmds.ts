@@ -6,7 +6,7 @@ import {
     log, TYPES_URL,
 } from "@darwinia/util";
 import {Arguments} from "yargs";
-import Crash from "./crash";
+import { Service } from "./service";
 import Fetcher from "./fetcher";
 import Relay from "./relay";
 
@@ -54,40 +54,44 @@ export async function edithandler(args: Arguments) {
  * @param {Arguments} args - yarg args
  */
 export async function keepHandler(args: Arguments) {
-    if ((args.daemon as boolean)) {
-        execSync(`pm2 start dj -- keep ${args.service}`);
-    } else {
-        switch ((args.service as string)) {
-            case "crash":
-                const crash = await Crash.new();
-                await crash.forever();
-            case "crash":
-                const fetcher = await Fetcher.new();
-                await fetcher.forever();
-            case "relay":
-                const relay = await Relay.new();
-                await relay.forever();
-            default:
-                break;
-        }
+    let daemon: boolean = false;
+    let script = `keep ${args.service}`;
+    let service: Service | null = null;
+
+    // select service
+    switch ((args.service as string)) {
+        case "fetcher":
+            service = await Fetcher.new();
+        case "relay":
+            service = await Relay.new();
+        default:
+            break;
     }
-}
 
+    // not match
+    if (service === null) {
+        log.ex("paramter not correct, try: `dj keep relay`");
+    }
 
-/**
- * @param {Arguments} args - yarg args
- */
-export async function resetHandler(args: Arguments) {
-    const api = await autoAPI();
-    const web3 = await autoWeb3();
-    const block = await web3.getBlock((args.block as string));
-    log.trace(JSON.stringify(block, null, 2));
+    // load port
+    if ((args.port as number)) {
+        script += ` -p ${args.port}`;
+        (service as Service).port = (args.port as number);
+    }
 
-    const res = await api.reset(block).catch((e: ExResult) => {
-        log.ex(e.toString());
-    });
+    // load daemon
+    if ((args.daemon as boolean)) {
+        daemon = true;
+    }
 
-    log.ox(`reset header succeed 📦 - ${(res as ExResult).toString()}`);
+    // exec
+    if (daemon) {
+        execSync(`pm2 start dj -- keep ${script}`);
+    } else if((service as Service).port !== 0) {
+        await (service as Service).foreverServe();
+    } else {
+        await (service as Service).forever();
+    }
 }
 
 
@@ -106,6 +110,7 @@ export async function relayHandler(args: Arguments) {
 
     const block = await web3.getBlock((args.block as number));
     const proof = await cfg.proofBlock((args.block as number));
+
     const res = await api.relay(
         (block as IDarwiniaEthBlock),
         (proof as IDoubleNodeWithMerkleProof[]),

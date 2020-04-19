@@ -33,19 +33,28 @@ export default class Relay extends Service {
     }
 
     public alive: boolean;
-    public fetcher: Fetcher;
     public api: API;
+    public fetcher: Fetcher;
+    public port: number;
     protected config: Config;
     private safe: number;
 
     constructor(api: API, config: Config, fetcher: Fetcher) {
         super();
-
-        this.config = config;
-        this.api = api;
-        this.fetcher = fetcher;
-        this.safe = 7;
         this.alive = false;
+        this.api = api;
+        this.config = config;
+        this.fetcher = fetcher;
+        this.port = 0;
+        this.safe = 7;
+    }
+
+    /**
+     * @deprecated no need to serve
+     */
+    public async serve(port: number): Promise<void> {
+        log.warn(`the expect port is ${port}, the server of relay is not completed`);
+        await this.start();
     }
 
     /**

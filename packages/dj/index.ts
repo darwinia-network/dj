@@ -67,6 +67,10 @@ function anyErrorYouLike(cms: string, e: any) {
                     alias: "d",
                     default: false,
                     type: "boolean",
+                }).option("port", {
+                    alias: "p",
+                    default: null,
+                    type: "number",
                 });
             },
             command: "keep <service>",
@@ -74,16 +78,6 @@ function anyErrorYouLike(cms: string, e: any) {
             handler: async (args: yargs.Arguments) => {
                 await handlers.keepHandler(args).catch(
                     (e: any) => anyErrorYouLike("start service", e),
-                );
-            },
-        })
-        .command({
-            builder: (argv: yargs.Argv) => argv.default("block", 0),
-            command: "reset [block]",
-            describe: "Reset genesis eth header in darwinia",
-            handler: async (args: yargs.Arguments) => {
-                await handlers.resetHandler(args).catch(
-                    (e: any) => anyErrorYouLike("rest header", e),
                 );
             },
         })
