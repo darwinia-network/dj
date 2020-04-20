@@ -13,13 +13,6 @@ export interface IErrorDoc {
     documentation: string[];
 }
 
-export interface IReceipt {
-    index: string;
-    proof: string;
-    header_hash: string;
-}
-
-
 /**
  * Extrinsic Result
  *

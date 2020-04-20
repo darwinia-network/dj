@@ -27,12 +27,31 @@ function anyErrorYouLike(cms: string, e: any) {
         .help("help").alias("help", "h")
         .version("version", whereisPj().version).alias("version", "V")
         .command({
-            builder: (argv: yargs.Argv) => argv.default("address", ""),
-            command: "balance [address]",
-            describe: "Get balance of darwinia account",
+            builder: (argv: yargs.Argv) => {
+                return argv.positional("recipe", {
+                    alias: "r",
+                    choices: ["balance", "bestHeader", "header"],
+                    default: "balance",
+                    describe: "the target recipe",
+                    required: true,
+                    type: "string",
+                }).positional("address", {
+                    alias: "a",
+                    default: "",
+                    describe: "target address",
+                    type: "string",
+                }).positional("block", {
+                    alias: "b",
+                    default: "",
+                    describe: "get block info",
+                    type: "string",
+                });
+            },
+            command: "info <recipe> [address]",
+            describe: "Get info of some recipes",
             handler: async (args: yargs.Arguments) => {
-                await handlers.balanceHandler(args).catch(
-                    (e: any) => anyErrorYouLike("get balance", e),
+                await handlers.infoHandler(args).catch(
+                    (e: any) => anyErrorYouLike("get info", e),
                 );
             },
         })

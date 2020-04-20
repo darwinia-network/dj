@@ -14,16 +14,40 @@ import Relay from "./relay";
 /**
  * @param {Arguments} args - yarg args
  */
-export async function balanceHandler(args: Arguments) {
+export async function infoHandler(args: Arguments) {
     const api = await autoAPI();
-    let addr = (args.address as string);
-    if (addr === "") {
-        addr = api.account.address;
-    }
+    const web3 = await autoWeb3();
 
-    const balance = await api.getBalance(addr);
-    const s = balance + " RING 💰";
-    log.ox(s);
+    switch (args.recipe) {
+        case "balance":
+            let addr = (args.address as string);
+            if (addr === "") {
+                addr = api.account.address;
+            }
+
+            const balance = await api.getBalance(addr);
+            const s = balance + " RING 💰";
+            log.ox(s);
+            break;
+        case "bestHeader":
+            const bestHeaderHash = await this.api._.query.ethRelay.bestHeaderHash();
+            const last = await web3.getBlock(bestHeaderHash.toString());
+            log.ox(JSON.stringify(last, null, 2));
+            break;
+        case "header":
+            let block = (args.block as string);
+            let header: IDarwiniaEthBlock | undefined = undefined;
+            if (block === "") {
+                const bestHeaderHash = await this.api._.query.ethRelay.bestHeaderHash();
+                header = await web3.getBlock(bestHeaderHash.toString());
+            }
+
+            header = await web3.getBlock(block);
+            log.ox(JSON.stringify(header, null, 2));
+            break;
+        default:
+            break;
+    }
 }
 
 
