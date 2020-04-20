@@ -7,7 +7,7 @@ import {
 } from "@darwinia/util";
 import {Arguments} from "yargs";
 import { Service } from "./service";
-import Fetcher from "./fetcher";
+import Shadow from "./shadow";
 import Relay from "./relay";
 
 
@@ -30,16 +30,16 @@ export async function infoHandler(args: Arguments) {
             log.ox(s);
             break;
         case "bestHeader":
-            const bestHeaderHash = await this.api._.query.ethRelay.bestHeaderHash();
+            const bestHeaderHash = await api._.query.ethRelay.bestHeaderHash();
             const last = await web3.getBlock(bestHeaderHash.toString());
             log.ox(JSON.stringify(last, null, 2));
             break;
         case "header":
-            let block = (args.block as string);
-            let header: IDarwiniaEthBlock | undefined = undefined;
+            const block = (args.block as string);
+            let header: IDarwiniaEthBlock | null = null;
             if (block === "") {
-                const bestHeaderHash = await this.api._.query.ethRelay.bestHeaderHash();
-                header = await web3.getBlock(bestHeaderHash.toString());
+                const hash = await api._.query.ethRelay.bestHeaderHash();
+                header = await web3.getBlock(hash.toString());
             }
 
             header = await web3.getBlock(block);
@@ -84,8 +84,8 @@ export async function keepHandler(args: Arguments) {
 
     // select service
     switch ((args.service as string)) {
-        case "fetcher":
-            service = await Fetcher.new();
+        case "shadow":
+            service = await Shadow.new();
             break;
         case "relay":
             service = await Relay.new();

@@ -3,7 +3,7 @@
  * service need to restart manualy when error occurs instead of
  * exiting process.
  */
-import Fetcher from "./fetcher";
+import Shadow from "./shadow";
 import { Service } from "./service";
 import { API, autoAPI } from "@darwinia/api";
 import { BlockWithProof, Config, log } from "@darwinia/util";
@@ -13,7 +13,7 @@ import { BlockWithProof, Config, log } from "@darwinia/util";
  * Keep relay ethereum blocks to darwinia
  *
  * @property {Boolean} alive - service alive flag
- * @property {Fetcher} fetcher - the fetcher service
+ * @property {Shadow} fetcher - the fetcher service
  * @property {Number} safe - the safe block number
  * @property {API} api - darwinia substrate api
  * @property {Config} config - darwinia.js config
@@ -22,24 +22,24 @@ export default class Relay extends Service {
     /**
      * Async init fetcher service
      *
-     * @return {Promise<Fetcher>} fetcher service
+     * @return {Promise<Shadow>} fetcher service
      */
     public static async new(): Promise<Relay> {
         const api = await autoAPI();
         const conf = new Config();
-        const fetcher = await Fetcher.new();
+        const fetcher = await Shadow.new();
 
         return new Relay(api, conf, fetcher);
     }
 
     public alive: boolean;
     public api: API;
-    public fetcher: Fetcher;
+    public fetcher: Shadow;
     public port: number;
     protected config: Config;
     private safe: number;
 
-    constructor(api: API, config: Config, fetcher: Fetcher) {
+    constructor(api: API, config: Config, fetcher: Shadow) {
         super();
         this.alive = false;
         this.api = api;
@@ -77,7 +77,7 @@ export default class Relay extends Service {
 
         // service loop
         while (this.alive) {
-            await this.shouldStopFetcher((next[0].number as number));
+            await this.shouldStopShadow((next[0].number as number));
             const res = await this.api.relay(next[0], next[1], true);
 
             // to next loop
@@ -103,7 +103,7 @@ export default class Relay extends Service {
     /**
      * Infer if we should stop fetcher
      */
-    private async shouldStopFetcher(n: number): Promise<void> {
+    private async shouldStopShadow(n: number): Promise<void> {
         if (
             (this.fetcher.max >= this.safe + n) && this.fetcher.status()
         ) {

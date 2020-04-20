@@ -1,5 +1,4 @@
 /* tslint:disable:no-var-requires */
-import Koa from "koa";
 import Jayson from "jayson";
 import * as path from "path";
 import { BlockWithProof, Config, IDarwiniaEthBlock, log } from "@darwinia/util";
@@ -7,7 +6,7 @@ import { autoAPI, autoWeb3, Web3, API } from "@darwinia/api";
 import { Vec, Struct } from "@polkadot/types";
 import { Service } from "./service";
 
-export interface IFetcherConfig {
+export interface IShadowConfig {
     ap: API;
     config: Config;
     count: number;
@@ -29,7 +28,7 @@ export interface CodecResp {
  * @property {Config} config - darwinia.js config
  * @property {Knex} knex - database orm
  */
-export default class Fetcher extends Service {
+export default class Shadow extends Service {
     /**
      * Check if table exists, remove outdated blocks
      *
@@ -54,9 +53,9 @@ export default class Fetcher extends Service {
     /**
      * Async init fetcher service
      *
-     * @return {Promise<Fetcher>} fetcher service
+     * @return {Promise<Shadow>} fetcher service
      */
-    public static async new(): Promise<Fetcher> {
+    public static async new(): Promise<Shadow> {
         const config = new Config();
         const ap = await autoAPI();
         const web3 = await autoWeb3();
@@ -72,14 +71,14 @@ export default class Fetcher extends Service {
         });
 
         // check table exists
-        await Fetcher.checkTable(knex);
+        await Shadow.checkTable(knex);
         log.trace(dbPath);
 
         // knex infos
         const max = await knex("blocks").max("height");
         const count = await knex("blocks").count("height");
 
-        return new Fetcher({
+        return new Shadow({
             ap,
             config,
             count: count[0]["count(`height`)"],
@@ -99,12 +98,12 @@ export default class Fetcher extends Service {
     private knex: any;
 
     /**
-     * Recommend to use `Fetcher.new()` instead
+     * Recommend to use `Shadow.new()` instead
      *
      * @param {Config} config - darwinia.js Config
      * @param {Web3} web - darwinia.js Web3
      */
-    constructor(config: IFetcherConfig) {
+    constructor(config: IShadowConfig) {
         super();
         this.ap = config.ap;
         this.alive = false;
@@ -184,7 +183,7 @@ export default class Fetcher extends Service {
      */
     public async start(start?: number): Promise<void> {
         let dimStart: number = 0;
-        await Fetcher.checkTable(this.knex, start);
+        await Shadow.checkTable(this.knex, start);
 
         if (start === undefined) {
             const max = await this.knex("blocks").max("height");
@@ -207,7 +206,7 @@ export default class Fetcher extends Service {
     }
 
     /**
-     * We can restart `Fetcher` just by runing `this.start()` again.
+     * We can restart `Shadow` just by runing `this.start()` again.
      */
     public async stop(): Promise<void> {
         this.alive = false;
