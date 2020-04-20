@@ -13,7 +13,8 @@ import rawTj from "./static/types.json";
 
 // constants
 export const TYPES_URL = "https://raw.githubusercontent.com/darwinia-network/darwinia/master/runtime/crab/crab_types.json"
-export const ETHASHPROOF_URL_OSX = "https://github.com/darwinia-network/darwinia.js/releases/download/ethproofhash/ethproofhash-osx.tar.gz"
+export const ETHASHPROOF_URL_OSX = "https://github.com/darwinia-network/darwinia.js/releases/download/ethproofhash/ethashproof-osx.tar.gz"
+export const ETHASHPROOF_URL_LINUX = "https://github.com/darwinia-network/darwinia.js/releases/download/ethproofhash/ethashproof-linux.tar.gz"
 
 // interfaces
 export interface IConfigPath {
@@ -147,6 +148,8 @@ export class Config {
     public async downloadEthashProofBins(): Promise<void> {
         if (os.type() === "Darwin") {
             await downloadTar(this.path.bin, ETHASHPROOF_URL_OSX, "ethashproof");
+        } else if (os.type() === "Linux") {
+            await downloadTar(this.path.bin, ETHASHPROOF_URL_LINUX, "ethashproof");
         } else {
             log.ex([
                 "only support downloading darwin binaries for now, you can ",
