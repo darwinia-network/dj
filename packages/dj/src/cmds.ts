@@ -62,8 +62,10 @@ export async function keepHandler(args: Arguments) {
     switch ((args.service as string)) {
         case "fetcher":
             service = await Fetcher.new();
+            break;
         case "relay":
             service = await Relay.new();
+            break;
         default:
             break;
     }

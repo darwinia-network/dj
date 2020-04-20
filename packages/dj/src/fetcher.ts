@@ -1,16 +1,24 @@
 /* tslint:disable:no-var-requires */
 import Koa from "koa";
+import Jayson from "jayson";
 import * as path from "path";
 import { BlockWithProof, Config, IDarwiniaEthBlock, log } from "@darwinia/util";
-import { autoWeb3, Web3 } from "@darwinia/api";
+import { autoAPI, autoWeb3, Web3, API } from "@darwinia/api";
+import { Vec, Struct } from "@polkadot/types";
 import { Service } from "./service";
 
 export interface IFetcherConfig {
+    ap: API;
     config: Config;
     count: number;
     knex: any;
     max: number;
     web3: Web3;
+}
+
+export interface CodecResp {
+    header: string;
+    proof: string;
 }
 
 /**
@@ -50,9 +58,8 @@ export default class Fetcher extends Service {
      */
     public static async new(): Promise<Fetcher> {
         const config = new Config();
+        const ap = await autoAPI();
         const web3 = await autoWeb3();
-
-
         const dbPath = path.resolve(config.path.db.fetcher);
 
         // init sqlite3 to save blocks
@@ -73,6 +80,7 @@ export default class Fetcher extends Service {
         const count = await knex("blocks").count("height");
 
         return new Fetcher({
+            ap,
             config,
             count: count[0]["count(`height`)"],
             knex,
@@ -81,6 +89,7 @@ export default class Fetcher extends Service {
         });
     }
 
+    public ap: API;
     public max: number;
     public count: number;
     public port: number;
@@ -97,6 +106,7 @@ export default class Fetcher extends Service {
      */
     constructor(config: IFetcherConfig) {
         super();
+        this.ap = config.ap;
         this.alive = false;
         this.config = config.config;
         this.count = config.count;
@@ -134,24 +144,37 @@ export default class Fetcher extends Service {
         // start the fetcher
         this.start();
 
-        // start server
-        const app = new Koa();
-        app.use(async (ctx) => {
-            const block = ctx.url.match(/\/block\/(\d+)/);
-            if (block) {
-                const num: string = block[1];
-                const pair = await this.getBlock(Number(num));
-                const dBlock = pair[0];
-                (dBlock as any).proof = pair[1];
+        const rpc = new Jayson.Server({
+            shadow_getEthHeaderWithProofByNumber: async (args: any, cb:any ) => {
+                const blockNumber: number = args.block_num;
+                // const transacation: boolean = args.transaction;
+                const options: Record<string, any> = args.options;
+                const pair = await this.getBlock(blockNumber);
+                const resp = {
+                    header: pair[0],
+                    proof: pair[1],
+                };
 
-                ctx.body = dBlock;
-            } else {
-                ctx.body = "hello";
+                if (options.format === "json") {
+                    (resp.header as any) = new Struct(
+                        this.ap._.registry,
+                        this.config.types.EthHeader,
+                        pair[0]
+                    ).toHex();
+
+                    (resp.proof as any) = new Vec(
+                        this.ap._.registry,
+                        (this.ap._.registry.get("DoubleNodeWithMerkleProof") as any),
+                        pair[1],
+                    ).toHex();
+                }
+
+                cb(null, resp);
             }
         });
 
         log(`fetcher server start at ${port}`);
-        app.listen(port);
+        rpc.http().listen(port);
     }
 
     /**
