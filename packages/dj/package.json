@@ -1,7 +1,7 @@
 {
   "private": false,
   "name": "@darwinia/dj",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "description": "High-level darwinia.js api",
   "homepage": "https://github.com/darwinia-network/darwinia.js",
   "repository": {
@@ -18,15 +18,19 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "@darwinia/api": "^0.1.11",
-    "@darwinia/util": "^0.1.11",
+    "@darwinia/api": "^0.1.12",
+    "@darwinia/util": "^0.1.12",
     "chalk": "^4.0.0",
     "knex": "^0.20.14",
+    "koa": "^2.11.0",
     "sqlite3": "^4.1.1",
     "yargs": "^15.3.1"
   },
   "scripts": {
     "build": "tsc --strict",
     "lint": "tsc --noEmit --strict && tslint --project ./tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/koa": "^2.11.3"
   }
 }

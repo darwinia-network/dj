@@ -1,6 +1,6 @@
 {
  "name": "@darwinia/util",
- "version": "0.1.11",
+ "version": "0.1.12",
  "description": "Util for developing darwinia javascript library.",
  "homepage": "https://github.com/darwinia-network/darwinia.js",
  "repository": {
@@ -19,7 +19,8 @@
   "ethereumjs-util": "^6.2.0",
   "got": "^10.7.0",
   "javascript-stringify": "^2.0.1",
-  "progress": "^2.0.3"
+  "progress": "^2.0.3",
+  "web3-utils": "^1.2.6"
  },
  "scripts": {
   "build": "tsc --strict && cp src/static/grammer.yml lib/src/static/grammer.yml",

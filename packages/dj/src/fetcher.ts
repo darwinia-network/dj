@@ -1,11 +1,12 @@
 /* tslint:disable:no-var-requires */
+import Koa from "koa";
 import * as path from "path";
-import { Config, IDarwiniaEthBlock, log } from "@darwinia/util";
+import { BlockWithProof, Config, IDarwiniaEthBlock, log } from "@darwinia/util";
 import { autoWeb3, Web3 } from "@darwinia/api";
 import { Service } from "./service";
 
 export interface IFetcherConfig {
-    conf: Config;
+    config: Config;
     count: number;
     knex: any;
     max: number;
@@ -33,6 +34,7 @@ export default class Fetcher extends Service {
             await knex.schema.createTable("blocks", (table: any) => {
                 table.integer("height").unique();
                 table.string("block").unique();
+                table.string("proof").unique();
             });
         } else {
             if (start) {
@@ -47,11 +49,11 @@ export default class Fetcher extends Service {
      * @return {Promise<Fetcher>} fetcher service
      */
     public static async new(): Promise<Fetcher> {
-        const conf = new Config();
+        const config = new Config();
         const web3 = await autoWeb3();
 
 
-        const dbPath = path.resolve(conf.path.db.fetcher);
+        const dbPath = path.resolve(config.path.db.fetcher);
 
         // init sqlite3 to save blocks
         const knex = require("knex")({
@@ -71,7 +73,7 @@ export default class Fetcher extends Service {
         const count = await knex("blocks").count("height");
 
         return new Fetcher({
-            conf,
+            config,
             count: count[0]["count(`height`)"],
             knex,
             max: max[0]["max(`height`)"],
@@ -81,6 +83,7 @@ export default class Fetcher extends Service {
 
     public max: number;
     public count: number;
+    public port: number;
     public web3: Web3;
     protected alive: boolean;
     protected config: Config;
@@ -94,11 +97,12 @@ export default class Fetcher extends Service {
      */
     constructor(config: IFetcherConfig) {
         super();
-        this.config = config.conf;
+        this.alive = false;
+        this.config = config.config;
         this.count = config.count;
         this.knex = config.knex;
-        this.alive = false;
         this.max = config.max;
+        this.port = 0;
         this.web3 = config.web3;
     }
 
@@ -108,17 +112,46 @@ export default class Fetcher extends Service {
      * @param {Number} num - block number
      * @return {IDarwiniaEthBlock} block - darwinia style eth block
      */
-    public async getBlock(height: number): Promise<IDarwiniaEthBlock> {
+    public async getBlock(height: number): Promise<BlockWithProof> {
         const tx = await this.knex("blocks")
             .select("*")
-            .whereRaw(`blocks.height = ${height}`).catch(async () => {
-                return await this.web3.getBlock(height);
-            });
+            .whereRaw(`blocks.height = ${height}`);
+
+        const proof = await this.config.proofBlock(height);
         if (tx.length === 0) {
-            return await this.web3.getBlock(height);
+            return [await this.web3.getBlock(height), proof];
         } else {
-            return JSON.parse(tx[0].block);
+            return [JSON.parse(tx[0].block), proof];
         }
+    }
+
+    /**
+     * Serve the fetcher service
+     *
+     * @example GET `/block/{number}`
+     */
+    public async serve(port: number): Promise<void> {
+        // start the fetcher
+        this.start();
+
+        // start server
+        const app = new Koa();
+        app.use(async (ctx) => {
+            const block = ctx.url.match(/\/block\/(\d+)/);
+            if (block) {
+                const num: string = block[1];
+                const pair = await this.getBlock(Number(num));
+                const dBlock = pair[0];
+                (dBlock as any).proof = pair[1];
+
+                ctx.body = dBlock;
+            } else {
+                ctx.body = "hello";
+            }
+        });
+
+        log(`fetcher server start at ${port}`);
+        app.listen(port);
     }
 
     /**
@@ -132,7 +165,11 @@ export default class Fetcher extends Service {
 
         if (start === undefined) {
             const max = await this.knex("blocks").max("height");
-            dimStart = max[0]["max(`height`)"];
+            if (max[0]["max(`height`)"]) {
+                dimStart = max[0]["max(`height`)"];
+            } else {
+                dimStart = 0;
+            }
         } else {
             dimStart = start;
         }
@@ -188,9 +225,11 @@ export default class Fetcher extends Service {
         if (block) {
             log.trace(`got block ${block.number} - ${block.hash}`);
             log.trace(`\t${JSON.stringify(block)}`);
+            const proof = await this.config.proofBlock((block.number as number));
             await this.knex("blocks").insert({
                 block: JSON.stringify(block),
                 height,
+                proof: JSON.stringify(proof),
             });
 
             // keep fetching
