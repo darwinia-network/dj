@@ -4,14 +4,11 @@
     "secret": ""
   },
   "grammer": {
-    "commands": {
-      "faucet": {
-        "supply": 400,
-        "amount": 1000,
-        "interval": 24
-      }
-    },
-    "port": 1439
+    "faucet": {
+      "supply": 400,
+      "amount": 1000,
+      "interval": 24
+    }
   },
   "node": "ws://0.0.0.0:9944",
   "seed": "//Alice"

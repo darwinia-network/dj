@@ -34,7 +34,8 @@ export interface IConfigPath {
 
 export interface IDatabaseConfig {
     crash: string;
-    fetcher: string;
+    grammer: string;
+    shadow: string;
 }
 
 export interface IEthConfig {
@@ -71,7 +72,8 @@ export class Config {
         // database
         const db = path.resolve(root, "database");
         const crash = path.resolve(db, "crash.db");
-        const fetcher = path.resolve(db, "fetcher.db");
+        const shadow = path.resolve(db, "shadow.db");
+        const grammerDb = path.resolve(db, "grammer.db");
 
         // init pathes
         this.path = {
@@ -79,7 +81,8 @@ export class Config {
             conf,
             db: {
                 crash,
-                fetcher
+                shadow,
+                grammer: grammerDb,
             },
             grammer,
             root,

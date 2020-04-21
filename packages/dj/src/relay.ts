@@ -13,38 +13,38 @@ import { BlockWithProof, Config, log } from "@darwinia/util";
  * Keep relay ethereum blocks to darwinia
  *
  * @property {Boolean} alive - service alive flag
- * @property {Shadow} fetcher - the fetcher service
+ * @property {Shadow} shadow - the shadow service
  * @property {Number} safe - the safe block number
  * @property {API} api - darwinia substrate api
  * @property {Config} config - darwinia.js config
  */
 export default class Relay extends Service {
     /**
-     * Async init fetcher service
+     * Async init shadow service
      *
-     * @return {Promise<Shadow>} fetcher service
+     * @return {Promise<Shadow>} shadow service
      */
     public static async new(): Promise<Relay> {
         const api = await autoAPI();
         const conf = new Config();
-        const fetcher = await Shadow.new();
+        const shadow = await Shadow.new();
 
-        return new Relay(api, conf, fetcher);
+        return new Relay(api, conf, shadow);
     }
 
     public alive: boolean;
     public api: API;
-    public fetcher: Shadow;
+    public shadow: Shadow;
     public port: number;
     protected config: Config;
     private safe: number;
 
-    constructor(api: API, config: Config, fetcher: Shadow) {
+    constructor(api: API, config: Config, shadow: Shadow) {
         super();
         this.alive = false;
         this.api = api;
         this.config = config;
-        this.fetcher = fetcher;
+        this.shadow = shadow;
         this.port = 0;
         this.safe = 7;
     }
@@ -87,8 +87,8 @@ export default class Relay extends Service {
             } else {
                 log.ok(`relay eth header ${next[0].number} succeed!`);
                 log.trace(`current darwinia eth height is:             ${next[0].number}`);
-                log.trace(`current the max height of local storage is: ${this.fetcher.max}`);
-                next = await this.fetcher.getBlock((next[0].number as number) + 1);
+                log.trace(`current the max height of local storage is: ${this.shadow.max}`);
+                next = await this.shadow.getBlock((next[0].number as number) + 1);
             }
         }
     }
@@ -101,20 +101,20 @@ export default class Relay extends Service {
     }
 
     /**
-     * Infer if we should stop fetcher
+     * Infer if we should stop shadow
      */
     private async shouldStopShadow(n: number): Promise<void> {
         if (
-            (this.fetcher.max >= this.safe + n) && this.fetcher.status()
+            (this.shadow.max >= this.safe + n) && this.shadow.status()
         ) {
-            log.event("fetcher - stop");
-            await this.fetcher.stop();
+            log.event("shadow - stop");
+            await this.shadow.stop();
         } else if (
-            (this.fetcher.max < this.safe + n) && !this.fetcher.status()
+            (this.shadow.max < this.safe + n) && !this.shadow.status()
         ) {
-            log.event("fetcher - start");
-            if (!this.fetcher.status()) {
-                this.fetcher.start(n);
+            log.event("shadow - start");
+            if (!this.shadow.status()) {
+                this.shadow.start(n);
             }
         }
     }
@@ -129,7 +129,7 @@ export default class Relay extends Service {
     private async startFromBestHeaderHash(): Promise<BlockWithProof> {
         log("start from the lastest eth header of darwinia...");
         const bestHeaderHash = await this.api._.query.ethRelay.bestHeaderHash();
-        const last = await this.fetcher.web3._.eth.getBlock(bestHeaderHash.toString());
-        return await this.fetcher.getBlock((last.number as number) + 1);
+        const last = await this.shadow.web3._.eth.getBlock(bestHeaderHash.toString());
+        return await this.shadow.getBlock((last.number as number) + 1);
     }
 }

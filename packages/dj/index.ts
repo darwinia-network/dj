@@ -80,7 +80,7 @@ function anyErrorYouLike(cms: string, e: any) {
         .command({
             builder: (argv: yargs.Argv) => {
                 return argv.positional('service', {
-                    choices: ["relay", "shadow"],
+                    choices: ["grammer", "relay", "shadow"],
                     required: true,
                 }).option("daemon", {
                     alias: "d",
