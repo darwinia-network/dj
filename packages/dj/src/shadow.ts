@@ -248,6 +248,7 @@ export default class Shadow extends Service {
             log.trace(`got block ${block.number} - ${block.hash}`);
             log.trace(`\t${JSON.stringify(block)}`);
             const proof = await this.config.proofBlock((block.number as number));
+            console.log(proof.length);
             await this.knex("blocks").insert({
                 block: JSON.stringify(block),
                 height,

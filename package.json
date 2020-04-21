@@ -35,5 +35,8 @@
       "pre-commit": "git add . && lerna run lint",
       "pre-push": "lerna run build"
     }
+  },
+  "dependencies": {
+    "@types/js-yaml": "^3.12.3"
   }
 }

@@ -47,7 +47,7 @@ function anyErrorYouLike(cms: string, e: any) {
                     type: "string",
                 });
             },
-            command: "info <recipe> [address]",
+            command: "info <recipe>",
             describe: "Get info of some recipes",
             handler: async (args: yargs.Arguments) => {
                 await handlers.infoHandler(args).catch(
@@ -80,7 +80,7 @@ function anyErrorYouLike(cms: string, e: any) {
         .command({
             builder: (argv: yargs.Argv) => {
                 return argv.positional('service', {
-                    choices: ["crash", "relay", "fetcher"],
+                    choices: ["relay", "shadow"],
                     required: true,
                 }).option("daemon", {
                     alias: "d",

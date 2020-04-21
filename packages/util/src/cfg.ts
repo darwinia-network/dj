@@ -12,15 +12,22 @@ import rawTj from "./static/types.json";
 
 
 // constants
-export const TYPES_URL = "https://raw.githubusercontent.com/darwinia-network/darwinia/master/runtime/crab/crab_types.json"
+export const TYPES_URL = "https://raw.githubusercontent.com/darwinia-network/darwinia/master/runtime/crab/darwinia_types.json"
 export const ETHASHPROOF_URL_OSX = "https://github.com/darwinia-network/darwinia.js/releases/download/ethproofhash/ethashproof-osx.tar.gz"
 export const ETHASHPROOF_URL_LINUX = "https://github.com/darwinia-network/darwinia.js/releases/download/ethproofhash/ethashproof-linux.tar.gz"
 
 // interfaces
+export interface IConfig {
+    eth: IEthConfig;
+    node: string;
+    seed: string;
+}
+
 export interface IConfigPath {
     bin: string;
     conf: string;
     db: IDatabaseConfig;
+    grammer: string;
     root: string;
     types: string;
 }
@@ -35,11 +42,6 @@ export interface IEthConfig {
     secret: string;
 }
 
-export interface IConfig {
-    eth: IEthConfig;
-    node: string;
-    seed: string;
-}
 
 /**
  * darwinia.js config
@@ -53,8 +55,8 @@ export interface IConfig {
  */
 export class Config {
     eth: IEthConfig;
-    path: IConfigPath;
     node: string;
+    path: IConfigPath;
     seed: string;
     types: Record<string, any>;
 
@@ -73,7 +75,15 @@ export class Config {
 
         // init pathes
         this.path = {
-            bin, conf, db: { crash, fetcher }, root, types
+            bin,
+            conf,
+            db: {
+                crash,
+                fetcher
+            },
+            grammer,
+            root,
+            types
         };
 
         // check database dir - the deepest

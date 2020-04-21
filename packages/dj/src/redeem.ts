@@ -5,7 +5,7 @@
  * with `sqlite3`.
  */
 import { Service } from "./service";
-import abi from "./json/abi.json";
+import abi from "./static/abi.json";
 import * as path from "path";
 import { autoWeb3, Web3 } from "@darwinia/api";
 import { Config, log } from "@darwinia/util";

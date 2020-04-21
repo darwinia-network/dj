@@ -56,6 +56,8 @@ export async function downloadTar(
     file: string,
 ): Promise<void> {
     fs.mkdirSync(dir, { recursive: true });
+    log.trace(`downloading ${file} from ${url}`);
+
     const bar = new Progress(`[ ${chalk.cyan("wait")} ] [:bar] :rate/bps :etas`, {
         complete: '=',
         incomplete: ' ',
@@ -66,9 +68,6 @@ export async function downloadTar(
     let prePercent = 0;
     await pipline(
         got.stream(url)
-            .on("request", () => {
-                log.trace(`downloading ${file} from ${url}`);
-            })
             .on("downloadProgress", (progress) => {
                 bar.tick(progress.percent - prePercent);
                 prePercent = progress.percent;

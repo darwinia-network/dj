@@ -1,0 +1,7 @@
+type Query {
+  "Let's talk!"
+  answer(
+    ident: String!,
+    message: String
+  ): String
+}
