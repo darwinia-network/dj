@@ -7,23 +7,47 @@ import {
 } from "@darwinia/util";
 import {Arguments} from "yargs";
 import { Service } from "./service";
-import Fetcher from "./fetcher";
+import Shadow from "./shadow";
 import Relay from "./relay";
 
 
 /**
  * @param {Arguments} args - yarg args
  */
-export async function balanceHandler(args: Arguments) {
+export async function infoHandler(args: Arguments) {
     const api = await autoAPI();
-    let addr = (args.address as string);
-    if (addr === "") {
-        addr = api.account.address;
-    }
+    const web3 = await autoWeb3();
 
-    const balance = await api.getBalance(addr);
-    const s = balance + " RING 💰";
-    log.ox(s);
+    switch (args.recipe) {
+        case "balance":
+            let addr = (args.address as string);
+            if (addr === "") {
+                addr = api.account.address;
+            }
+
+            const balance = await api.getBalance(addr);
+            const s = balance + " RING 💰";
+            log.ox(s);
+            break;
+        case "bestHeader":
+            const bestHeaderHash = await api._.query.ethRelay.bestHeaderHash();
+            const last = await web3.getBlock(bestHeaderHash.toString());
+            log.ox(JSON.stringify(last, null, 2));
+            break;
+        case "header":
+            const block = (args.block as string);
+            let header: IDarwiniaEthBlock | null = null;
+            if (block === "") {
+                const hash = await api._.query.ethRelay.bestHeaderHash();
+                header = await web3.getBlock(hash.toString());
+            }
+
+            header = await web3.getBlock(block);
+            log.ox(JSON.stringify(header, null, 2));
+            break;
+        default:
+            break;
+    }
 }
 
 
@@ -60,10 +84,12 @@ export async function keepHandler(args: Arguments) {
 
     // select service
     switch ((args.service as string)) {
-        case "fetcher":
-            service = await Fetcher.new();
+        case "shadow":
+            service = await Shadow.new();
+            break;
         case "relay":
             service = await Relay.new();
+            break;
         default:
             break;
     }

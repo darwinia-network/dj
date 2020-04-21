@@ -34,8 +34,8 @@ function burn(web3: any, addr: any): any {
  * @property {Number} sent - the count of sent txes
  * @property {Web3} web - darwinia web3
  */
-export default class Crash extends Service {
-    public static async new(): Promise<Crash> {
+export default class Redeem extends Service {
+    public static async new(): Promise<Redeem> {
         const conf = new Config();
         const web3 = await autoWeb3();
         if (conf.eth.node.indexOf("mainnet") > -1) {
@@ -52,9 +52,10 @@ export default class Crash extends Service {
             ].join(""));
         }
 
-        return new Crash(conf, web3);
+        return new Redeem(conf, web3);
     }
 
+    public port: number;
     protected config: Config;
     private addr: string;
     private contract: any;
@@ -83,9 +84,18 @@ export default class Crash extends Service {
         this.alive = false;
         this.receipt = 0;
         this.sent = 0;
+        this.port = 0;
         this.addr = this.web3._.eth.accounts.wallet[0].address;
         this.contract = burn(this.web3, this.addr);
         log.trace(dbPath);
+    }
+
+    /**
+     * @deprecated no need to serve
+     */
+    public async serve(port: number): Promise<void> {
+        log.warn(`the expect port is ${port}, the server of relay is not completed`);
+        await this.start();
     }
 
     /**
