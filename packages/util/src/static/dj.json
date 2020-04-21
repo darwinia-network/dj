@@ -6,7 +6,7 @@
   "grammer": {
     "faucet": {
       "supply": 400,
-      "amount": 1000,
+      "amount": 1000000000000,
       "interval": 24
     }
   },

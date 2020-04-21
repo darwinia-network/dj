@@ -130,7 +130,7 @@ function anyErrorYouLike(cms: string, e: any) {
             },
         }).argv;
 
-    // show help if no inputso
+    // show help if no input
     if (process.argv.length < 3) {
         yargs.showHelp();
     }

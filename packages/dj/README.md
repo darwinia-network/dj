@@ -18,10 +18,9 @@ Input <kbd>dj</kbd> to your command-line.
 dj <hello@darwinia.network>
 
 Commands:
-  dj balance [address]            Get balance of darwinia account
+  dj info <recipe>                Get balance of darwinia account
   dj config [edit]                show config
   dj keep <service>               trigger services
-  dj reset [block]                Reset genesis eth header in darwinia
   dj relay [block]                Relay eth header to darwinia
   dj transfer <address> <amount>  Transfer to darwinia account
 
