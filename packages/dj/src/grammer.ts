@@ -71,6 +71,11 @@ export interface IGrammerConfig {
  * Grammer Service
  *
  * @property {Config} config - dj.json
+ * @property {Number} port - port of grammer server
+ * @property {API} api - darwinia api
+ * @property {IGrammerCommandsConfig} commands - commands config from `dj.json`
+ * @property {IGrammer} grammer - grammer config from `grammer.yml`
+ * @property {Knex} knex - address database
  */
 export default class Grammer extends Service {
     /**
@@ -148,6 +153,11 @@ export default class Grammer extends Service {
         this.port = 1439;
     }
 
+    /**
+     * serve grammer with specfic port
+     *
+     * @param {Number} port - this port can be passed from command-line
+     */
     public async serve(port: number) {
         const server = new ApolloServer({
             typeDefs: GrammerSchema,
@@ -179,14 +189,25 @@ export default class Grammer extends Service {
         });
     }
 
+    /**
+     * start to serve grammer server
+     */
     public async start() {
         this.serve(this.port);
     }
 
+    /**
+     * quit process
+     */
     public async stop() {
         log.ox("grammer server has stopped");
     }
 
+    /**
+     * Transfer some ring wich multi-checks
+     *
+     * @param {String} addr - the target address
+     */
     private async transfer(addr: string): Promise<string> {
         // check address
         addr = addr.trim();
