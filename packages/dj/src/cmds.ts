@@ -7,8 +7,9 @@ import {
 } from "@darwinia/util";
 import {Arguments} from "yargs";
 import { Service } from "./service";
-import Shadow from "./shadow";
+import Grammer from "./grammer";
 import Relay from "./relay";
+import Shadow from "./shadow";
 
 
 /**
@@ -84,6 +85,9 @@ export async function keepHandler(args: Arguments) {
 
     // select service
     switch ((args.service as string)) {
+        case "grammer":
+            service = await Grammer.new();
+            break;
         case "shadow":
             service = await Shadow.new();
             break;

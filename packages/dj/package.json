@@ -20,8 +20,11 @@
   "dependencies": {
     "@darwinia/api": "^0.1.12",
     "@darwinia/util": "^0.1.12",
+    "apollo-server": "^2.12.0",
     "chalk": "^4.0.0",
+    "graphql-import-node": "^0.0.4",
     "jayson": "^3.2.1",
+    "js-yaml": "^3.13.1",
     "knex": "^0.20.14",
     "sqlite3": "^4.1.1",
     "yargs": "^15.3.1"

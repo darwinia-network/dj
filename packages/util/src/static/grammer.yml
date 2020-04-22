@@ -33,13 +33,18 @@ more: >-
 
 # `faucet` command
 faucet:
+  failed: >-
+    transfer failed, please try again
+    
   succeed: >-
     congratulations! the transaction is pending, take a look at
 
     https://crab.subscan.io/extrinsic/${hash}
 
   interval: >-
-    it seems that you have already got the ring of today, tell me your story
+    it seems that you have already got the ring of today, tell me your story~
+
+    You can call me after ${hour} hrs.
 
   supply: >-
     we have run out our faucet supply today, trigger your clock at tomorrow morning

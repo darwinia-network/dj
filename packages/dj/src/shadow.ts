@@ -51,15 +51,15 @@ export default class Shadow extends Service {
     }
 
     /**
-     * Async init fetcher service
+     * Async init shadow service
      *
-     * @return {Promise<Shadow>} fetcher service
+     * @return {Promise<Shadow>} shadow service
      */
     public static async new(): Promise<Shadow> {
         const config = new Config();
         const ap = await autoAPI();
         const web3 = await autoWeb3();
-        const dbPath = path.resolve(config.path.db.fetcher);
+        const dbPath = path.resolve(config.path.db.shadow);
 
         // init sqlite3 to save blocks
         const knex = require("knex")({
@@ -135,12 +135,12 @@ export default class Shadow extends Service {
     }
 
     /**
-     * Serve the fetcher service
+     * Serve the shadow service
      *
      * @example GET `/block/{number}`
      */
     public async serve(port: number): Promise<void> {
-        // start the fetcher
+        // start the shadow
         this.start();
 
         const rpc = new Jayson.Server({
@@ -172,7 +172,7 @@ export default class Shadow extends Service {
             }
         });
 
-        log(`fetcher server start at ${port}`);
+        log(`shadow server start at ${port}`);
         rpc.http().listen(port);
     }
 
@@ -214,7 +214,7 @@ export default class Shadow extends Service {
 
 
     /**
-     * Check if fetcher is running
+     * Check if shadow is running
      */
     public status(): boolean {
         return this.alive;
@@ -248,6 +248,7 @@ export default class Shadow extends Service {
             log.trace(`got block ${block.number} - ${block.hash}`);
             log.trace(`\t${JSON.stringify(block)}`);
             const proof = await this.config.proofBlock((block.number as number));
+            console.log(proof.length);
             await this.knex("blocks").insert({
                 block: JSON.stringify(block),
                 height,
@@ -265,7 +266,7 @@ export default class Shadow extends Service {
     }
 
     /**
-     * Restart fetcher
+     * Restart shadow
      *
      * @param {Number} height - ethereum block height
      */

@@ -215,8 +215,8 @@ export class API {
     ): Promise<ExResult> {
         const res = new ExResult(
             false,
-            "",
-            ex.hash.toString(),
+            "", // blockHash
+            "", // exHash
         );
 
         return await new Promise((resolve, reject) => {
@@ -229,8 +229,8 @@ export class API {
 
                 if (status.isInBlock) {
                     res.blockHash = status.asInBlock.toHex().toString();
+                    res.exHash = ex.hash.toHex().toString();
                     if (!inFinialize) {
-                        log.trace("inBlock relay mode");
                         res.isOk = true;
                         resolve(res);
                     }
