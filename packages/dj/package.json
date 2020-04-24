@@ -1,7 +1,7 @@
 {
   "private": false,
   "name": "@darwinia/dj",
-  "version": "0.1.12",
+  "version": "0.1.14",
   "description": "High-level darwinia.js api",
   "homepage": "https://github.com/darwinia-network/darwinia.js",
   "repository": {
@@ -18,8 +18,8 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "@darwinia/api": "^0.1.12",
-    "@darwinia/util": "^0.1.12",
+    "@darwinia/api": "^0.1.13",
+    "@darwinia/util": "^0.1.13",
     "apollo-server": "^2.12.0",
     "chalk": "^4.0.0",
     "graphql-import-node": "^0.0.4",
@@ -30,7 +30,7 @@
     "yargs": "^15.3.1"
   },
   "scripts": {
-    "build": "tsc --strict",
+    "build": "tsc --strict && cp src/static/schema.gql lib/src/static/schema.gql",
     "lint": "tsc --noEmit --strict && tslint --project ./tsconfig.json"
   },
   "devDependencies": {
