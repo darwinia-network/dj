@@ -236,24 +236,24 @@ export class API {
                     }
 
                     if (events) {
-                        events.forEach(async (r: EventRecord) => {
+                        events.forEach((value: EventRecord): void => {
                             log.trace(
                                 "\t" +
-                                    r.phase.toString() +
-                                    `: ${r.event.section}.${r.event.method}` +
-                                    r.event.data.toString(),
+                                    value.phase.toString() +
+                                    `: ${value.event.section}.${value.event.method}` +
+                                    value.event.data.toString(),
                             );
 
-                            if (r.event.method.indexOf("Failed") > -1) {
+                            if (value.event.method.indexOf("Failed") > -1) {
                                 log.err("transaction failed");
                                 res.isOk = false;
                                 res.isErr = true;
                                 reject(res);
                             }
 
-                            if ((r.event.data[0] as DispatchError).isModule) {
-                                res.docs = await this._.registry.findMetaError(
-                                    (r.event.data[0] as DispatchError).asModule.toU8a(),
+                            if ((value.event.data[0] as DispatchError).isModule) {
+                                res.docs = this._.registry.findMetaError(
+                                    (value.event.data[0] as DispatchError).asModule.toU8a(),
                                 );
 
                                 reject(res);

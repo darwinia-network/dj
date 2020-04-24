@@ -11,7 +11,7 @@ help: >-
   
   - /more - there must be more to life than being a bot!
   
-  - /faucet - let`s talk about it, woundn`t it be nice?
+  - /faucet - let`s talk about it, wouldn`t it be nice?
 
 # `book` command
 book: >-
@@ -39,11 +39,13 @@ faucet:
   succeed: >-
     congratulations! the transaction is pending, take a look at
 
+    
     https://crab.subscan.io/extrinsic/${hash}
 
   interval: >-
     it seems that you have already got the ring of today, tell me your story~
 
+    
     You can call me after ${hour} hrs.
 
   supply: >-

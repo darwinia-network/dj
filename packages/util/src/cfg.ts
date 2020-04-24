@@ -70,7 +70,7 @@ export class Config {
         const grammer = path.resolve(root, "grammer.yml");
 
         // database
-        const db = path.resolve(root, "database");
+        const db = path.resolve(root, "cache");
         const crash = path.resolve(db, "crash.db");
         const shadow = path.resolve(db, "shadow.db");
         const grammerDb = path.resolve(db, "grammer.db");
