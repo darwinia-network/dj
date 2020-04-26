@@ -38,7 +38,7 @@ export default class Redeem extends Service {
     public static async new(): Promise<Redeem> {
         const conf = new Config();
         const web3 = await autoWeb3();
-        if (conf.eth.node.indexOf("mainnet") > -1) {
+        if (conf.eth.api.indexOf("mainnet") > -1) {
             log.ex([
                 "DO NOT USE THIS COMMAND IN ETHEREUM MAINNET,",
                 " THIS WILL BURN OUT ALL OF YOUR ETH!"

@@ -32,6 +32,7 @@ export class Web3 {
     public async getBlock(block: string | number): Promise<IDarwiniaEthBlock> {
         log.trace(`fetch block ${block} from ethereum...`);
         const eBlock: IEthBlock = await this._.eth.getBlock(block);
+        log.trace(`raw eth block: ${eBlock}`);
         return Block.parse(eBlock);
     }
 }

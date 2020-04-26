@@ -7,9 +7,8 @@ import path from "path";
 import { download, downloadTar } from "./download";
 import { log } from "./log";
 import { IDoubleNodeWithMerkleProof, getProof } from "./proof";
-import rawDj from "./static/dj.json";
+import rawCj from "./static/config.json";
 import rawTj from "./static/types.json";
-
 
 // constants
 export const TYPES_URL = "https://raw.githubusercontent.com/darwinia-network/darwinia/master/runtime/crab/darwinia_types.json"
@@ -39,10 +38,9 @@ export interface IDatabaseConfig {
 }
 
 export interface IEthConfig {
-    node: string;
+    api: string;
     secret: string;
 }
-
 
 /**
  * darwinia.js config
@@ -65,7 +63,7 @@ export class Config {
         const home = os.homedir();
         const root = path.resolve(home, ".darwinia");
         const bin = path.resolve(root, "bin");
-        const conf = path.resolve(root, "dj.json");
+        const conf = path.resolve(root, "config.json");
         const types = path.resolve(root, "types.json");
         const grammer = path.resolve(root, "grammer.yml");
 
@@ -100,11 +98,11 @@ export class Config {
         }
 
         // load dj.json
-        let dj: IConfig = rawDj;
+        let cj: IConfig = rawCj;
         if (!fs.existsSync(conf)) {
-            fs.writeFileSync(conf, JSON.stringify(dj, null, 2));
+            fs.writeFileSync(conf, JSON.stringify(cj, null, 2));
         } else {
-            dj = JSON.parse(fs.readFileSync(conf, "utf8"));
+            cj = JSON.parse(fs.readFileSync(conf, "utf8"));
         }
 
         // load types.json
@@ -122,22 +120,21 @@ export class Config {
 
         // load config
         this.eth = {
-            node: dj.eth.node,
-            secret: dj.eth.secret,
+            api: cj.eth.api,
+            secret: cj.eth.secret,
         }
-        this.node = dj.node;
-        this.seed = dj.seed;
+        this.node = cj.node;
+        this.seed = cj.seed;
         this.types = tj;
 
         // warnings
-        if (this.eth.node === "") {
+        if (this.eth.api === "") {
             log.warn([
                 "web3 node has not been configured, ",
                 "edit `~/.darwinia/dj.json` if it is required",
             ].join(""));
         }
     }
-
 
     /**
      * edit dj.json
@@ -171,7 +168,6 @@ export class Config {
             ].join(""));
         }
     }
-
 
     /**
      * proof eth block
