@@ -211,6 +211,7 @@ export default class Grammer extends Service {
     private async transfer(addr: string): Promise<string> {
         // check address
         addr = addr.trim();
+        log.trace(`trying to tansfer to ${addr}`);
         if (addr.indexOf("CRAB") < 0 || addr.length !== 48) {
             return this.grammer.faucet.address;
         }
