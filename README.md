@@ -55,6 +55,28 @@ want to try `@darwinia/api` and `@darwinia/util`.
 
 If you want to test darwinia using `darwinia.js`, check the `@darwinia/dj` project.
 
+### Conect to Offchain worker
+- The `darwinia.js` can provide a shadow service help validator validate things
+- The shadow service may run on the same node or on a differet node, and any port as you like.
+- The offchain worker make the request to `eth-resource` with standard http port 80
+
+
+Here is the example help you to connect a shadow service running on port 8000 with same node with linux OS
+- point the `eth-resource` as 127.0.0.1, you also customized this with other dns service
+  1. `# echo '127.0.0.1        eth-resource' >> /etc/hosts`
+- proxy request on 80 port to 8000 port, only if the shadow service not run on the 80 port
+  1. install ngix
+  1. add following setting on config file
+    ```
+      server {
+          listen       eth-resource:80;
+          server_name  eth-resource;
+          location / {
+              proxy_pass http://127.0.0.1:8000;
+          }
+      }
+    ```
+  1. start the nginx
 
 ## LICENSE
 
