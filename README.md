@@ -6,7 +6,7 @@
 
 ## SPEC
 
-Gather common javascript usages for darwinia.
+Gather common javascript usages for [Darwinia Network](https://darwinia.network).
 
 
 | type      | name                                        |
@@ -39,7 +39,7 @@ we strongly recommand you to read this sample before you starting your
     },
     "port": 1439
   },
-  "node": "ws://0.0.0.0:9944",   // darwinia node, should start with `ws://`
+  "node": "ws://0.0.0.0:9944",   // darwinia node, should start with `ws://` or `wss://`
   "seed": "//Alice"              // darwinia account seed
 }
 ```
@@ -47,26 +47,26 @@ we strongly recommand you to read this sample before you starting your
 
 ### For Developers
 
-If you want to use `darwinia.js` developing your own `darwinia.js` based, you might
+If you want to use `darwinia.js` developing your own `darwinia.js` based apps, you might
 want to try `@darwinia/api` and `@darwinia/util`.
 
 
 ### For Testers and Users
 
-If you want to test darwinia using `darwinia.js`, check the `@darwinia/dj` project.
+If you want to test Darwinia using `darwinia.js`, check the `@darwinia/dj` project.
 
-### Conect to Offchain worker
-- The `darwinia.js` can provide a shadow service help validator validate things
-- The shadow service may run on the same node or on a differet node, and any port as you like.
-- The offchain worker make the request to `eth-resource` with standard http port 80
+### Connect to Offchain worker
+- The `darwinia.js` can provide a shadow service to help validators validate things
+- The shadow service may run on the same node or on a differet node, at any port as you like.
+- The offchain worker make the request to `eth-resource` host at standard http port 80
 
 
-Here is the example help you to connect a shadow service running on port 8000 with same node with linux OS
-- point the `eth-resource` as 127.0.0.1, you also customized this with other dns service
+Here is the example to connect a shadow service running on port 8000 on the same node with Linux OS
+- point the `eth-resource` host name to 127.0.0.1, you also customized this with other DNS services
   1. `# echo '127.0.0.1        eth-resource' >> /etc/hosts`
-- proxy request on 80 port to 8000 port, only if the shadow service not run on the 80 port
-  1. install ngix
-  1. add following setting on config file
+- proxy request on 80 port to 8000 port, only if the shadow service is not running on the 80 port
+  1. install Nginx
+  1. add following settings to config file
     ```
       server {
           listen       eth-resource:80;
@@ -76,7 +76,7 @@ Here is the example help you to connect a shadow service running on port 8000 wi
           }
       }
     ```
-  1. start the nginx
+  1. start the Nginx
 
 ## LICENSE
 
