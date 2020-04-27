@@ -26,10 +26,11 @@ we strongly recommand you to read this sample before you starting your
 // ~/.darwinia/dj.json
 {
   "eth": {
-    "node": "",                  // ethereum node url, you can input an infura url
-    "secret": ""                 // ethereum secret key, used for crash service
+    "node": "ethereum node url, you can input an infura url",
+    "secret": "ethereum secret key, used for crash service"
   },
-  "grammer": {                   // this field is for grammer server
+  "grammer": {           
+    "_comment": "this field is for grammer server, delete this line",
     "commands": {
       "faucet": {
         "supply": 400,
@@ -39,8 +40,8 @@ we strongly recommand you to read this sample before you starting your
     },
     "port": 1439
   },
-  "node": "ws://0.0.0.0:9944",   // darwinia node, should start with `ws://` or `wss://`
-  "seed": "//Alice"              // darwinia account seed
+  "node": "darwinia node, should start with `ws://` or `wss://`, eg: ws://0.0.0.0:9944",
+  "seed": "darwinia account seed, eg: //Alice"
 }
 ```
 
