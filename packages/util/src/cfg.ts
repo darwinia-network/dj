@@ -10,11 +10,10 @@ import { IDoubleNodeWithMerkleProof, getProof } from "./proof";
 import rawDj from "./static/dj.json";
 import rawTj from "./static/types.json";
 
-
 // constants
 export const TYPES_URL = "https://raw.githubusercontent.com/darwinia-network/darwinia/master/runtime/crab/darwinia_types.json"
-export const ETHASHPROOF_URL_OSX = "https://github.com/darwinia-network/darwinia.js/releases/download/ethproofhash/ethashproof-osx.tar.gz"
-export const ETHASHPROOF_URL_LINUX = "https://github.com/darwinia-network/darwinia.js/releases/download/ethproofhash/ethashproof-linux.tar.gz"
+export const DARGO_OSX_URL = "https://github.com/darwinia-network/darwinia.go/releases/download/v0.1.0/dargo-osx.tar.gz"
+export const DARGO_LINUX_URL = "https://github.com/darwinia-network/darwinia.go/releases/download/v0.1.0/dargo-linux.tar.gz"
 
 // interfaces
 export interface IConfig {
@@ -42,7 +41,6 @@ export interface IEthConfig {
     node: string;
     secret: string;
 }
-
 
 /**
  * darwinia.js config
@@ -138,7 +136,6 @@ export class Config {
         }
     }
 
-
     /**
      * edit dj.json
      */
@@ -160,9 +157,9 @@ export class Config {
      */
     public async downloadEthashProofBins(): Promise<void> {
         if (os.type() === "Darwin") {
-            await downloadTar(this.path.bin, ETHASHPROOF_URL_OSX, "ethashproof");
+            await downloadTar(this.path.bin, DARGO_OSX_URL, "dargo");
         } else if (os.type() === "Linux") {
-            await downloadTar(this.path.bin, ETHASHPROOF_URL_LINUX, "ethashproof");
+            await downloadTar(this.path.bin, DARGO_LINUX_URL, "dargo");
         } else {
             log.ex([
                 "only support downloading darwin binaries for now, you can ",
@@ -172,14 +169,13 @@ export class Config {
         }
     }
 
-
     /**
      * proof eth block
      */
     public async proofBlock(blockNumber: number): Promise<IDoubleNodeWithMerkleProof[]> {
-        const relayer = path.resolve(this.path.bin, "relayer");
+        const relayer = path.resolve(this.path.bin, "dargo");
         if (!fs.existsSync(relayer)) {
-            log.event("download eth hash proof binaries.");
+            log.event("download dargo binarie...");
             await this.downloadEthashProofBins();
         }
 

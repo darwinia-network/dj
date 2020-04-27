@@ -14,7 +14,7 @@ export async function getProof(
     blockNumber: number, binPath: string,
 ): Promise<IDoubleNodeWithMerkleProof[]> {
     let output: string = execSync(
-        `${binPath} ${blockNumber} | sed -e '1,/Json output/d'`
+        `${binPath} proof ${blockNumber} | sed -e '1,/Json output/d'`
     ).toString();
 
     // retrying...
@@ -23,7 +23,7 @@ export async function getProof(
         await new Promise(() => {
             setTimeout(async () => {
                 output = execSync(
-                    `${binPath} ${blockNumber} | sed -e '1,/Json output/d'`
+                    `${binPath} proof ${blockNumber} | sed -e '1,/Json output/d'`
                 ).toString();
             }, 3000)
         });
@@ -35,14 +35,14 @@ export async function getProof(
         .filter((_: any, index: number) => index % 2 === 0)
         .map((element: any, index: number) => {
             return Web3Utils.padLeft(element, 64)
-                + Web3Utils.padLeft(rawProof.elements[index*2 + 1], 64).substr(2)
+                + Web3Utils.padLeft(rawProof.elements[index * 2 + 1], 64).substr(2)
         });
 
     return h512s
         .filter((_: any, index: number) => index % 2 === 0)
         .map((element: any, index: number) => {
             return {
-                dag_nodes: [element, h512s[index*2 + 1]],
+                dag_nodes: [element, h512s[index * 2 + 1]],
                 proof: rawProof.merkle_proofs.slice(
                     index * rawProof.proof_length,
                     (index + 1) * rawProof.proof_length,

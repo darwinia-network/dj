@@ -144,8 +144,10 @@ export default class Shadow extends Service {
         this.start();
 
         const rpc = new Jayson.Server({
-            shadow_getEthHeaderWithProofByNumber: async (args: any, cb:any ) => {
+            shadow_getEthHeaderWithProofByNumber: async (args: any, cb: any) => {
+                console.log(args)
                 const blockNumber: number = args.block_num;
+                console.log(blockNumber)
                 // const transacation: boolean = args.transaction;
                 const options: Record<string, any> = args.options;
                 const pair = await this.getBlock(blockNumber);
@@ -211,7 +213,6 @@ export default class Shadow extends Service {
     public async stop(): Promise<void> {
         this.alive = false;
     }
-
 
     /**
      * Check if shadow is running

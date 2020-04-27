@@ -5,12 +5,11 @@ import {
     IDoubleNodeWithMerkleProof,
     log, TYPES_URL,
 } from "@darwinia/util";
-import {Arguments} from "yargs";
+import { Arguments } from "yargs";
 import { Service } from "./service";
 import Grammer from "./grammer";
 import Relay from "./relay";
 import Shadow from "./shadow";
-
 
 /**
  * @param {Arguments} args - yarg args
@@ -51,7 +50,6 @@ export async function infoHandler(args: Arguments) {
     }
 }
 
-
 /**
  * @param {Arguments} args - yarg args
  */
@@ -73,7 +71,6 @@ export async function edithandler(args: Arguments) {
         log.n(JSON.parse(cfg.toString()));
     }
 }
-
 
 /**
  * @param {Arguments} args - yarg args
@@ -117,13 +114,13 @@ export async function keepHandler(args: Arguments) {
     // exec
     if (daemon) {
         execSync(`pm2 start dj -- keep ${script}`);
-    } else if((service as Service).port !== 0) {
+    } else if ((service as Service).port !== 0) {
+        console.log("serve")
         await (service as Service).foreverServe();
     } else {
         await (service as Service).forever();
     }
 }
-
 
 /**
  * @param {Arguments} args - yarg args
@@ -158,7 +155,6 @@ export async function relayHandler(args: Arguments) {
         ));
     }
 }
-
 
 /**
  * @param {Arguments} args - yarg args
