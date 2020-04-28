@@ -8,7 +8,6 @@ import { Service } from "./service";
 import { API, autoAPI } from "@darwinia/api";
 import { BlockWithProof, Config, log } from "@darwinia/util";
 
-
 /**
  * Keep relay ethereum blocks to darwinia
  *
@@ -77,7 +76,7 @@ export default class Relay extends Service {
 
         // service loop
         while (this.alive) {
-            await this.shouldStopShadow((next[0].number as number));
+            await this.shouldStopShadow(next[0].number);
             const res = await this.api.relay(next[0], next[1], true);
 
             // to next loop
@@ -88,7 +87,7 @@ export default class Relay extends Service {
                 log.ok(`relay eth header ${next[0].number} succeed!`);
                 log.trace(`current darwinia eth height is:             ${next[0].number}`);
                 log.trace(`current the max height of local storage is: ${this.shadow.max}`);
-                next = await this.shadow.getBlock((next[0].number as number) + 1);
+                next = await this.shadow.getBlock(next[0].number + 1);
             }
         }
     }

@@ -4,12 +4,12 @@ import { rlp } from "ethereumjs-util";
 
 export interface IEthBlock {
     mixHash?: string;
-    nonce: string | number;
+    nonce: string;
     parentHash: string;
-    timestamp: string | number;
-    number: string | number;
+    timestamp: number;
+    number: number;
     miner: string;
-    totalDifficulty: string | number;
+    totalDifficulty: number;
     transactionsRoot?: string;
     sha3Uncles: string;
     extraData: string;
@@ -18,30 +18,30 @@ export interface IEthBlock {
     transactions: string[];
     uncles: string[];
     logsBloom: string;
-    gasUsed: string | number;
-    gasLimit: string | number;
-    difficulty: string | number;
+    gasUsed: number;
+    gasLimit: number;
+    difficulty: number;
     seal?: string;
-    size?: string | number;
+    size?: number;
     hash: string;
 }
 
 export interface IDarwiniaEthBlock {
-    author: string;
-    difficulty: string | number;
-    extra_data: string;
-    hash: string;
-    gas_limit: string | number;
-    gas_used: string | number;
-    log_bloom: string;
-    number: string | number;
     parent_hash: string;
-    receipts_root?: string;
-    seal: string[];
-    state_root: string;
-    timestamp: string | number;
+    timestamp: number;
+    number: number;
+    author: string;
     transactions_root?: string;
     uncles_hash: string;
+    extra_data: string;
+    state_root: string;
+    receipts_root?: string;
+    log_bloom: string;
+    gas_used: number;
+    gas_limit: number;
+    difficulty: number;
+    seal: string[];
+    hash: string;
 }
 
 /**
@@ -64,7 +64,7 @@ export class Block {
      */
     public static from(block: IEthBlock): Block {
         let mh = block.mixHash;
-        if (mh === undefined)  {
+        if (mh === undefined) {
             mh = "";
         }
 
@@ -92,38 +92,38 @@ export class Block {
         return darwiniaBlock;
     }
 
-    public author: string;
-    public difficulty: string | number;
-    public extra_data: string;
-    public hash: string;
-    public gas_limit: string | number;
-    public gas_used: string | number;
-    public log_bloom: string;
-    public number: string | number;
     public parent_hash: string;
-    public receipts_root?: string;
-    public seal: string[];
-    public state_root: string;
-    public timestamp: string | number;
+    public timestamp: number;
+    public number: number;
+    public author: string;
     public transactions_root?: string;
     public uncles_hash: string;
+    public extra_data: string;
+    public state_root: string;
+    public receipts_root?: string;
+    public log_bloom: string;
+    public gas_used: number;
+    public gas_limit: number;
+    public difficulty: number;
+    public seal: string[];
+    public hash: string;
 
     constructor() {
-        this.author = "";
-        this.difficulty = 0;
-        this.extra_data = "";
-        this.hash = "";
-        this.gas_limit = "";
-        this.gas_used = "";
-        this.log_bloom = "";
-        this.number = 0;
         this.parent_hash = "";
-        this.receipts_root = "";
-        this.seal = [];
-        this.state_root = "";
         this.timestamp = 0;
+        this.number = 0;
+        this.author = "";
         this.transactions_root = "";
         this.uncles_hash = "";
+        this.extra_data = "";
+        this.state_root = "";
+        this.receipts_root = "";
+        this.log_bloom = "";
+        this.gas_used = 0;
+        this.gas_limit = 0;
+        this.difficulty = 0;
+        this.seal = [];
+        this.hash = "";
     }
 
     /**
@@ -133,21 +133,21 @@ export class Block {
      */
     public toJson(): IDarwiniaEthBlock {
         return {
-            author: this.author,
-            difficulty: this.difficulty,
-            extra_data: this.extra_data,
-            gas_limit: this.gas_limit,
-            gas_used: this.gas_used,
-            hash: this.hash,
-            log_bloom: this.log_bloom,
-            number: this.number,
             parent_hash: this.parent_hash,
-            receipts_root: this.receipts_root,
-            seal: this.seal,
-            state_root: this.state_root,
             timestamp: this.timestamp,
+            number: this.number,
+            author: this.author,
             transactions_root: this.transactions_root,
             uncles_hash: this.uncles_hash,
+            extra_data: this.extra_data,
+            state_root: this.state_root,
+            receipts_root: this.receipts_root,
+            log_bloom: this.log_bloom,
+            gas_used: this.gas_used,
+            gas_limit: this.gas_limit,
+            difficulty: this.difficulty,
+            seal: this.seal,
+            hash: this.hash,
         };
     }
 

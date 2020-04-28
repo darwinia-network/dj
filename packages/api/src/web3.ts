@@ -31,8 +31,28 @@ export class Web3 {
      */
     public async getBlock(block: string | number): Promise<IDarwiniaEthBlock> {
         log.trace(`fetch block ${block} from ethereum...`);
-        const eBlock: IEthBlock = await this._.eth.getBlock(block);
-        log.trace(`raw eth block: ${eBlock}`);
+        const web3EthBlock = await this._.eth.getBlock(block);
+        const eBlock: IEthBlock = {
+            mixHash: (web3EthBlock as any).mixHash ? (web3EthBlock as any).mixHash : "",
+            nonce: web3EthBlock.nonce,
+            parentHash: web3EthBlock.parentHash,
+            timestamp: Number(web3EthBlock.timestamp),
+            number: web3EthBlock.number,
+            miner: web3EthBlock.miner,
+            totalDifficulty: Number(web3EthBlock.totalDifficulty),
+            transactionsRoot: (web3EthBlock as any).transactionsRoot,
+            sha3Uncles: web3EthBlock.sha3Uncles,
+            extraData: web3EthBlock.extraData,
+            stateRoot: web3EthBlock.stateRoot,
+            receiptsRoot: (web3EthBlock as any).receiptsRoot,
+            transactions: web3EthBlock.transactions,
+            uncles: web3EthBlock.uncles,
+            logsBloom: web3EthBlock.logsBloom,
+            gasUsed: web3EthBlock.gasUsed,
+            gasLimit: web3EthBlock.gasLimit,
+            difficulty: web3EthBlock.difficulty,
+            hash: web3EthBlock.hash,
+        }
         return Block.parse(eBlock);
     }
 }

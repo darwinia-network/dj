@@ -145,19 +145,30 @@ export default class Shadow extends Service {
 
         const rpc = new Jayson.Server({
             shadow_getEthHeaderWithProofByNumber: async (args: any, cb: any) => {
-                console.log(args)
                 const blockNumber: number = args.block_num;
-                console.log(blockNumber)
                 // const transacation: boolean = args.transaction;
                 const options: Record<string, any> = args.options;
                 const pair = await this.getBlock(blockNumber);
                 const resp = {
-                    header: pair[0],
+                    eth_header: pair[0],
                     proof: pair[1],
                 };
 
-                if (options.format === "json") {
-                    (resp.header as any) = new Struct(
+                // format block to resp
+                (resp.eth_header.difficulty as any) = "0x" + resp.eth_header.difficulty.toString(16);
+                (resp.eth_header.gas_used as any) = "0x" + resp.eth_header.gas_used.toString(16);
+                (resp.eth_header.gas_limit as any) = "0x" + resp.eth_header.gas_limit.toString(16);
+                (resp.eth_header.extra_data as any) = Object.values(Uint8Array.from(
+                    Buffer.from(resp.eth_header.extra_data.slice(2), "hex")
+                ));
+                (resp.eth_header.seal as any) = [
+                    Object.values(Uint8Array.from(Buffer.from(resp.eth_header.seal[0].slice(2), "hex"))),
+                    Object.values(Uint8Array.from(Buffer.from(resp.eth_header.seal[1].slice(2), "hex"))),
+                ]
+
+                // scale condition
+                if (options.format === "scale") {
+                    (resp.eth_header as any) = new Struct(
                         this.ap._.registry,
                         this.config.types.EthHeader,
                         pair[0]
@@ -248,8 +259,7 @@ export default class Shadow extends Service {
         if (block) {
             log.trace(`got block ${block.number} - ${block.hash}`);
             log.trace(`\t${JSON.stringify(block)}`);
-            const proof = await this.config.proofBlock((block.number as number));
-            console.log(proof.length);
+            const proof = await this.config.proofBlock(block.number);
             await this.knex("blocks").insert({
                 block: JSON.stringify(block),
                 height,

@@ -115,7 +115,6 @@ export async function keepHandler(args: Arguments) {
     if (daemon) {
         execSync(`pm2 start dj -- keep ${script}`);
     } else if ((service as Service).port !== 0) {
-        console.log("serve")
         await (service as Service).foreverServe();
     } else {
         await (service as Service).forever();
@@ -132,7 +131,7 @@ export async function relayHandler(args: Arguments) {
     if (!args.block) {
         const bestHeaderHash = await api._.query.ethRelay.bestHeaderHash();
         const last = await web3.getBlock(bestHeaderHash.toString());
-        args.block = (last.number as number) + 1;
+        args.block = last.number + 1;
     }
 
     const block = await web3.getBlock((args.block as number));
