@@ -13,24 +13,24 @@ export interface IDoubleNodeWithMerkleProof {
 export async function getProof(
     blockNumber: number, binPath: string,
 ): Promise<IDoubleNodeWithMerkleProof[]> {
-    let output: string = execSync(
+    const output: string = execSync(
         `${binPath} proof ${blockNumber} | sed -e '1,/Json output/d'`
     ).toString();
 
     // retrying...
-    while (output.length === 0) {
+    let rawProof = JSON.parse(output);
+    while (!rawProof.elements) {
         log.warn("get proof failed, retry in 3s...");
         await new Promise(() => {
             setTimeout(async () => {
-                output = execSync(
+                rawProof = JSON.parse(execSync(
                     `${binPath} proof ${blockNumber} | sed -e '1,/Json output/d'`
-                ).toString();
+                ).toString());
             }, 3000)
         });
     }
 
     log.trace(output);
-    const rawProof = JSON.parse(output);
     const h512s = rawProof.elements
         .filter((_: any, index: number) => index % 2 === 0)
         .map((element: any, index: number) => {

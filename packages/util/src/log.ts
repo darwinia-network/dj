@@ -26,7 +26,10 @@ const FIXED_LOGS = [
 ];
 
 const INFO_LOGS = [
+    Logger.Event,
     Logger.Info,
+    Logger.Wait,
+    Logger.Warn,
     Logger.Ok,
 ];
 
@@ -120,9 +123,9 @@ export function shouldOutputLog(label: Logger): boolean {
 function flush(label: string, context: any): void {
     let plain = l + label + r;
 
-    if (typeof(context) === "string") {
+    if (typeof (context) === "string") {
         plain += context;
-    } else if (typeof(context) === "object"  && Object.keys(context).length > 0) {
+    } else if (typeof (context) === "object" && Object.keys(context).length > 0) {
         plain += JSON.stringify(context);
     } else {
         plain += stringify(context);
@@ -148,6 +151,14 @@ export function log(s: any) {
     }
 }
 
+/**
+ * @param {String} s - the log out string
+ */
+log.debug = (s: any): void => {
+    if (shouldOutputLog(Logger.Error)) {
+        flush(chalk.dim("debug"), s);
+    }
+};
 
 /**
  * @param {String} s - the log out string
@@ -169,7 +180,6 @@ log.event = (s: any): void => {
     }
 };
 
-
 /**
  * log error and quit process
  *
@@ -183,7 +193,6 @@ log.ex = (s: any): void => {
     }
 };
 
-
 /**
  * common log - console.log
  *
@@ -193,7 +202,6 @@ log.n = (msg: any): void => {
     console.log(msg);
 };
 
-
 /**
  * @param {String} s - the log context
  */
@@ -202,7 +210,6 @@ log.ok = (s: any): void => {
         flush(chalk.green("ok"), s);
     }
 };
-
 
 /**
  * log ok and quit process
@@ -217,7 +224,6 @@ log.ox = (s: any): void => {
     }
 };
 
-
 /**
  * @param {String} s - the log out string
  */
@@ -227,7 +233,6 @@ log.trace = (s: any): void => {
     }
 };
 
-
 /**
  * @param {String} s - the log out string
  */
@@ -236,7 +241,6 @@ log.wait = (s: any): void => {
         flush(chalk.cyan("wait"), s);
     }
 };
-
 
 /**
  * @param {String} s - the log out string

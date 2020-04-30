@@ -1,7 +1,7 @@
 {
   "private": false,
   "name": "@darwinia/api",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "description": "High-level darwinia.js api",
   "homepage": "https://github.com/darwinia-network/darwinia.js",
   "repository": {
@@ -13,10 +13,10 @@
   "main": "lib/index.js",
   "files": ["lib/**/*"],
   "dependencies": {
-    "@darwinia/util": "^0.1.19",
-    "@polkadot/api": "1.10.1",
-    "@polkadot/keyring": "2.8.1",
-    "@polkadot/util-crypto": "2.8.1",
+    "@darwinia/util": "^0.1.20",
+    "@polkadot/api": "^1.10.1",
+    "@polkadot/keyring": "2.9.1",
+    "@polkadot/util-crypto": "2.9.1",
     "web3": "^1.2.6"
   },
   "scripts": {

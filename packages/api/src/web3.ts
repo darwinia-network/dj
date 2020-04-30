@@ -50,7 +50,7 @@ export class Web3 {
             logsBloom: web3EthBlock.logsBloom,
             gasUsed: web3EthBlock.gasUsed,
             gasLimit: web3EthBlock.gasLimit,
-            difficulty: web3EthBlock.difficulty,
+            difficulty: Number(web3EthBlock.difficulty),
             hash: web3EthBlock.hash,
         }
         return Block.parse(eBlock);

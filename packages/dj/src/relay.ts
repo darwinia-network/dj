@@ -72,7 +72,7 @@ export default class Relay extends Service {
 
         // keep relay
         let next = await this.startFromBestHeaderHash();
-        log.trace(`the next height is ${next[0].number}`);
+        log(`the next height is ${next[0].number}`);
 
         // service loop
         while (this.alive) {
@@ -85,8 +85,8 @@ export default class Relay extends Service {
                 next = await this.startFromBestHeaderHash();
             } else {
                 log.ok(`relay eth header ${next[0].number} succeed!`);
-                log.trace(`current darwinia eth height is:             ${next[0].number}`);
-                log.trace(`current the max height of local storage is: ${this.shadow.max}`);
+                log(`current darwinia eth height is:             ${next[0].number}`);
+                log(`current the max height of local storage is: ${this.shadow.max}`);
                 next = await this.shadow.getBlock(next[0].number + 1);
             }
         }

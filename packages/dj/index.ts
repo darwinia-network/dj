@@ -18,7 +18,7 @@ function anyErrorYouLike(cms: string, e: any) {
 (async () => {
     // enable logger
     if (process.env.LOGGER === undefined) {
-        process.env.LOGGER = "ALL";
+        process.env.LOGGER = "INFO";
     }
 
     // parser

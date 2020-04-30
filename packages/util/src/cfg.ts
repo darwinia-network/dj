@@ -12,8 +12,8 @@ import rawTj from "./static/types.json";
 
 // constants
 export const TYPES_URL = "https://raw.githubusercontent.com/darwinia-network/darwinia/master/runtime/crab/darwinia_types.json"
-export const DARGO_OSX_URL = "https://github.com/darwinia-network/darwinia.go/releases/download/v0.1.0/dargo-osx.tar.gz"
-export const DARGO_LINUX_URL = "https://github.com/darwinia-network/darwinia.go/releases/download/v0.1.0/dargo-linux.tar.gz"
+export const DARGO_OSX_URL = "https://github.com/darwinia-network/darwinia.go/releases/download/v0.1.1/dargo-osx.tar.gz"
+export const DARGO_LINUX_URL = "https://github.com/darwinia-network/darwinia.go/releases/download/v0.1.1/dargo-linux.tar.gz"
 
 // interfaces
 export interface IConfig {
@@ -191,5 +191,13 @@ export class Config {
             null,
             2
         );
+    }
+
+    /**
+     * run dargo
+     */
+    public async dargo(args: string): Promise<Buffer> {
+        const bin = path.resolve(this.path.bin, "dargo");
+        return child_process.execSync(`${bin} ${args}`);
     }
 }

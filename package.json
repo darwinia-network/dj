@@ -12,7 +12,7 @@
   "homepage": "https://github.com/darwinia-network/darwinia.js",
   "workspaces": ["packages/*"],
   "devDependencies": {
-    "@polkadot/types": "1.10.1",
+    "@polkadot/types": "^1.10.1",
     "@types/node": "^13.11.1",
     "@types/js-yaml": "^3.12.3",
     "@types/progress": "^2.0.3",

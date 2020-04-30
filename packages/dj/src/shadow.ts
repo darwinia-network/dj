@@ -213,7 +213,7 @@ export default class Shadow extends Service {
         const count = await this.knex("blocks").count("height");
         this.count = count[0]["count(`height`)"];
         this.alive = true;
-        log.trace(`start fetching eth headers from ${start}...`);
+        log(`start fetching eth headers from ${start}...`);
 
         await this.fetch(dimStart);
     }
@@ -247,11 +247,11 @@ export default class Shadow extends Service {
         );
 
         if (exists.length > 0) {
-            log.trace("header exists, move to next...");
+            log.warn("header exists, move to next...");
             return await this.fetch(height + 1);
         }
 
-        log.trace(`fetching the ${height} block...`);
+        log(`fetching the ${height} block...`);
         const block: IDarwiniaEthBlock = await this.web3.getBlock(
             height,
         );
