@@ -30,7 +30,7 @@ function anyErrorYouLike(cms: string, e: any) {
             builder: (argv: yargs.Argv) => {
                 return argv.positional("recipe", {
                     alias: "r",
-                    choices: ["balance", "bestHeader", "header"],
+                    choices: ["balance", "bestHeader", "header", "codec"],
                     default: "balance",
                     describe: "the target recipe",
                     required: true,
@@ -80,7 +80,7 @@ function anyErrorYouLike(cms: string, e: any) {
         .command({
             builder: (argv: yargs.Argv) => {
                 return argv.positional('service', {
-                    choices: ["grammer", "relay", "shadow"],
+                    choices: ["grammer", "relay"],
                     required: true,
                 }).option("daemon", {
                     alias: "d",
