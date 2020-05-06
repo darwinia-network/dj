@@ -2,10 +2,13 @@
 import Jayson from "jayson";
 import * as path from "path";
 import { BlockWithProof, Config, IDarwiniaEthBlock, log } from "@darwinia/util";
-import { autoAPI, autoWeb3, Web3, API } from "@darwinia/api";
+import { autoAPI, autoWeb3, Web3, API, ShadowAPI } from "@darwinia/api";
 import { Vec, Struct } from "@polkadot/types";
 import { Service } from "./service";
 
+/**
+ * interfces
+ */
 export interface IShadowConfig {
     ap: API;
     config: Config;
@@ -96,6 +99,7 @@ export default class Shadow extends Service {
     protected alive: boolean;
     protected config: Config;
     private knex: any;
+    private _: ShadowAPI;
 
     /**
      * Recommend to use `Shadow.new()` instead
@@ -113,6 +117,7 @@ export default class Shadow extends Service {
         this.max = config.max;
         this.port = 0;
         this.web3 = config.web3;
+        this._ = new ShadowAPI(config.config.shadow);
     }
 
     /**

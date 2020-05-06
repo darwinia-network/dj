@@ -20,6 +20,7 @@ export interface IConfig {
     eth: IEthConfig;
     node: string;
     seed: string;
+    shadow: string;
 }
 
 export interface IConfigPath {
@@ -57,6 +58,7 @@ export class Config {
     node: string;
     path: IConfigPath;
     seed: string;
+    shadow: string;
     types: Record<string, any>;
 
     constructor() {
@@ -70,7 +72,7 @@ export class Config {
         // database
         const db = path.resolve(root, "cache");
         const crash = path.resolve(db, "crash.db");
-        const shadow = path.resolve(db, "shadow.db");
+        const shadowDb = path.resolve(db, "shadow.db");
         const grammerDb = path.resolve(db, "grammer.db");
 
         // init pathes
@@ -79,7 +81,7 @@ export class Config {
             conf,
             db: {
                 crash,
-                shadow,
+                shadow: shadowDb,
                 grammer: grammerDb,
             },
             grammer,
@@ -125,6 +127,7 @@ export class Config {
         }
         this.node = cj.node;
         this.seed = cj.seed;
+        this.shadow = cj.shadow;
         this.types = tj;
 
         // warnings
