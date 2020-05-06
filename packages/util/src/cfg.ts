@@ -133,9 +133,20 @@ export class Config {
         // warnings
         if (this.eth.api === "") {
             log.warn([
-                "web3 node has not been configured, ",
-                "edit `~/.darwinia/dj.json` if it is required",
+                "web3 api has not been configured, ",
+                "edit `~/.darwinia/config.json` if it is required",
             ].join(""));
+        }
+
+        if (this.shadow === "") {
+            log.warn([
+                "shadow address has not been configured, ",
+                "edit `~/.darwinia/config.json` if it is required",
+            ].join(""));
+        }
+
+        if (this.node === "") {
+            log.ex("darwinia node has not been configured");
         }
     }
 
