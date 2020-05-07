@@ -38,7 +38,7 @@ we strongly recommand you to read this sample before you starting your
       "interval": 24
     }
   },
-  "shadow": "shadow service api, refer github.com/darwini-network/darwinia.go"
+  "shadow": "shadow service api, refer github.com/darwini-network/darwinia.go",
   "node": "darwinia node, should start with `ws://` or `wss://`, eg: ws://0.0.0.0:9944",
   "seed": "darwinia account seed, eg: //Alice"
 }
