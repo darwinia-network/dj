@@ -3,11 +3,9 @@
  * service need to restart manualy when error occurs instead of
  * exiting process.
  */
-import Shadow from "./shadow";
 import { Service } from "./service";
-import { API, autoAPI } from "@darwinia/api";
+import { API, autoAPI, ShadowAPI } from "@darwinia/api";
 import { BlockWithProof, Config, log } from "@darwinia/util";
-
 
 /**
  * Keep relay ethereum blocks to darwinia
@@ -25,28 +23,25 @@ export default class Relay extends Service {
      * @return {Promise<Shadow>} shadow service
      */
     public static async new(): Promise<Relay> {
-        const api = await autoAPI();
         const conf = new Config();
-        const shadow = await Shadow.new();
+        const api = await autoAPI();
 
-        return new Relay(api, conf, shadow);
+        return new Relay(api, conf);
     }
 
     public alive: boolean;
     public api: API;
-    public shadow: Shadow;
     public port: number;
     protected config: Config;
-    private safe: number;
+    private _: ShadowAPI;
 
-    constructor(api: API, config: Config, shadow: Shadow) {
+    constructor(api: API, config: Config) {
         super();
         this.alive = false;
         this.api = api;
         this.config = config;
-        this.shadow = shadow;
-        this.port = 0;
-        this.safe = 7;
+        this.port = NaN;
+        this._ = new ShadowAPI(config.shadow);
     }
 
     /**
@@ -64,20 +59,12 @@ export default class Relay extends Service {
         // stay alive
         this.alive = true;
 
-        // set safe block, if it is zero use lucky 7 or safe * 2 in darwinia
-        const safe = await this.api._.query.ethRelay.numberOfBlocksSafe();
-        const n = Number(safe.toString());
-        if (n !== 0) {
-            this.safe = n * 2;
-        }
-
         // keep relay
         let next = await this.startFromBestHeaderHash();
-        log.trace(`the next height is ${next[0].number}`);
+        log(`the next height is ${next[0].number}`);
 
         // service loop
         while (this.alive) {
-            await this.shouldStopShadow((next[0].number as number));
             const res = await this.api.relay(next[0], next[1], true);
 
             // to next loop
@@ -86,9 +73,8 @@ export default class Relay extends Service {
                 next = await this.startFromBestHeaderHash();
             } else {
                 log.ok(`relay eth header ${next[0].number} succeed!`);
-                log.trace(`current darwinia eth height is:             ${next[0].number}`);
-                log.trace(`current the max height of local storage is: ${this.shadow.max}`);
-                next = await this.shadow.getBlock((next[0].number as number) + 1);
+                log(`current darwinia eth height is: ${next[0].number}`);
+                next = await this._.getBlockWithProof(next[0].number + 1);
             }
         }
     }
@@ -101,25 +87,6 @@ export default class Relay extends Service {
     }
 
     /**
-     * Infer if we should stop shadow
-     */
-    private async shouldStopShadow(n: number): Promise<void> {
-        if (
-            (this.shadow.max >= this.safe + n) && this.shadow.status()
-        ) {
-            log.event("shadow - stop");
-            await this.shadow.stop();
-        } else if (
-            (this.shadow.max < this.safe + n) && !this.shadow.status()
-        ) {
-            log.event("shadow - start");
-            if (!this.shadow.status()) {
-                this.shadow.start(n);
-            }
-        }
-    }
-
-    /**
      * Start relay from BestHeaderHash in darwinia, this function has two
      * usages:
      *
@@ -129,7 +96,10 @@ export default class Relay extends Service {
     private async startFromBestHeaderHash(): Promise<BlockWithProof> {
         log("start from the lastest eth header of darwinia...");
         const bestHeaderHash = await this.api._.query.ethRelay.bestHeaderHash();
-        const last = await this.shadow.web3._.eth.getBlock(bestHeaderHash.toString());
-        return await this.shadow.getBlock((last.number as number) + 1);
+
+        // fetch header from shadow service
+        log.trace(`current best header hash is: ${bestHeaderHash.toString()}`);
+        const last = await this._.getBlock(bestHeaderHash.toString());
+        return await this._.getBlockWithProof((Number.parseInt(last.number as any, 16)) + 1);
     }
 }

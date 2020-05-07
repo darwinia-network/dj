@@ -6,6 +6,7 @@ import Keyring from "@polkadot/keyring";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { DispatchError, EventRecord } from "@polkadot/types/interfaces/types";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
+import { Vec, Struct } from "@polkadot/types";
 
 export interface IErrorDoc {
     name: string;
@@ -18,7 +19,6 @@ export interface IReceipt {
     proof: string;
     header_hash: string;
 }
-
 
 /**
  * Extrinsic Result
@@ -122,10 +122,11 @@ export class API {
         });
 
         log.trace("init darwinia api succeed");
-        return new API(account, (api as ApiPromise));
+        return new API(account, (api as ApiPromise), types);
     }
 
     public account: KeyringPair;
+    public types: Record<string, any>;
     public _: ApiPromise;
 
     /**
@@ -136,9 +137,36 @@ export class API {
      * @param {KeyringPair} account - darwinia account
      * @param {ApiPromise} ap - raw polkadot api
      */
-    constructor(account: KeyringPair, ap: ApiPromise) {
+    constructor(account: KeyringPair, ap: ApiPromise, types: Record<string, any>) {
         this.account = account;
+        this.types = types;
         this._ = ap;
+    }
+
+    /**
+     * Encode darwiniaEthBlock to scale codec
+     *
+     * @param {IDarwiniaEthBlock} block - darwinia eth block
+     */
+    public encodeHeader(block: IDarwiniaEthBlock): string {
+        return new Struct(
+            this._.registry,
+            this.types.EthHeader,
+            block,
+        ).toHex();
+    }
+
+    /**
+     * Encode darwiniaEthBlock to scale codec
+     *
+     * @param {IDarwiniaEthBlock} block - darwinia eth block
+     */
+    public encodeProofs(proofs: IDoubleNodeWithMerkleProof[]): string {
+        return new Vec(
+            this._.registry,
+            this.types.EthHeader,
+            proofs,
+        ).toHex();
     }
 
     /**
@@ -224,8 +252,8 @@ export class API {
                 const status = sr.status;
                 const events = sr.events;
 
-                log.trace(`Transaction status: ${status.type}`);
-                log.trace(status.toString());
+                log(`Transaction status: ${status.type}`);
+                log(status.toString());
 
                 if (status.isInBlock) {
                     res.blockHash = status.asInBlock.toHex().toString();
@@ -237,11 +265,11 @@ export class API {
 
                     if (events) {
                         events.forEach((value: EventRecord): void => {
-                            log.trace(
+                            log(
                                 "\t" +
-                                    value.phase.toString() +
-                                    `: ${value.event.section}.${value.event.method}` +
-                                    value.event.data.toString(),
+                                value.phase.toString() +
+                                `: ${value.event.section}.${value.event.method}` +
+                                value.event.data.toString(),
                             );
 
                             if (value.event.method.indexOf("Failed") > -1) {
@@ -272,7 +300,7 @@ export class API {
                         reject(res);
                     } else if (status.isFinalized) {
                         res.isOk = true;
-                        log.trace(`Finalized block hash: ${res.blockHash}`);
+                        log(`Finalized block hash: ${res.blockHash}`);
                         resolve(res);
                     }
                 }

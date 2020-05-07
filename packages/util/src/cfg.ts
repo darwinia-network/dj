@@ -7,20 +7,20 @@ import path from "path";
 import { download, downloadTar } from "./download";
 import { log } from "./log";
 import { IDoubleNodeWithMerkleProof, getProof } from "./proof";
-import rawDj from "./static/dj.json";
+import rawCj from "./static/config.json";
 import rawTj from "./static/types.json";
-
 
 // constants
 export const TYPES_URL = "https://raw.githubusercontent.com/darwinia-network/darwinia/master/runtime/crab/darwinia_types.json"
-export const ETHASHPROOF_URL_OSX = "https://github.com/darwinia-network/darwinia.js/releases/download/ethproofhash/ethashproof-osx.tar.gz"
-export const ETHASHPROOF_URL_LINUX = "https://github.com/darwinia-network/darwinia.js/releases/download/ethproofhash/ethashproof-linux.tar.gz"
+export const DARGO_OSX_URL = "https://github.com/darwinia-network/darwinia.go/releases/download/v0.1.1/dargo-osx.tar.gz"
+export const DARGO_LINUX_URL = "https://github.com/darwinia-network/darwinia.go/releases/download/v0.1.1/dargo-linux.tar.gz"
 
 // interfaces
 export interface IConfig {
     eth: IEthConfig;
     node: string;
     seed: string;
+    shadow: string;
 }
 
 export interface IConfigPath {
@@ -39,10 +39,9 @@ export interface IDatabaseConfig {
 }
 
 export interface IEthConfig {
-    node: string;
+    api: string;
     secret: string;
 }
-
 
 /**
  * darwinia.js config
@@ -59,20 +58,21 @@ export class Config {
     node: string;
     path: IConfigPath;
     seed: string;
+    shadow: string;
     types: Record<string, any>;
 
     constructor() {
         const home = os.homedir();
         const root = path.resolve(home, ".darwinia");
         const bin = path.resolve(root, "bin");
-        const conf = path.resolve(root, "dj.json");
+        const conf = path.resolve(root, "config.json");
         const types = path.resolve(root, "types.json");
         const grammer = path.resolve(root, "grammer.yml");
 
         // database
         const db = path.resolve(root, "cache");
         const crash = path.resolve(db, "crash.db");
-        const shadow = path.resolve(db, "shadow.db");
+        const shadowDb = path.resolve(db, "shadow.db");
         const grammerDb = path.resolve(db, "grammer.db");
 
         // init pathes
@@ -81,7 +81,7 @@ export class Config {
             conf,
             db: {
                 crash,
-                shadow,
+                shadow: shadowDb,
                 grammer: grammerDb,
             },
             grammer,
@@ -100,11 +100,11 @@ export class Config {
         }
 
         // load dj.json
-        let dj: IConfig = rawDj;
+        let cj: IConfig = rawCj;
         if (!fs.existsSync(conf)) {
-            fs.writeFileSync(conf, JSON.stringify(dj, null, 2));
+            fs.writeFileSync(conf, JSON.stringify(cj, null, 2));
         } else {
-            dj = JSON.parse(fs.readFileSync(conf, "utf8"));
+            cj = JSON.parse(fs.readFileSync(conf, "utf8"));
         }
 
         // load types.json
@@ -122,22 +122,33 @@ export class Config {
 
         // load config
         this.eth = {
-            node: dj.eth.node,
-            secret: dj.eth.secret,
+            api: cj.eth.api,
+            secret: cj.eth.secret,
         }
-        this.node = dj.node;
-        this.seed = dj.seed;
+        this.node = cj.node;
+        this.seed = cj.seed;
+        this.shadow = cj.shadow;
         this.types = tj;
 
         // warnings
-        if (this.eth.node === "") {
+        if (this.eth.api === "") {
             log.warn([
-                "web3 node has not been configured, ",
-                "edit `~/.darwinia/dj.json` if it is required",
+                "web3 api has not been configured, ",
+                "edit `~/.darwinia/config.json` if it is required",
             ].join(""));
         }
-    }
 
+        if (this.shadow === "") {
+            log.warn([
+                "shadow address has not been configured, ",
+                "edit `~/.darwinia/config.json` if it is required",
+            ].join(""));
+        }
+
+        if (this.node === "") {
+            log.ex("darwinia node has not been configured");
+        }
+    }
 
     /**
      * edit dj.json
@@ -160,26 +171,25 @@ export class Config {
      */
     public async downloadEthashProofBins(): Promise<void> {
         if (os.type() === "Darwin") {
-            await downloadTar(this.path.bin, ETHASHPROOF_URL_OSX, "ethashproof");
+            await downloadTar(this.path.bin, DARGO_OSX_URL, "dargo");
         } else if (os.type() === "Linux") {
-            await downloadTar(this.path.bin, ETHASHPROOF_URL_LINUX, "ethashproof");
+            await downloadTar(this.path.bin, DARGO_LINUX_URL, "dargo");
         } else {
             log.ex([
                 "only support downloading darwin binaries for now, you can ",
-                `go to ${chalk.cyan.underline("https://github.com/darwinia-network/ethashproof")} `,
+                `go to ${chalk.cyan.underline("https://github.com/darwinia-network/darwinia.go")} `,
                 `and compile the cmds into ${this.path.bin} your self.`
             ].join(""));
         }
     }
 
-
     /**
      * proof eth block
      */
     public async proofBlock(blockNumber: number): Promise<IDoubleNodeWithMerkleProof[]> {
-        const relayer = path.resolve(this.path.bin, "relayer");
+        const relayer = path.resolve(this.path.bin, "dargo");
         if (!fs.existsSync(relayer)) {
-            log.event("download eth hash proof binaries.");
+            log.event("download dargo binarie...");
             await this.downloadEthashProofBins();
         }
 
@@ -195,5 +205,13 @@ export class Config {
             null,
             2
         );
+    }
+
+    /**
+     * run dargo
+     */
+    public async dargo(args: string): Promise<Buffer> {
+        const bin = path.resolve(this.path.bin, "dargo");
+        return child_process.execSync(`${bin} ${args}`);
     }
 }

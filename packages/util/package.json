@@ -1,30 +1,27 @@
 {
- "name": "@darwinia/util",
- "version": "0.1.15",
- "description": "Util for developing darwinia javascript library.",
- "homepage": "https://github.com/darwinia-network/darwinia.js",
- "repository": {
-  "type": "git",
-  "url": "https://github.com/darwinia-network/darwinia.js"
- },
- "author": "darwinia-network <hello@darwinia.network>",
- "license": "GPL-3.0",
- "main": "lib/index.js",
- "files": [
-  "lib/**/*"
- ],
- "dependencies": {
-  "@polkadot/util": "^2.7.1",
-  "chalk": "^4.0.0",
-  "ethereumjs-util": "^6.2.0",
-  "got": "^10.7.0",
-  "javascript-stringify": "^2.0.1",
-  "progress": "^2.0.3",
-  "web3-utils": "^1.2.6"
- },
- "scripts": {
-  "build": "tsc --strict && cp src/static/grammer.yml lib/src/static/grammer.yml",
-  "lint": "tsc --noEmit --strict && tslint --project ./tsconfig.json"
- },
- "gitHead": "0999fb93cce8f12e1599a2db882148798dcf0c33"
+  "name": "@darwinia/util",
+  "version": "0.1.21",
+  "description": "Util for developing darwinia javascript library.",
+  "homepage": "https://github.com/darwinia-network/darwinia.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/darwinia-network/darwinia.js"
+  },
+  "author": "darwinia-network <hello@darwinia.network>",
+  "license": "GPL-3.0",
+  "main": "lib/index.js",
+  "files": ["lib/**/*"],
+  "dependencies": {
+    "@polkadot/util": "2.8.1",
+    "chalk": "^4.0.0",
+    "ethereumjs-util": "^6.2.0",
+    "got": "^10.7.0",
+    "javascript-stringify": "^2.0.1",
+    "progress": "^2.0.3",
+    "web3-utils": "^1.2.6"
+  },
+  "scripts": {
+    "build": "tsc --strict && cp src/static/grammer.yml lib/src/static/grammer.yml",
+    "lint": "tsc --noEmit --strict && tslint --project ./tsconfig.json"
+  }
 }

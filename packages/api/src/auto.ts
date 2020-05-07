@@ -16,5 +16,5 @@ export async function autoAPI(): Promise<API> {
  */
 export async function autoWeb3(): Promise<Web3> {
     const cfg = new Config();
-    return new Web3(cfg.eth.node, cfg.eth.secret);
+    return new Web3(cfg.eth.api, cfg.eth.secret);
 }

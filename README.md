@@ -26,11 +26,12 @@ we strongly recommand you to read this sample before you starting your
 // ~/.darwinia/dj.json
 {
   "eth": {
-    "node": "ethereum node url, you can input an infura url",
+    "_comment": "(this field will be deprecated soon)",
+    "api": "ethereum node url, you can input an infura url",
     "secret": "ethereum secret key, used for crash service"
   },
-  "grammer": {           
-    "_comment": "this field is for grammer server, delete this line",
+  "grammer": {
+    "_comment": "this field is for grammer server, delete this line, (will be deprecated soon)",
     "commands": {
       "faucet": {
         "supply": 400,
@@ -45,7 +46,6 @@ we strongly recommand you to read this sample before you starting your
 }
 ```
 
-
 ### For Developers
 
 If you want to use `darwinia.js` developing your own `darwinia.js` based apps, you might
@@ -56,28 +56,6 @@ want to try `@darwinia/api` and `@darwinia/util`.
 
 If you want to test Darwinia using `darwinia.js`, check the `@darwinia/dj` project.
 
-### Connect to Offchain worker
-- The `darwinia.js` can provide a shadow service to help validators validate things
-- The shadow service may run on the same node or on a differet node, at any port as you like.
-- The offchain worker make the request to `eth-resource` host at standard http port 80
-
-
-Here is the example to connect a shadow service running on port 8000 on the same node with Linux OS
-- point the `eth-resource` host name to 127.0.0.1, you also customized this with other DNS services
-  1. `# echo '127.0.0.1        eth-resource' >> /etc/hosts`
-- proxy request on 80 port to 8000 port, only if the shadow service is not running on the 80 port
-  1. install Nginx
-  1. add following settings to config file
-    ```
-      server {
-          listen       eth-resource:80;
-          server_name  eth-resource;
-          location / {
-              proxy_pass http://127.0.0.1:8000;
-          }
-      }
-    ```
-  1. start the Nginx
 
 ## LICENSE
 
