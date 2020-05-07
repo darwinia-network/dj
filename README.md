@@ -23,7 +23,7 @@ we strongly recommand you to read this sample before you starting your
 `darwinia.js` trip!
 
 ```json
-// ~/.darwinia/dj.json
+// ~/.darwinia/config.json
 {
   "eth": {
     "_comment": "(this field will be deprecated soon)",
@@ -32,15 +32,13 @@ we strongly recommand you to read this sample before you starting your
   },
   "grammer": {
     "_comment": "this field is for grammer server, delete this line, (will be deprecated soon)",
-    "commands": {
-      "faucet": {
-        "supply": 400,
-        "amount": 1000,
-        "interval": 24
-      }
-    },
-    "port": 1439
+    "faucet": {
+      "supply": 400,
+      "amount": 1000,
+      "interval": 24
+    }
   },
+  "shadow": "shadow service api, refer github.com/darwini-network/darwinia.go"
   "node": "darwinia node, should start with `ws://` or `wss://`, eg: ws://0.0.0.0:9944",
   "seed": "darwinia account seed, eg: //Alice"
 }
