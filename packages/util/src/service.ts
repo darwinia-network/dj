@@ -1,7 +1,8 @@
 /**
  * abstract service class
  */
-import { Config, log } from "@darwinia/util";
+import { log } from "./log";
+import { Config } from "./cfg";
 
 export abstract class Service {
     public abstract port: number;

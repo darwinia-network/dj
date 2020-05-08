@@ -1,7 +1,6 @@
-import chalk from "chalk";
 import yargs from "yargs";
 import { autoAPI, ExResult } from "@darwinia/api";
-import { log } from "@darwinia/util";
+import { chalk, log } from "@darwinia/util";
 
 const cmdTransfer: yargs.CommandModule = {
     builder: {},

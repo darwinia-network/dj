@@ -1,103 +1,68 @@
 import child_process from "child_process";
-import chalk from "chalk";
 import fs from "fs";
 import os from "os";
 import path from "path";
 
-import { download, downloadTar } from "./download";
+import { download } from "./download";
 import { log } from "./log";
-import { IDoubleNodeWithMerkleProof, getProof } from "./proof";
 import rawCj from "./static/config.json";
 import rawTj from "./static/types.json";
 
 // constants
 export const TYPES_URL = "https://raw.githubusercontent.com/darwinia-network/darwinia/master/runtime/crab/darwinia_types.json"
-export const DARGO_OSX_URL = "https://github.com/darwinia-network/darwinia.go/releases/download/v0.1.1/dargo-osx.tar.gz"
-export const DARGO_LINUX_URL = "https://github.com/darwinia-network/darwinia.go/releases/download/v0.1.1/dargo-linux.tar.gz"
 
 // interfaces
 export interface IConfig {
-    eth: IEthConfig;
     node: string;
     seed: string;
     shadow: string;
 }
 
 export interface IConfigPath {
-    bin: string;
     conf: string;
-    db: IDatabaseConfig;
-    grammer: string;
     root: string;
     types: string;
-}
-
-export interface IDatabaseConfig {
-    crash: string;
-    grammer: string;
-    shadow: string;
-}
-
-export interface IEthConfig {
-    api: string;
-    secret: string;
 }
 
 /**
  * darwinia.js config
  *
  * @property {IConfigPath} path - darwinia config paths
- * @property {IDatabaseConfig} db - darwinia database config
- * @property {IEthConfig} eth - darwinia eth config
- * @property {IGrammerConfig} grammer - darwinia grammer config
  * @property {String} node - darwinia node address
  * @property {String} seed - darwinia account seed
  */
 export class Config {
-    eth: IEthConfig;
-    node: string;
-    path: IConfigPath;
-    seed: string;
-    shadow: string;
-    types: Record<string, any>;
+    static warn(config: Config) {
+        if (config.shadow === "") {
+            log.warn([
+                "shadow address has not been configured, ",
+                "edit `~/.darwinia/config.json` if it is required",
+            ].join(""));
+        }
+
+        if (config.node === "") {
+            log.ex("darwinia node has not been configured");
+        }
+    }
+
+    public node: string;
+    public path: IConfigPath;
+    public seed: string;
+    public shadow: string;
+    public types: Record<string, any>;
 
     constructor() {
         const home = os.homedir();
         const root = path.resolve(home, ".darwinia");
-        const bin = path.resolve(root, "bin");
         const conf = path.resolve(root, "config.json");
         const types = path.resolve(root, "types.json");
-        const grammer = path.resolve(root, "grammer.yml");
-
-        // database
-        const db = path.resolve(root, "cache");
-        const crash = path.resolve(db, "crash.db");
-        const shadowDb = path.resolve(db, "shadow.db");
-        const grammerDb = path.resolve(db, "grammer.db");
 
         // init pathes
         this.path = {
-            bin,
             conf,
-            db: {
-                crash,
-                shadow: shadowDb,
-                grammer: grammerDb,
-            },
-            grammer,
             root,
             types
         };
-
-        // check bin dir
-        if (!fs.existsSync(bin)) {
-            fs.mkdirSync(bin, { recursive: true });
-        }
-
-        // check database dir - the deepest
-        if (!fs.existsSync(db)) {
-            fs.mkdirSync(db, { recursive: true });
-        }
 
         // load config.json
         let cj: IConfig = rawCj;
@@ -122,39 +87,13 @@ export class Config {
             tj = JSON.parse(fs.readFileSync(types, "utf8"));
         }
 
-        // migrate grammer.yml
-        if (!fs.existsSync(grammer)) {
-            fs.copyFileSync(path.resolve(__dirname, "static/grammer.yml"), grammer);
-        }
-
-        // load config
-        this.eth = {
-            api: cj.eth.api,
-            secret: cj.eth.secret,
-        }
         this.node = cj.node;
         this.seed = cj.seed;
         this.shadow = cj.shadow;
         this.types = tj;
 
-        // warnings
-        if (this.eth.api === "") {
-            log.warn([
-                "web3 api has not been configured, ",
-                "edit `~/.darwinia/config.json` if it is required",
-            ].join(""));
-        }
-
-        if (this.shadow === "") {
-            log.warn([
-                "shadow address has not been configured, ",
-                "edit `~/.darwinia/config.json` if it is required",
-            ].join(""));
-        }
-
-        if (this.node === "") {
-            log.ex("darwinia node has not been configured");
-        }
+        // Warn config
+        Config.warn(this);
     }
 
     /**
@@ -174,36 +113,6 @@ export class Config {
     }
 
     /**
-     * download ethashproof binaries
-     */
-    public async downloadEthashProofBins(): Promise<void> {
-        if (os.type() === "Darwin") {
-            await downloadTar(this.path.bin, DARGO_OSX_URL, "dargo");
-        } else if (os.type() === "Linux") {
-            await downloadTar(this.path.bin, DARGO_LINUX_URL, "dargo");
-        } else {
-            log.ex([
-                "only support downloading darwin binaries for now, you can ",
-                `go to ${chalk.cyan.underline("https://github.com/darwinia-network/darwinia.go")} `,
-                `and compile the cmds into ${this.path.bin} your self.`
-            ].join(""));
-        }
-    }
-
-    /**
-     * proof eth block
-     */
-    public async proofBlock(blockNumber: number): Promise<IDoubleNodeWithMerkleProof[]> {
-        const relayer = path.resolve(this.path.bin, "dargo");
-        if (!fs.existsSync(relayer)) {
-            log.event("download dargo binarie...");
-            await this.downloadEthashProofBins();
-        }
-
-        return await getProof(blockNumber, relayer);
-    }
-
-    /**
      * print config to string
      */
     public toString(): string {
@@ -212,13 +121,5 @@ export class Config {
             null,
             2
         );
-    }
-
-    /**
-     * run dargo
-     */
-    public async dargo(args: string): Promise<Buffer> {
-        const bin = path.resolve(this.path.bin, "dargo");
-        return child_process.execSync(`${bin} ${args}`);
     }
 }

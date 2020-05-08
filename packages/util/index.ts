@@ -3,9 +3,16 @@ import { Config, TYPES_URL } from "./src/cfg";
 import { download } from "./src/download";
 import { log } from "./src/log";
 import { whereisPj } from "./src/pj";
-import { IDoubleNodeWithMerkleProof } from "./src/proof";
+import { Service } from "./src/service";
 import chalk from "chalk";
 
+/**
+ * types
+ */
+interface IDoubleNodeWithMerkleProof {
+    dag_nodes: string[],
+    proof: string[],
+}
 
 type BlockWithProof = [IDarwiniaEthBlock, IDoubleNodeWithMerkleProof[]];
 
@@ -19,6 +26,7 @@ export {
     download,
     IDarwiniaEthBlock, IEthBlock,
     log,
+    Service,
     TYPES_URL,
     whereisPj,
 }
