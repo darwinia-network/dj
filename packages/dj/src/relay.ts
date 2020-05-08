@@ -40,7 +40,7 @@ export default class Relay extends Service {
         this.alive = false;
         this.api = api;
         this.config = config;
-        this.port = NaN;
+        this.port = 0;
         this._ = new ShadowAPI(config.shadow);
     }
 
@@ -48,7 +48,6 @@ export default class Relay extends Service {
      * @deprecated no need to serve
      */
     public async serve(port: number): Promise<void> {
-        log.warn(`the expect port is ${port}, the server of relay is not completed`);
         await this.start();
     }
 

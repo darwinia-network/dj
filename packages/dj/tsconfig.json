@@ -14,11 +14,6 @@
     "skipLibCheck": true,
     "target": "es6"
   },
-  "include": [
-    "index.ts",
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["index.ts", "src/**/*"],
+  "exclude": ["node_modules"]
 }
