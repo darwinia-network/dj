@@ -47,7 +47,7 @@ export default class Relay extends Service {
     /**
      * @deprecated no need to serve
      */
-    public async serve(port: number): Promise<void> {
+    public async serve(_: number): Promise<void> {
         await this.start();
     }
 

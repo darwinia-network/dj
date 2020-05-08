@@ -7,7 +7,9 @@ import {
 const cmdRelay: yargs.CommandModule = {
     builder: (argv: yargs.Argv) => {
         return argv.positional("block", {
-            default: undefined,
+            alias: "b",
+            default: isNaN,
+            type: "number",
             describe: "block hash or block height"
         }).option("finalize", {
             alias: "f",
@@ -16,19 +18,24 @@ const cmdRelay: yargs.CommandModule = {
             type: "boolean",
         });
     },
-    command: "relay [block]",
+    command: "relay [block] [finalize]",
     describe: "Relay eth header to darwinia",
     handler: async (args: yargs.Arguments) => {
         const api = await autoAPI();
         const cfg = new Config();
         const shadow = new ShadowAPI(cfg.shadow);
-        if (!args.block) {
+        if (isNaN(args.block as number)) {
             const bestHeaderHash = await api._.query.ethRelay.bestHeaderHash();
             const last = await shadow.getBlock(bestHeaderHash.toString());
-            args.block = last.number + 1;
+            args.block = Number.parseInt((last.number as any), 16) + 1;
         }
 
-        const shadowResp = await shadow.getBlockWithProof(args.block as number);
+        console.log(Number.parseInt(args.block as string, 10))
+        const shadowResp = await shadow.getBlockWithProof(
+            Number.parseInt(args.block as string, 10)
+        );
+
+        // Relay block to darwinia
         const res = await api.relay(
             shadowResp[0],
             shadowResp[1],
@@ -37,14 +44,15 @@ const cmdRelay: yargs.CommandModule = {
             log.ex(e.toString());
         });
 
-        if (args.finalize) {
-            log.ox(`relay header succeed 🎉 - ${(res as ExResult).toString()}`);
-        } else {
-            log.ok(`the tx is contained in block ${(res as ExResult).blockHash}`);
+        // log and exit
+        if ((res as ExResult).isOk) {
+            log.ok(`relay header succeed 🎉 `);
             log.ox(chalk.cyan.underline(
                 `https://crab.subscan.io/extrinsic/${(res as ExResult).exHash}`
             ));
         }
+
+        log.ex("relay failed");
     },
 }
 

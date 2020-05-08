@@ -60,19 +60,22 @@ const cmdRecipe: yargs.CommandModule = {
                 break;
             case "codec":
                 const codecBlock: string = (args.block as string);
+                let pair: any = null;
                 if (codecBlock === "") {
                     const hash = await api._.query.ethRelay.bestHeaderHash();
-                    log.ox(JSON.stringify(shadow.getBlockWithProof(hash.toString()), null, 2))
+                    pair = await shadow.getBlockWithProof(hash.toString());
                 }
 
                 // Get proof by hash or number
-                let pair: any;
-                if (codecBlock.length >= 64) {
-                    pair = shadow.getBlockWithProof(codecBlock);
-                } else {
-                    pair = shadow.getBlockWithProof(Number.parseInt(codecBlock, 10));
+                if (pair === null) {
+                    if (codecBlock.length >= 64) {
+                        pair = await shadow.getBlockWithProof(codecBlock);
+                    } else {
+                        pair = await shadow.getBlockWithProof(Number.parseInt(codecBlock, 10));
+                    }
                 }
 
+                log.trace(pair);
                 // codec resp
                 const resp = {
                     eth_header: new Struct(
