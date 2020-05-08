@@ -89,7 +89,7 @@ export class Config {
             types
         };
 
-        // check database dir - the deepest
+        // check bin dir
         if (!fs.existsSync(bin)) {
             fs.mkdirSync(bin, { recursive: true });
         }
@@ -99,12 +99,19 @@ export class Config {
             fs.mkdirSync(db, { recursive: true });
         }
 
-        // load dj.json
+        // load config.json
         let cj: IConfig = rawCj;
         if (!fs.existsSync(conf)) {
             fs.writeFileSync(conf, JSON.stringify(cj, null, 2));
         } else {
-            cj = JSON.parse(fs.readFileSync(conf, "utf8"));
+            const curConfig = JSON.parse(fs.readFileSync(conf, "utf8"));
+            const mergeConfig = Object.assign(rawCj, curConfig);
+            if (mergeConfig !== curConfig) {
+                fs.writeFileSync(conf, JSON.stringify(cj, null, 2));
+            }
+
+            // assign cj
+            cj = mergeConfig;
         }
 
         // load types.json
