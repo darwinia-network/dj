@@ -31,7 +31,9 @@ async function recipeHeader(api: API, args: yargs.Arguments, shadow: ShadowAPI) 
         header = await shadow.getBlock(hash.toString());
     }
 
-    header = await shadow.getBlock(block);
+    if (header === null) {
+        header = await shadow.getBlock(block);
+    }
     log.ox(JSON.stringify(header, null, 2));
 }
 
