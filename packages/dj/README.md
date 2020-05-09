@@ -9,7 +9,11 @@ darwinia.js command-line tools
 Install `dj` globally
 
 ```shell
+# for stable version
 yarn global add @darwinia/dj
+
+# for lastest version
+yarn global add @darwinia/dj@next
 ```
 
 Input <kbd>dj</kbd> to your command-line.
@@ -20,7 +24,7 @@ dj <hello@darwinia.network>
 Commands:
   dj info <recipe>                Get info of recipes
   dj config [edit]                Show config
-  dj relay                        Relay eth header to darwinia
+  dj relay [block]                Relay eth header to darwinia
   dj transfer <address> <amount>  Transfer to darwinia account
 
 Options:
