@@ -8,7 +8,6 @@
 
 Gather common javascript usages for [Darwinia Network](https://darwinia.network).
 
-
 | type      | name                                        |
 |-----------|---------------------------------------------|
 | cmd-tools | [@darwinia/dj](./packages/dj/README.md)     |
@@ -18,26 +17,13 @@ Gather common javascript usages for [Darwinia Network](https://darwinia.network)
 
 ### Config
 
-The config part is used by all projects building with `darwinia.js`, 
+The config part is shared with all projects building with `darwinia.js`, 
 we strongly recommand you to read this sample before you starting your
 `darwinia.js` trip!
 
 ```json
 // ~/.darwinia/config.json
 {
-  "eth": {
-    "_comment": "(this field will be deprecated soon)",
-    "api": "ethereum node url, you can input an infura url",
-    "secret": "ethereum secret key, used for crash service"
-  },
-  "grammer": {
-    "_comment": "this field is for grammer server, delete this line, (will be deprecated soon)",
-    "faucet": {
-      "supply": 400,
-      "amount": 1000,
-      "interval": 24
-    }
-  },
   "shadow": "shadow service api, refer github.com/darwini-network/darwinia.go",
   "node": "darwinia node, should start with `ws://` or `wss://`, eg: ws://0.0.0.0:9944",
   "seed": "darwinia account seed, eg: //Alice"

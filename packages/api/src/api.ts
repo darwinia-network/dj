@@ -273,7 +273,6 @@ export class API {
                             );
 
                             if (value.event.method.indexOf("Failed") > -1) {
-                                log.err("transaction failed");
                                 res.isOk = false;
                                 res.isErr = true;
                                 reject(res);

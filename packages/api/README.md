@@ -25,7 +25,6 @@ import { autoAPI } from "@darwinia-network/darwinia.js";
 | method     | params                         | return          |
 |------------|--------------------------------|-----------------|
 | getBalance | (addr: string)                 | balance: string |
-| reset      | (block: string/number)         | res: ExResult   |
 | relay      | (block: string/number)         | res: ExResult   |
 | transfer   | (addr: string, amount: number) | res: ExResult   |
 | redeem     | (receipt: IReceipt)            | res: ExResult   |
