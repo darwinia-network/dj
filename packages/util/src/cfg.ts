@@ -64,6 +64,11 @@ export class Config {
             types
         };
 
+        // check root
+        if (!fs.existsSync(root)) {
+            fs.mkdirSync(root, { recursive: true });
+        }
+
         // load config.json
         let cj: IConfig = rawCj;
         if (!fs.existsSync(conf)) {
