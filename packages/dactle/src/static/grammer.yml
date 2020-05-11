@@ -1,0 +1,43 @@
+# `help` command
+help: >-
+  Looking for some help?
+  
+  - /help - miss me?
+  
+  - /book - roll up for the magic mystery tour!
+  
+  - /docs - let's explore the darwinia world!
+  
+  - /more - there must be more to life than being a bot!
+  
+  - /faucet - let`s talk about it, wouldn`t it be nice?
+# `book` command
+book: >-
+  https://darwinia-network.github.io/the-darwinia-book/
+# `docs` command
+docs: >-
+  https://docs.darwinia.network/
+# `more` command
+more: >-
+  more features can't wait to see ya! 
+  
+  https://github.com/darwinia-network/darwinia.js/packages/dactle
+  
+  I'll see you on the dark side of the moon :-P
+# `faucet` command
+faucet:
+  failed: >-
+    transfer failed, please try again
+    
+  succeed: >-
+    congratulations! the transaction is pending, take a look at
+    
+    https://crab.subscan.io/extrinsic/${hash}
+  interval: >-
+    it seems that you have already got the ring of today, tell me your story~
+    
+    You can call me after ${hour} hrs.
+  supply: >-
+    we have run out our faucet supply today, trigger your clock at tomorrow morning
+  address: >-
+    I won't tell your that lucky folks always have keyword `CRAB` in their address
