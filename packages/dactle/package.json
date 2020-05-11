@@ -1,8 +1,8 @@
 {
   "private": false,
   "name": "@darwinia/dactle",
-  "version": "0.1.26-alpha.1",
-  "description": "High-level darwinia.js api",
+  "version": "0.1.1-alpha.0",
+  "description": "darwinia ctl",
   "homepage": "https://github.com/darwinia-network/darwinia.js",
   "repository": {
     "type": "git",
@@ -14,22 +14,16 @@
   "bin": {
     "dactle": "lib/index.js"
   },
-  "files": [
-    "lib/**/*"
-  ],
+  "files": ["lib/**/*"],
   "dependencies": {
     "@darwinia/api": "0.1.26",
     "@darwinia/util": "0.1.26",
-    "@types/knex": "^0.16.1",
-    "knex": "^0.21.1",
+    "js-yaml": "^3.13.1",
     "node-telegram-bot-api": "^0.40.0",
-    "node-telegram-keyboard-wrapper": "^2.0.1",
-    "node-telegram-operation-manager": "^1.2.0",
-    "sqlite3": "^4.2.0",
     "yargs": "^15.3.1"
   },
   "scripts": {
-    "build": "tsc --strict",
+    "build": "tsc --strict && mkdir -p lib/src/static && cp -r src/static/grammer.yml lib/src/static/grammer.yml",
     "lint": "tsc --noEmit --strict && tslint --project ./tsconfig.json"
   },
   "gitHead": "0999fb93cce8f12e1599a2db882148798dcf0c33",
