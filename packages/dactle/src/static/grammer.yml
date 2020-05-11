@@ -19,7 +19,7 @@ docs: >-
   https://docs.darwinia.network/
 # `more` command
 more: >-
-  more features can't wait to see ya! 
+  more features can`t wait to see ya! 
   
   https://github.com/darwinia-network/darwinia.js/packages/dactle
   
@@ -41,3 +41,9 @@ faucet:
     we have run out our faucet supply today, trigger your clock at tomorrow morning
   address: >-
     I won't tell your that lucky folks always have keyword `CRAB` in their address
+  received: >-
+    This address has already received the air-drop, I know this though I'm a bot :D
+  config:
+    amount: 1000
+    supply: 400
+    interval: 24

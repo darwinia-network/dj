@@ -27,6 +27,14 @@ export interface IFaucetGrammers {
     interval: string;
     supply: string;
     address: string;
+    received: string;
+    config: ICommandFaucetConfig;
+}
+
+export interface ICommandFaucetConfig {
+    supply: number;
+    amount: number;
+    interval: number;
 }
 
 export interface IGrammer {
@@ -38,24 +46,10 @@ export interface IGrammer {
 }
 
 /**
- * grammer config - the config below will generate from `dj.json`
- */
-export interface IGrammerCommandFaucetConfig {
-    supply: number;
-    amount: number;
-    interval: number;
-}
-
-export interface IGrammerCommandsConfig {
-    faucet: IGrammerCommandFaucetConfig;
-}
-
-/**
  * this is the interface of Grammer service
  */
 export interface IGrammerConfig {
     api: API;
-    commands: IGrammerCommandsConfig;
     config: Config;
     grammer: IGrammer;
     knex: any;
@@ -79,12 +73,19 @@ export default class Grammer {
      * @param {Number} start - delete block before start
      */
     public static async checkTable(knex: any) {
-        const addressExists = await knex.schema.hasTable("address");
+        const addrExists = await knex.schema.hasTable("addr");
+        const userExists = await knex.schema.hasTable("user");
         const faucetExists = await knex.schema.hasTable("faucet");
 
-        if (!addressExists) {
-            await knex.schema.createTable("address", (table: any) => {
-                table.string("address").unique();
+        if (!addrExists) {
+            await knex.schema.createTable("addr", (table: any) => {
+                table.string("value").unique();
+            });
+        }
+
+        if (!userExists) {
+            await knex.schema.createTable("user", (table: any) => {
+                table.string("id").unique();
                 table.integer("last");
             });
         }
@@ -108,11 +109,8 @@ export default class Grammer {
         const grammer: IGrammer = yml.safeLoad(
             fs.readFileSync(path.resolve(__dirname, "static/grammer.yml"), "utf8")
         );
-        const commands: IGrammerCommandsConfig = JSON.parse(fs.readFileSync(
-            config.path.conf, "utf8"
-        )).grammer;
 
-        // create cache path
+        // create cache path if not exists
         const cache = path.resolve(config.path.root, "cache");
         if (!fs.existsSync(cache)) {
             fs.mkdirSync(cache);
@@ -129,7 +127,6 @@ export default class Grammer {
         await Grammer.checkTable(knex);
         return new Grammer({
             api,
-            commands,
             config,
             grammer,
             knex,
@@ -139,14 +136,12 @@ export default class Grammer {
     public port: number;
     protected config: Config;
     private api: API;
-    private commands: IGrammerCommandsConfig;
     private grammer: IGrammer;
     private knex: any;
 
     constructor(conf: IGrammerConfig) {
         this.api = conf.api;
         this.config = conf.config;
-        this.commands = conf.commands;
         this.grammer = conf.grammer;
         this.knex = conf.knex;
         this.port = 1439;
@@ -161,16 +156,19 @@ export default class Grammer {
         const bot = new TelegramBot(key, { polling: true });
         bot.on("polling_error", (msg) => log.err(msg));
         bot.onText(/\/help/, (message) => {
-            bot.sendMessage(message.from.id, this.grammer.help);
+            bot.sendMessage(message.chat.id, this.grammer.help);
+        });
+        bot.onText(/\/book/, (message) => {
+            bot.sendMessage(message.chat.id, this.grammer.book);
         });
         bot.onText(/\/docs/, (message) => {
-            bot.sendMessage(message.from.id, this.grammer.docs);
+            bot.sendMessage(message.chat.id, this.grammer.docs);
         });
         bot.onText(/\/more/, (message) => {
-            bot.sendMessage(message.from.id, this.grammer.more);
+            bot.sendMessage(message.chat.id, this.grammer.more);
         });
         bot.onText(/\/faucet/, async (message) => {
-            bot.sendMessage(message.from.id, await this.transfer(message));
+            bot.sendMessage(message.chat.id, await this.transfer(message));
         });
     }
 
@@ -180,57 +178,82 @@ export default class Grammer {
      * @param {String} addr - the target address
      */
     private async transfer(msg: TelegramBot.Message): Promise<string> {
-        // check address
-        const addr = msg.text.trim();
+        if (
+            msg.text === undefined ||
+            msg.from === undefined
+        ) {
+            return this.grammer.faucet.address;
+        }
+
+        const matches = msg.text.match(/\/(\w+)\S+\s+(\S+)/);
+        if (matches === null || matches.length < 3) {
+            return this.grammer.faucet.address;
+        }
+
+        const addr = matches[3];
         log.trace(`trying to tansfer to ${addr}`);
         if (addr.indexOf("CRAB") < 0 || addr.length !== 48) {
             return this.grammer.faucet.address;
         }
 
-        // query database
-        let supply: number = this.commands.faucet.supply;
+        // check addr
+        const addrQuery = await this.knex.table("addr")
+            .select("*")
+            .whereRaw(`addr.value = "${addr}"`);
+
+        if (addrQuery.length === 0) {
+            addrQuery[0] = {
+                value: addr,
+            };
+
+            await this.knex.table("addr").insert(addrQuery);
+        } else {
+            return this.grammer.faucet.received;
+        }
+
+        // // check supply
+        let supply: number = this.grammer.faucet.config.supply;
         const date = new Date().toJSON().slice(0, 10);
         const supplyQuery = await this.knex.table("faucet")
             .select("*")
             .whereRaw(`faucet.date = "${date}"`);
 
-        const addrQuery = await this.knex.table("address")
-            .select("*")
-            .whereRaw(`address.address = "${addr}"`);
-
-        // check record
         if (supplyQuery.length === 0) {
             await this.knex.table("faucet").insert({ date, supply });
         } else {
             supply = supplyQuery[0].supply;
         }
 
-        if (addrQuery.length === 0) {
-            addrQuery[0] = {
-                address: addr,
-                last: 0,
-            };
-
-            await this.knex.table("address").insert(addrQuery[0]);
-        }
-
-        // check if supply runs out
         if (supply === 0) {
             return this.grammer.faucet.supply;
         }
 
-        // check if has got ring in era
-        const sub: number = ((new Date().getTime() - addrQuery[0].last) / 1000 / 60 / 60);
-        if (sub <= this.commands.faucet.interval) {
+        // check user
+        const userQuery = await this.knex.table("user")
+            .select("*")
+            .whereRaw(`user.id = "${msg.from.id}"`);
+
+        if (userQuery.length === 0) {
+            userQuery[0] = {
+                id: msg.from.id,
+                last: 0,
+            };
+
+            await this.knex.table("user").insert(userQuery[0]);
+        }
+
+        // check if user has got ring in era
+        const sub: number = ((new Date().getTime() - userQuery[0].last) / 1000 / 60 / 60);
+        if (sub <= this.grammer.faucet.config.interval) {
             return this.grammer.faucet.interval.replace(
-                "${hour}", Math.floor((this.commands.faucet.interval - sub)).toString()
+                "${hour}", Math.floor((this.grammer.faucet.config.interval - sub)).toString()
             );
         }
 
         // transfer to address
         let hash = "";
         const ex = await this.api.transfer(
-            addr, this.commands.faucet.amount
+            addr, this.grammer.faucet.config.amount * 1000000000
         ).catch(() => {
             hash = "";
         });
@@ -244,8 +267,8 @@ export default class Grammer {
                 supply: supply - 1,
             });
 
-            await this.knex.table("address").where({
-                address: addr,
+            await this.knex.table("user").where({
+                id: msg.from.id,
             }).update({
                 last: new Date().getTime(),
             });

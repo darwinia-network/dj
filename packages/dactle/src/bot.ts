@@ -7,7 +7,7 @@ const cmdBot: yargs.CommandModule = {
             alias: "k",
             describe: "the telegram-bot key",
             default: "",
-            type: "boolean",
+            type: "string",
         });
     },
     command: "bot <key>",
