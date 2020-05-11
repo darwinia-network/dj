@@ -9,11 +9,7 @@ darwinia.js command-line tools
 Install `dactle` globally
 
 ```shell
-# for stable version
 yarn global add @darwinia/dactle
-
-# for advanced version
-yarn global add @darwinia/dactle@canary
 ```
 
 Input <kbd>dactle</kbd> to your command-line.

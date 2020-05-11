@@ -23,7 +23,7 @@
     "yargs": "^15.3.1"
   },
   "scripts": {
-    "build": "tsc --strict && mkdir -p lib/src/static && cp -r src/static/grammer.yml lib/src/static/grammer.yml",
+    "build": "tsc --strict && cp -r src/static lib/src/static",
     "lint": "tsc --noEmit --strict && tslint --project ./tsconfig.json"
   },
   "gitHead": "0999fb93cce8f12e1599a2db882148798dcf0c33",

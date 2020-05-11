@@ -9,11 +9,7 @@ darwinia.js command-line tools
 Install `dj` globally
 
 ```shell
-# for stable version
 yarn global add @darwinia/dj
-
-# for lastest version
-yarn global add @darwinia/dj@next
 ```
 
 Input <kbd>dj</kbd> to your command-line.
