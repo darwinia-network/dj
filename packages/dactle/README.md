@@ -12,8 +12,8 @@ Install `dactle` globally
 # for stable version
 yarn global add @darwinia/dactle
 
-# for lastest version
-yarn global add @darwinia/dactle@next
+# for advanced version
+yarn global add @darwinia/dactle@canary
 ```
 
 Input <kbd>dactle</kbd> to your command-line.

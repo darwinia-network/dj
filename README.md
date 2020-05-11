@@ -8,11 +8,12 @@
 
 Gather common javascript usages for [Darwinia Network](https://darwinia.network).
 
-| type      | name                                        |
-|-----------|---------------------------------------------|
-| cmd-tools | [@darwinia/dj](./packages/dj/README.md)     |
-| library   | [@darwinia/api](./packages/api/README.md)   |
-| library   | [@darwinia/util](./packages/util/README.md) |
+| type     | name                                            |
+|----------|-------------------------------------------------|
+| cmd-tool | [@darwinia/dj](./packages/dj/README.md)         |
+| cmd-tool | [@darwinia/dactle](./packages/dactle/README.md) |
+| library  | [@darwinia/api](./packages/api/README.md)       |
+| library  | [@darwinia/util](./packages/util/README.md)     |
 
 
 ### Config
