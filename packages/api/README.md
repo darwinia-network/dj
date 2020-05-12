@@ -12,6 +12,8 @@ High-level darwinia.js api
 yarn add @darwinia/api
 ```
 
+If you have global config at `~/.darwinia/config.json`
+
 ```javascript
 import { autoAPI } from "@darwinia/api";
 

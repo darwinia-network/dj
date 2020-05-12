@@ -79,7 +79,6 @@ async function recipeCodec(api: API, args: yargs.Arguments, shadow: ShadowAPI) {
 const cmdRecipe: yargs.CommandModule = {
     builder: (argv: yargs.Argv) => {
         return argv.positional("recipe", {
-            alias: "r",
             choices: ["balance", "bestHeader", "header", "codec"],
             default: "balance",
             describe: "the target recipe",
@@ -97,7 +96,7 @@ const cmdRecipe: yargs.CommandModule = {
             type: "string",
         });
     },
-    command: "info <recipe>",
+    command: "info <receipe>",
     describe: "Get info of recipes",
     handler: async (args: yargs.Arguments) => {
         const api = await autoAPI();
