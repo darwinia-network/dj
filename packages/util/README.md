@@ -10,7 +10,7 @@ Utils for developing darwinia javascript library.
 ### Config
 
 ```javascript
-import { API, Config } from "@darwinia-network/darwinia.js";
+import { API, Config } from "@darwinia-network/util";
 
 /**
  * @return {API} api - generate API automatically

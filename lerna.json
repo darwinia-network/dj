@@ -1,6 +1,13 @@
 {
-  "packages": ["packages/*"],
-  "version": "0.1.19",
+  "packages": [
+    "packages/*"
+  ],
+  "version": "0.1.28-alpha.1",
   "npmClient": "yarn",
-  "useWorkspaces": true
+  "useWorkspaces": true,
+  "command": {
+    "version": {
+      "message": "chore(release): publish %s"
+    }
+  }
 }

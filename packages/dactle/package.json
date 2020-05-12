@@ -1,8 +1,8 @@
 {
   "private": false,
-  "name": "@darwinia/dj",
-  "version": "0.1.26-alpha.1",
-  "description": "High-level darwinia.js api",
+  "name": "@darwinia/dactle",
+  "version": "0.1.1-alpha.2",
+  "description": "darwinia ctl",
   "homepage": "https://github.com/darwinia-network/darwinia.js",
   "repository": {
     "type": "git",
@@ -12,17 +12,22 @@
   "license": "GPL-3.0",
   "main": "lib/index.js",
   "bin": {
-    "dj": "lib/index.js"
+    "dactle": "lib/index.js"
   },
   "files": ["lib/**/*"],
   "dependencies": {
     "@darwinia/api": "0.1.26",
     "@darwinia/util": "0.1.26",
+    "js-yaml": "^3.13.1",
+    "node-telegram-bot-api": "^0.40.0",
     "yargs": "^15.3.1"
   },
   "scripts": {
-    "build": "tsc --strict",
+    "build": "tsc --strict && cp -r src/static lib/src/static",
     "lint": "tsc --noEmit --strict && tslint --project ./tsconfig.json"
   },
-  "gitHead": "0999fb93cce8f12e1599a2db882148798dcf0c33"
+  "gitHead": "0999fb93cce8f12e1599a2db882148798dcf0c33",
+  "devDependencies": {
+    "@types/node-telegram-bot-api": "^0.40.3"
+  }
 }

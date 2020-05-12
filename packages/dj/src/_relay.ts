@@ -1,8 +1,8 @@
 /**
  * The is a shadow command
  */
-import { API, autoAPI, ShadowAPI } from "@darwinia/api";
-import { BlockWithProof, Config, log, Service } from "@darwinia/util";
+import { API, autoAPI, ShadowAPI, ExResult } from "@darwinia/api";
+import { BlockWithProof, Config, chalk, log, Service } from "@darwinia/util";
 
 /**
  * Keep relay ethereum blocks to darwinia
@@ -39,6 +39,23 @@ export default class Relay extends Service {
         this.config = config;
         this.port = 0;
         this._ = new ShadowAPI(config.shadow);
+    }
+
+    public async relay(block: number) {
+        const bp = isNaN(block) ?
+            await this.startFromBestHeaderHash() :
+            await this._.getBlockWithProof(block);
+        const res = await this.api.relay(bp[0], bp[1], true);
+
+        // to next loop
+        if (!res.isOk) {
+            log.ex((res as ExResult).toString());
+        } else {
+            log.ok(`relay eth header ${bp[0].number} succeed! 🎉`);
+            log.ox(chalk.cyan.underline(
+                `https://crab.subscan.io/extrinsic/${(res as ExResult).exHash}`
+            ));
+        }
     }
 
     /**

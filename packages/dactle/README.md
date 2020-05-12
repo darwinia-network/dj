@@ -6,22 +6,19 @@ darwinia.js command-line tools
 
 ## Usage
 
-Install `dj` globally
+Install `dactle` globally
 
 ```shell
-yarn global add @darwinia/dj
+yarn global add @darwinia/dactle
 ```
 
-Input <kbd>dj</kbd> to your command-line.
+Input <kbd>dactle</kbd> to your command-line.
 
 ```text
-dj <hello@darwinia.network>
+dactle <hello@darwinia.network>
 
 Commands:
-  dj info <recipe>                Get info of recipes
-  dj config [edit]                Show config
-  dj relay [block]                Relay eth header to darwinia
-  dj transfer <address> <amount>  Transfer to darwinia account
+  dj bot <key>                Run the bot
 
 Options:
   --help, -h     Show help                                             [boolean]
