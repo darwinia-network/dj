@@ -21,7 +21,7 @@ export class BotDb {
         _path: string,
         supply = 0,
     ) {
-        // encure the path of database
+        // ensure the path of database
         if (!fs.existsSync(_path)) {
             fs.mkdirSync(path.dirname(_path), { recursive: true });
             fs.writeFileSync(_path, "");
@@ -74,11 +74,13 @@ export class BotDb {
     /**
      * Validate supply
      */
-    public hasSupply(date: string): boolean {
+    public hasSupply(date: string, supply: number): boolean {
+        this.fillSupply(date, supply);
         return this._.supply[date] > 0;
     }
 
-    public burnSupply(date: string) {
+    public burnSupply(date: string, supply: number) {
+        this.fillSupply(date, supply);
         this._.supply[date] -= 1;
         this.save();
     }
@@ -88,6 +90,13 @@ export class BotDb {
      */
     private save() {
         fs.writeFileSync(this.path, JSON.stringify(this._, null, 2));
+    }
+
+    private fillSupply(date: string, supply: number) {
+        if (this._.supply[date] === undefined) {
+            this._.supply[date] = supply;
+            this.save();
+        }
     }
 }
 

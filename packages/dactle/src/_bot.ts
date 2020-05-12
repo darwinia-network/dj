@@ -88,6 +88,19 @@ export default class Grammer {
         return new Grammer({ api, config, grammer, db });
     }
 
+    static checkMsg(msg: TelegramBot.Message): boolean {
+        if (
+            msg.reply_to_message === undefined ||
+            msg.reply_to_message.from === undefined ||
+            msg.reply_to_message.from.id
+
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
     protected config: Config;
     private api: API;
     private grammer: IGrammer;
@@ -108,27 +121,49 @@ export default class Grammer {
     public async run(key: string) {
         const bot = new TelegramBot(key, { polling: true });
         bot.on("polling_error", (msg) => log.err(msg));
-        bot.onText(/\/help/, (message) => {
-            bot.sendMessage(message.chat.id, this.grammer.help);
+        bot.onText(/\/\w+/, async (msg) => {
+            if (msg.text === undefined) {
+                return false;
+            }
+
+            const match = msg.text.match(/\/\w+/);
+            if (match === null) {
+                return;
+            }
+
+            // reply
+            bot.sendMessage(
+                msg.chat.id,
+                await this.reply(bot, msg, match[0].slice(1)),
+                {
+                    reply_to_message_id: msg.message_id,
+                }
+            )
         });
-        bot.onText(/\/book/, (message) => {
-            bot.sendMessage(message.chat.id, this.grammer.book);
-        });
-        bot.onText(/\/docs/, (message) => {
-            bot.sendMessage(message.chat.id, this.grammer.docs);
-        });
-        bot.onText(/\/talk/, (message) => {
-            bot.sendMessage(message.chat.id, this.grammer.talk);
-        });
-        bot.onText(/\/more/, (message) => {
-            bot.sendMessage(message.chat.id, this.grammer.more);
-        });
-        bot.onText(/\/about/, (message) => {
-            bot.sendMessage(message.chat.id, this.grammer.about);
-        });
-        bot.onText(/\/faucet/, async (message) => {
-            bot.sendMessage(message.chat.id, await this.transfer(bot, message));
-        });
+
+    }
+
+    private async reply(
+        bot: TelegramBot,
+        msg: TelegramBot.Message,
+        cmd: string
+    ): Promise<string> {
+        switch (cmd) {
+            case "book":
+                return this.grammer.book;
+            case "docs":
+                return this.grammer.docs;
+            case "talk":
+                return this.grammer.talk;
+            case "more":
+                return this.grammer.more;
+            case "about":
+                return this.grammer.about;
+            case "faucet":
+                return await this.transfer(bot, msg);
+            default:
+                return this.grammer.help;
+        }
     }
 
     /**
@@ -164,7 +199,7 @@ export default class Grammer {
 
         // check supply
         const date = new Date().toJSON().slice(0, 10);
-        if (!this.db.hasSupply(date)) {
+        if (!this.db.hasSupply(date, this.grammer.faucet.config.supply)) {
             return this.grammer.faucet.supply;
         }
 
@@ -192,7 +227,8 @@ export default class Grammer {
         // return exHash
         if (ex) {
             hash = (ex as ExResult).exHash;
-            this.db.burnSupply(date);
+            this.db.addAddr(addr);
+            this.db.burnSupply(date, this.grammer.faucet.config.supply);
             this.db.lastDrop(msg.from.username, new Date().getTime())
             return this.grammer.faucet.succeed.replace("${hash}", hash);
         } else {

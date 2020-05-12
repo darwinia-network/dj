@@ -13,7 +13,7 @@ yarn add @darwinia/api
 ```
 
 ```javascript
-import { autoAPI } from "@darwinia-network/darwinia.js";
+import { autoAPI } from "@darwinia/api";
 
 (async () => {
     const api = await autoAPI();
