@@ -39,6 +39,14 @@ about: |
   About me? why don't you introduce yourself first?
 # `faucet` command
 faucet:
+  empty: |
+    The airdrop has just sent to the air ;)
+  prefix: |
+    (The secret of generating lucky addresses is...wubalubadubdub
+
+    To be or not to be, it is a question.
+  length: |
+    The length of my crab address is 48, what about yours?
   failed: |
     Transfer failed, please try again later
   succeed: |
@@ -46,15 +54,15 @@ faucet:
     
     https://crab.subscan.io/extrinsic/${hash}
   interval: |
-    It seems that you have already got the ring of today, just tell me your story.
+    It seems that you have already got the CRING of today, just tell me your story.
     
-    You can call me after ${hour} hrs
+    (You can call me after ${hour} hrs
   supply: |
     We have run out our faucet supply today, trigger your clock at tomorrow morning
   address: |
-    I won't tell your that lucky folks always have keyword `CRAB` in their address
+    I won't tell you that lucky folks always have the keyword `CRAB` in their addresses
   received: |
-    This address has already received the air-drop, I know this cause I'M JUST A BOT??? :D
+    This address has already received the airdrop, I know this cause I'M JUST A BOT??? :D
   config:
     amount: 1000
     supply: 400

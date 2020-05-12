@@ -23,6 +23,9 @@ export interface ICommandArgs {
  * @param address string - wrong address alert
  */
 export interface IFaucetGrammers {
+    empty: string;
+    prefix: string;
+    length: string;
     failed: string;
     succeed: string;
     interval: string;
@@ -181,14 +184,18 @@ export default class Grammer {
         }
 
         // Get addr
-        const matches = msg.text.match(/\/(\w+)\S+\s+(\S+)/);
+        const matches = msg.text.match(/\/(\w+)\s+(\S+)/);
         if (matches === null || matches.length < 3) {
-            return this.grammer.faucet.address;
+            return this.grammer.faucet.empty;
         }
 
         const addr = matches[2];
         log.trace(`trying to tansfer to ${addr}`);
-        if (addr.indexOf("CRAB") < 0 || addr.length !== 48) {
+        if (addr.length !== 48) {
+            return this.grammer.faucet.length;
+        } else if (!addr.startsWith("5")) {
+            return this.grammer.faucet.prefix;
+        } else if (addr.indexOf("CRAB") < 0) {
             return this.grammer.faucet.address;
         }
 
@@ -216,7 +223,10 @@ export default class Grammer {
         }
 
         // transfer to address
-        bot.sendMessage(msg.chat.id, "Copy that! Well! Oh yes wait a minute mister postman!");
+        bot.sendMessage(
+            msg.chat.id,
+            "Copy that! Well! Oh yes wait a minute mister postman!",
+        );
         let hash = "";
         const ex = await this.api.transfer(
             addr, this.grammer.faucet.config.amount * 1000000000
