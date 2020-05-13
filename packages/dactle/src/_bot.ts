@@ -143,7 +143,6 @@ export default class Grammer {
                 }
             )
         });
-
     }
 
     private async reply(
@@ -183,27 +182,6 @@ export default class Grammer {
             return this.grammer.faucet.address;
         }
 
-        // Get addr
-        const matches = msg.text.match(/\/(\w+)\s+(\S+)/);
-        if (matches === null || matches.length < 3) {
-            return this.grammer.faucet.empty;
-        }
-
-        const addr = matches[2];
-        log.trace(`trying to tansfer to ${addr}`);
-        if (addr.length !== 48) {
-            return this.grammer.faucet.length;
-        } else if (!addr.startsWith("5")) {
-            return this.grammer.faucet.prefix;
-        } else if (addr.indexOf("CRAB") < 0) {
-            return this.grammer.faucet.address;
-        }
-
-        // check addr
-        if (this.db.hasReceived(addr)) {
-            return this.grammer.faucet.received;
-        }
-
         // check supply
         const date = new Date().toJSON().slice(0, 10);
         if (!this.db.hasSupply(date, this.grammer.faucet.config.supply)) {
@@ -220,6 +198,28 @@ export default class Grammer {
             return this.grammer.faucet.interval.replace(
                 "${hour}", Math.floor(nextDrop).toString()
             );
+        }
+
+        // Get addr
+        const matches = msg.text.match(/\/(\w+)\s+(\S+)/);
+        if (matches === null || matches.length < 3) {
+            return this.grammer.faucet.empty;
+        }
+
+        const addr = matches[2];
+        log.trace(`trying to tansfer to ${addr}`);
+        if (addr.length !== 48) {
+            return this.grammer.faucet.length;
+        } else if (!addr.startsWith("5")) {
+            return this.grammer.faucet.prefix;
+        } else if (!addr.match(/CRAB/g)) {
+            log.warn(`addr ${addr} doesn't match`);
+            return this.grammer.faucet.address;
+        }
+
+        // check addr
+        if (this.db.hasReceived(addr)) {
+            return this.grammer.faucet.received;
         }
 
         // transfer to address
