@@ -1,12 +1,8 @@
 export default abstract class BotDb {
-    constructor() { }
-
-    public abstract addAddr(addr: string): void;
-    public abstract hasReceived(addr: string): boolean;
-
-    public abstract nextDrop(id: number, interval: number): number;
-    public abstract lastDrop(id: number, last: number): void;
-
-    public abstract hasSupply(date: string, supply: number): boolean;
-    public abstract burnSupply(date: string, supply: number): void;
+    public abstract async addAddr(addr: string): Promise<void>;
+    public abstract async hasReceived(addr: string): Promise<boolean>;
+    public abstract async nextDrop(id: number, interval: number): Promise<number>;
+    public abstract async lastDrop(id: number, last: number): Promise<void>;
+    public abstract async hasSupply(date: string, supply: number): Promise<boolean>;
+    public abstract async burnSupply(date: string, supply: number): Promise<void>;
 }

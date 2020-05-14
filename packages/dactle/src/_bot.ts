@@ -191,7 +191,7 @@ export default class Grammer {
         }
 
         // check user
-        const nextDrop: number = this.db.nextDrop(
+        const nextDrop: number = await this.db.nextDrop(
             msg.from.id,
             this.grammer.faucet.config.interval
         );
