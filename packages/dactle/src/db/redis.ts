@@ -1,5 +1,5 @@
 import Redis from "ioredis";
-import BotDb from "./_db";
+import BotDb from "./schema";
 
 /// Table
 const USER = "_user"
@@ -75,3 +75,5 @@ export class RDb extends BotDb {
         return `${key}_${radix}`;
     }
 }
+
+export default RDb;

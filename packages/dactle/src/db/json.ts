@@ -1,6 +1,6 @@
 import fs from "fs"
 import path from "path"
-import BotDb from "./_db";
+import BotDb from "./schema";
 
 /**
  * Database of bot

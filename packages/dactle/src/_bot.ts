@@ -4,8 +4,7 @@ import * as yml from "js-yaml";
 import { API, autoAPI, ExResult } from "@darwinia/api";
 import { Config, log } from "@darwinia/util";
 import TelegramBot from "node-telegram-bot-api"
-import BotJsonDb from "./_jdb";
-import BotDb from "./_db";
+import { BotDb, JDb, RDb } from "./db";
 
 /**
  * command arguments
@@ -78,17 +77,22 @@ export default class Grammer {
      *
      * @return {Promise<Grammer>} grammer service
      */
-    static async new(): Promise<Grammer> {
+    static async new(rdb = false): Promise<Grammer> {
         const api = await autoAPI();
         const config = new Config();
         const grammer: IGrammer = yml.safeLoad(
             fs.readFileSync(path.resolve(__dirname, "static/grammer.yml"), "utf8")
         );
 
-        const db: BotDb = new BotJsonDb(
-            path.resolve(config.path.root, "cache/boby.json"),
-            grammer.faucet.config.supply,
-        );
+        let db: BotDb;
+        if (rdb) {
+            db = new RDb();
+        } else {
+            db = new JDb(
+                path.resolve(config.path.root, "cache/boby.json"),
+                grammer.faucet.config.supply,
+            );
+        }
 
         return new Grammer({ api, config, grammer, db });
     }
