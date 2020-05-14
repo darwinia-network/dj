@@ -5,5 +5,6 @@ module.exports = {
         'ts-jest': {
             isolatedModules: true,
         },
-    }
+    },
+    testTimeout: 30000
 }

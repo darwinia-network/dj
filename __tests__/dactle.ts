@@ -1,8 +1,8 @@
 import { RDb } from "@darwinia/dactle/src/db";
 
 // Addrs
-test("Test addrs", async () => {
-    const redis = new RDb();
+test("Test addrs", async (done: jest.DoneCallback) => {
+    const redis = new RDb("6379");
     const addrs = [
         "5CRABDGPE9XKM4TSZneAG3vvyPLpiZj3Mw4fnfSYVqsVRDit",
         "5CRAB3QUL56xNQKUW16FrHEQo3B7giiNT9yKCEfUPfUMf12f",
@@ -19,11 +19,11 @@ test("Test addrs", async () => {
         expect(await redis.hasReceived(addrs[i])).toEqual(true);
     }
 
-    return;
+    done();
 });
 
 // User Interval
-test("Test users", async () => {
+test("Test users", async (done: jest.DoneCallback) => {
     const redis = new RDb();
     const users = [0, 1, 2];
 
@@ -37,11 +37,11 @@ test("Test users", async () => {
         expect(await redis.nextDrop(users[i], 24)).toEqual(23)
     }
 
-    return;
+    done();
 });
 
 // Supplies
-test("Test Supply", async () => {
+test("Test Supply", async (done: jest.DoneCallback) => {
     const redis = new RDb();
     const date = new Date().toJSON().slice(0, 10);
 
@@ -59,4 +59,5 @@ test("Test Supply", async () => {
         await redis.burnSupply(date, 400)
     }
     expect(await redis.hasSupply(date, 400)).toEqual(false);
+    done()
 });
