@@ -46,7 +46,7 @@ test("Test Supply", async (done: jest.DoneCallback) => {
     const date = new Date().toJSON().slice(0, 10);
 
     // fill supply today
-    await redis._.set(`_supply_${date}`, 400);
+    await redis._.hmset(`_supply`, [date, 400]);
 
     // check supply
     for (let i = 0; i < 200; i++) {

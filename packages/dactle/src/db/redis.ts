@@ -2,7 +2,7 @@ import Redis from "ioredis";
 import BotDb from "./schema";
 
 /// Table
-const USER = "_user"
+const USER = "_users"
 const ADDRS = "_addrs"
 const SUPPLY = "_supply"
 
@@ -27,8 +27,7 @@ export class RDb extends BotDb {
     }
 
     public async nextDrop(id: number, interval: number): Promise<number> {
-        const key = this.expand(USER, "" + id);
-        const last = await this._.get(key);
+        const last = await this._.hget(USER, id.toString());
         if (last) {
             const lastTime = Number.parseInt(last, 10);
             const sub = interval - ((new Date().getTime() - lastTime) / 1000 / 60 / 60);
@@ -38,41 +37,26 @@ export class RDb extends BotDb {
     }
 
     public async lastDrop(id: number, last: number): Promise<void> {
-        const key = this.expand(USER, "" + id);
-        await this._.set(key, last);
+        await this._.hmset(USER, [id, last]);
     }
 
     public async hasSupply(date: string, supply: number): Promise<boolean> {
-        const key = this.expand(SUPPLY, date);
-        const cs = await this.fillSupply(key, supply)
-        return cs > 0;
+        const cs = await this._.hget(SUPPLY, date);
+        if (cs) {
+            return Number.parseInt(cs, 10) > 0;
+        } else {
+            await this._.hmset(SUPPLY, [date, supply]);
+            return true;
+        }
     }
 
     public async burnSupply(date: string, supply: number): Promise<void> {
-        const key = this.expand(SUPPLY, date);
-        const cs = await this.fillSupply(key, supply)
-        this._.set(key, cs - 1);
-    }
-
-    private async fillSupply(key: string, supply: number): Promise<number> {
-        let currentSupply: number = 0;
-        const s = await this._.get(key);
-        if (!s) {
-            this._.set(key, supply);
-            currentSupply = supply;
+        const current = await this._.hget(SUPPLY, date);
+        if (current) {
+            await this._.hmset(SUPPLY, [date, (Number.parseInt(current, 10) - 1)]);
         } else {
-            currentSupply = Number.parseInt(s, 10)
+            this._.hmset(SUPPLY, [date, supply]);
         }
-
-        return Number(currentSupply);
-    }
-
-    /**
-     * @param {string} key - key name
-     * @param {string} radix - radix value
-     */
-    private expand(key: string, radix: string): string {
-        return `${key}_${radix}`;
     }
 }
 

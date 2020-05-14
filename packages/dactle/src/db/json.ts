@@ -5,7 +5,7 @@ import BotDb from "./schema";
 /**
  * Database of bot
  */
-interface IBotScheme {
+export interface IBotScheme {
     addrs: string[],
     users: Record<number, number>,
     supply: Record<string, number>,

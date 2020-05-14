@@ -39,6 +39,10 @@ about: |
   About me? why don't you introduce yourself first?
 # `faucet` command
 faucet:
+  invite: |
+    Needs some CRING? Follow me: https://t.me/DarwiniaFaucet
+  only: |
+    Would you mind to join https://t.me/DarwiniaNetwork first and ask me again?
   invalid: |
     To be or not to be, that is the question.
   empty: |

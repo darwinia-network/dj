@@ -23,6 +23,8 @@ export interface ICommandArgs {
  * @param address string - wrong address alert
  */
 export interface IFaucetGrammers {
+    only: string;
+    invite: string;
     invalid: string;
     empty: string;
     prefix: string;
@@ -187,6 +189,18 @@ export default class Grammer {
         ) {
             return this.grammer.faucet.invalid;
         }
+
+        // Check if user in channel @DarwiniaFaucet
+        // if (msg.chat.id !== -1001364443637) {
+        //     return this.grammer.faucet.invite;
+        // }
+        //
+        // Check if user in channel @DarwiniaNetwork
+        // try {
+        //     await bot.getChatMember("@DarwiniaNetwork", msg.from.id.toString());
+        // } catch (e) {
+        //     return this.grammer.faucet.only;
+        // }
 
         // check supply
         const date = new Date().toJSON().slice(0, 10);
