@@ -41,8 +41,9 @@ about: |
 faucet:
   invite: |
     Needs some CRING? Follow me: https://t.me/DarwiniaFaucet
-  only: |
-    Would you mind to join https://t.me/DarwiniaNetwork first and ask me again?
+  only: >-
+    I know here we are in a lonesome town, 
+    but would you mind to join https://t.me/DarwiniaNetwork and talk to me again?
   invalid: |
     To be or not to be, that is the question.
   empty: |

@@ -79,7 +79,7 @@ export default class Grammer {
      *
      * @return {Promise<Grammer>} grammer service
      */
-    static async new(rdb = false, conf = ""): Promise<Grammer> {
+    static async new(rdb = true, conf = ""): Promise<Grammer> {
         const api = await autoAPI();
         const config = new Config();
         const grammer: IGrammer = yml.safeLoad(
@@ -191,16 +191,16 @@ export default class Grammer {
         }
 
         // Check if user in channel @DarwiniaFaucet
-        // if (msg.chat.id !== -1001364443637) {
-        //     return this.grammer.faucet.invite;
-        // }
-        //
+        if (msg.chat.id !== -1001364443637) {
+            return this.grammer.faucet.invite;
+        }
+
         // Check if user in channel @DarwiniaNetwork
-        // try {
-        //     await bot.getChatMember("@DarwiniaNetwork", msg.from.id.toString());
-        // } catch (e) {
-        //     return this.grammer.faucet.only;
-        // }
+        try {
+            await bot.getChatMember("@DarwiniaNetwork", msg.from.id.toString());
+        } catch (_) {
+            return this.grammer.faucet.only;
+        }
 
         // check supply
         const date = new Date().toJSON().slice(0, 10);
