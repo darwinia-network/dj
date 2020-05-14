@@ -4,6 +4,7 @@ import * as yml from "js-yaml";
 import { API, autoAPI, ExResult } from "@darwinia/api";
 import { Config, log } from "@darwinia/util";
 import TelegramBot from "node-telegram-bot-api"
+import BotJsonDb from "./_jdb";
 import BotDb from "./_db";
 
 /**
@@ -23,6 +24,7 @@ export interface ICommandArgs {
  * @param address string - wrong address alert
  */
 export interface IFaucetGrammers {
+    invalid: string;
     empty: string;
     prefix: string;
     length: string;
@@ -83,7 +85,7 @@ export default class Grammer {
             fs.readFileSync(path.resolve(__dirname, "static/grammer.yml"), "utf8")
         );
 
-        const db: BotDb = new BotDb(
+        const db: BotDb = new BotJsonDb(
             path.resolve(config.path.root, "cache/boby.json"),
             grammer.faucet.config.supply,
         );
@@ -177,9 +179,9 @@ export default class Grammer {
         if (
             msg.text === undefined ||
             msg.from === undefined ||
-            msg.from.username === undefined
+            msg.from.id === undefined
         ) {
-            return this.grammer.faucet.address;
+            return this.grammer.faucet.invalid;
         }
 
         // check supply
@@ -190,7 +192,7 @@ export default class Grammer {
 
         // check user
         const nextDrop: number = this.db.nextDrop(
-            msg.from.username,
+            msg.from.id,
             this.grammer.faucet.config.interval
         );
 
@@ -207,13 +209,12 @@ export default class Grammer {
         }
 
         const addr = matches[2];
-        log.trace(`trying to tansfer to ${addr}`);
+        log.trace(`${new Date()} trying to tansfer to ${addr}`);
         if (addr.length !== 48) {
             return this.grammer.faucet.length;
         } else if (!addr.startsWith("5")) {
             return this.grammer.faucet.prefix;
         } else if (!addr.match(/CRAB/g)) {
-            log.warn(`addr ${addr} doesn't match`);
             return this.grammer.faucet.address;
         }
 
@@ -239,7 +240,7 @@ export default class Grammer {
             hash = (ex as ExResult).exHash;
             this.db.addAddr(addr);
             this.db.burnSupply(date, this.grammer.faucet.config.supply);
-            this.db.lastDrop(msg.from.username, new Date().getTime())
+            this.db.lastDrop(msg.from.id, new Date().getTime())
             return this.grammer.faucet.succeed.replace("${hash}", hash);
         } else {
             return this.grammer.faucet.failed;

@@ -39,12 +39,12 @@ about: |
   About me? why don't you introduce yourself first?
 # `faucet` command
 faucet:
+  invalid: |
+    To be or not to be, that is the question.
   empty: |
     The airdrop has just sent to the air ;)
   prefix: |
-    (The secret of generating lucky addresses is...wubalubadubdub
-
-    To be or not to be, it is a question.
+    (The secret of generating a lucky address is...wubalubadubdub
   length: |
     The length of my crab address is 48, what about yours?
   failed: |
