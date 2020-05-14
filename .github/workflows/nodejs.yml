@@ -11,11 +11,11 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         node-version: [10.x, 11.x, 12.x]
-        os: [macOS-latest, ubuntu-latest, windows-latest]
+        os: [macOS-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
@@ -23,11 +23,36 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - name: Deps
-      run: |
-        npm -g i yarn
-        yarn
-        yarn deps
+      run: yarn && yarn deps
     - name: Lint
       run: yarn lint
     - name: Build
       run: yarn build
+  tests:
+    needs: build
+    strategy:
+      matrix:
+        node-version: [10.x, 11.x, 12.x]
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Deps
+      run: yarn && yarn deps
+    - name: Lint
+      run: yarn lint
+    - name: Build
+      run: yarn build
+    - name: Test
+      run: yarn test

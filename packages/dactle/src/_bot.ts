@@ -77,7 +77,7 @@ export default class Grammer {
      *
      * @return {Promise<Grammer>} grammer service
      */
-    static async new(rdb = false): Promise<Grammer> {
+    static async new(rdb = false, conf = ""): Promise<Grammer> {
         const api = await autoAPI();
         const config = new Config();
         const grammer: IGrammer = yml.safeLoad(
@@ -86,7 +86,7 @@ export default class Grammer {
 
         let db: BotDb;
         if (rdb) {
-            db = new RDb();
+            db = new RDb(conf);
         } else {
             db = new JDb(
                 path.resolve(config.path.root, "cache/boby.json"),

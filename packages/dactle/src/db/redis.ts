@@ -7,19 +7,19 @@ const ADDRS = "_addrs"
 const SUPPLY = "_supply"
 
 export class RDb extends BotDb {
-    private db: Redis.Redis;
+    public _: Redis.Redis;
 
-    constructor() {
+    constructor(conf = "") {
         super();
-        this.db = new Redis();
+        this._ = new Redis(conf);
     }
 
     public async addAddr(addr: string): Promise<void> {
-        await this.db.sadd(ADDRS, addr);
+        await this._.sadd(ADDRS, addr);
     }
 
     public async hasReceived(addr: string): Promise<boolean> {
-        if (await this.db.sismember(ADDRS, addr) === 0) {
+        if (await this._.sismember(ADDRS, addr) === 0) {
             return false
         }
 
@@ -28,9 +28,9 @@ export class RDb extends BotDb {
 
     public async nextDrop(id: number, interval: number): Promise<number> {
         const key = this.expand(USER, "" + id);
-        const last = await this.db.get(key);
+        const last = await this._.get(key);
         if (last) {
-            const lastTime = Number.parseInt(last, 10)
+            const lastTime = Number.parseInt(last, 10);
             const sub = interval - ((new Date().getTime() - lastTime) / 1000 / 60 / 60);
             return Math.floor(sub);
         }
@@ -39,7 +39,7 @@ export class RDb extends BotDb {
 
     public async lastDrop(id: number, last: number): Promise<void> {
         const key = this.expand(USER, "" + id);
-        await this.db.set(key, last);
+        await this._.set(key, last);
     }
 
     public async hasSupply(date: string, supply: number): Promise<boolean> {
@@ -51,14 +51,14 @@ export class RDb extends BotDb {
     public async burnSupply(date: string, supply: number): Promise<void> {
         const key = this.expand(SUPPLY, date);
         const cs = await this.fillSupply(key, supply)
-        this.db.set(key, cs - 1);
+        this._.set(key, cs - 1);
     }
 
     private async fillSupply(key: string, supply: number): Promise<number> {
         let currentSupply: number = 0;
-        const s = await this.db.get(key);
+        const s = await this._.get(key);
         if (!s) {
-            this.db.set(key, supply);
+            this._.set(key, supply);
             currentSupply = supply;
         } else {
             currentSupply = Number.parseInt(s, 10)
