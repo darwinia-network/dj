@@ -204,7 +204,8 @@ export default class Grammer {
 
         // check supply
         const date = new Date().toJSON().slice(0, 10);
-        if (!this.db.hasSupply(date, this.grammer.faucet.config.supply)) {
+        const hasSupply = await this.db.hasSupply(date, this.grammer.faucet.config.supply);
+        if (!hasSupply) {
             return this.grammer.faucet.supply;
         }
 
@@ -237,7 +238,9 @@ export default class Grammer {
         }
 
         // check addr
-        if (this.db.hasReceived(addr)) {
+        const received: boolean = await this.db.hasReceived(addr);
+        if (received) {
+            log.trace(`${new Date()}: ${addr} has already reviced the airdrop`)
             return this.grammer.faucet.received;
         }
 
@@ -256,9 +259,9 @@ export default class Grammer {
         // return exHash
         if (ex) {
             hash = (ex as ExResult).exHash;
-            this.db.addAddr(addr);
-            this.db.burnSupply(date, this.grammer.faucet.config.supply);
-            this.db.lastDrop(msg.from.id, new Date().getTime())
+            await this.db.addAddr(addr);
+            await this.db.burnSupply(date, this.grammer.faucet.config.supply);
+            await this.db.lastDrop(msg.from.id, new Date().getTime())
             return this.grammer.faucet.succeed.replace("${hash}", hash);
         } else {
             return this.grammer.faucet.failed;

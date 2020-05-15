@@ -19,7 +19,8 @@ export class RDb extends BotDb {
     }
 
     public async hasReceived(addr: string): Promise<boolean> {
-        if (await this._.sismember(ADDRS, addr) === 0) {
+        const res: number = await this._.sismember(ADDRS, addr);
+        if (res === 0) {
             return false
         }
 
@@ -27,7 +28,7 @@ export class RDb extends BotDb {
     }
 
     public async nextDrop(id: number, interval: number): Promise<number> {
-        const last = await this._.hget(USER, id.toString());
+        const last: string | null = await this._.hget(USER, id.toString());
         if (last) {
             const lastTime = Number.parseInt(last, 10);
             const sub = interval - ((new Date().getTime() - lastTime) / 1000 / 60 / 60);
