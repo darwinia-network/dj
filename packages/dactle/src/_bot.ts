@@ -48,6 +48,7 @@ export interface IGrammer {
     help: string;
     docs: string;
     book: string;
+    dev: string;
     talk: string;
     more: string;
     about: string;
@@ -79,7 +80,17 @@ export default class Grammer {
      *
      * @return {Promise<Grammer>} grammer service
      */
-    static async new(rdb = true, conf = ""): Promise<Grammer> {
+    static async new(rdb = true, port = 6379, host = "0.0.0.0"): Promise<Grammer> {
+        // Check ENV
+        if (process.env.DACTLE_REDIS_PORT) {
+            port = Number.parseInt(process.env.DACTLE_REDIS_PORT, 10);
+        }
+
+        if (process.env.DACTLE_REDIS_HOST) {
+            host = process.env.DACTLE_REDIS_HOST;
+        }
+
+        // Generate API
         const api = await autoAPI();
         const config = new Config();
         const grammer: IGrammer = yml.safeLoad(
@@ -88,7 +99,7 @@ export default class Grammer {
 
         let db: BotDb;
         if (rdb) {
-            db = new RDb(conf);
+            db = new RDb(port, host);
         } else {
             db = new JDb(
                 path.resolve(config.path.root, "cache/boby.json"),
@@ -143,13 +154,27 @@ export default class Grammer {
             }
 
             // reply
-            bot.sendMessage(
+            const sentMsg = await bot.sendMessage(
                 msg.chat.id,
                 await this.reply(bot, msg, match[0].slice(1)),
                 {
                     reply_to_message_id: msg.message_id,
                 }
             )
+
+            // check if should delete message
+            const that = this;
+            if (sentMsg.text) {
+                if (sentMsg.text && (
+                    sentMsg.text === this.grammer.faucet.only.trim() ||
+                    sentMsg.text === this.grammer.faucet.invite.trim()
+                )) {
+                    await this.deleteMsg(bot, msg);
+                    setTimeout(async () => {
+                        await that.deleteMsg(bot, sentMsg);
+                    }, 30000);
+                }
+            }
         });
     }
 
@@ -163,6 +188,8 @@ export default class Grammer {
                 return this.grammer.book;
             case "docs":
                 return this.grammer.docs;
+            case "dev":
+                return this.grammer.dev;
             case "talk":
                 return this.grammer.talk;
             case "more":
@@ -197,7 +224,15 @@ export default class Grammer {
 
         // Check if user in channel @DarwiniaNetwork
         try {
-            await bot.getChatMember("@DarwiniaNetwork", msg.from.id.toString());
+            const res = await bot.getChatMember("@DarwiniaNetwork", msg.from.id.toString());
+            const status: string = res.status;
+            if (
+                status !== "creator" &&
+                status !== "member" &&
+                status !== "administrator"
+            ) {
+                return this.grammer.faucet.only;
+            }
         } catch (_) {
             return this.grammer.faucet.only;
         }
@@ -266,5 +301,13 @@ export default class Grammer {
         } else {
             return this.grammer.faucet.failed;
         }
+    }
+
+    private async deleteMsg(bot: TelegramBot, msg: TelegramBot.Message): Promise<void> {
+        await bot.deleteMessage(
+            msg.chat.id, msg.message_id.toString(),
+        ).catch((_: any) => {
+            log.warn(`doesn't have the access for deleting messages`);
+        });
     }
 }

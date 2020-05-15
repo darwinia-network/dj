@@ -11,16 +11,21 @@ help: |
 
   - /help   - Miss me?
   - /book   - Roll up for the magic mystery tour!
+  - /dev    - Unlimited programming in an eyeful?
   - /docs   - Let's explore the darwinia world!
   - /talk   - **DO NOT TAP THIS COMMAND**
   - /more   - There must be more to life than being a bot!
   - /about  - About me
-  - /faucet - Let`s talk about it, wouldn`t it be nice?
+  - /faucet - Let`s talk about it, wouldn`t be it nice?
 # `book` command
 book: |
   Our handbook is in progress now, looking forward to your contributions!
   
   https://darwinia-network.github.io/the-darwinia-book/
+dev: |
+  Have you ever heard the qoute, unlimited programming in an eyeful?
+
+  https://t.me/DarwiniaDev
 # `docs` command
 docs: |
   https://docs.darwinia.network/
@@ -39,11 +44,11 @@ about: |
   About me? why don't you introduce yourself first?
 # `faucet` command
 faucet:
-  invite: |
-    Needs some CRING? Follow me: https://t.me/DarwiniaFaucet
   only: >-
     You and I, all we got is each other in this lonesome town, 
-    but would you mind to join https://t.me/DarwiniaNetwork first and talk to me again?
+    but would you mind to join https://t.me/DarwiniaNetwork first and talk to me later?
+  invite: |
+    Needs some CRING? Follow me: https://t.me/DarwiniaFaucet
   invalid: |
     To be or not to be, that is the question.
   empty: |

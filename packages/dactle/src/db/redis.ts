@@ -9,9 +9,9 @@ const SUPPLY = "_supply"
 export class RDb extends BotDb {
     public _: Redis.Redis;
 
-    constructor(conf = "") {
+    constructor(port = 6379, host = "0.0.0.0") {
         super();
-        this._ = new Redis(conf);
+        this._ = new Redis(port, host);
     }
 
     public async addAddr(addr: string): Promise<void> {

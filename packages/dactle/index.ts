@@ -1,10 +1,12 @@
 #!/usr/bin/env node
-import { whereisPj } from "@darwinia/util";
+import fs from "fs";
 import yargs from "yargs";
 import cmdBot from "./src/bot";
 
 // main
 (async () => {
+    const pj = JSON.parse(fs.readFileSync("./package.json").toString());
+
     // enable logger
     if (process.env.LOGGER === undefined) {
         process.env.LOGGER = "INFO";
@@ -14,9 +16,9 @@ import cmdBot from "./src/bot";
     const _ = yargs
         .usage("dactle <hello@darwinia.network>")
         .help("help").alias("help", "h")
-        .version("version", whereisPj().version).alias("version", "V")
-          .command(cmdBot)
-          .argv;
+        .version("version", pj.version).alias("version", "V")
+        .command(cmdBot)
+        .argv;
 
     // show help if no input
     if (process.argv.length < 3) {
