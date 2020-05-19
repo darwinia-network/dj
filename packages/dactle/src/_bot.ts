@@ -4,7 +4,7 @@ import * as yml from "js-yaml";
 import { API, autoAPI, ExResult } from "@darwinia/api";
 import { Config, log } from "@darwinia/util";
 import TelegramBot from "node-telegram-bot-api"
-import BotDb from "./_db";
+import { BotDb, JDb, RDb } from "./db";
 
 /**
  * command arguments
@@ -23,6 +23,12 @@ export interface ICommandArgs {
  * @param address string - wrong address alert
  */
 export interface IFaucetGrammers {
+    only: string;
+    invite: string;
+    invalid: string;
+    empty: string;
+    prefix: string;
+    length: string;
     failed: string;
     succeed: string;
     interval: string;
@@ -42,6 +48,7 @@ export interface IGrammer {
     help: string;
     docs: string;
     book: string;
+    dev: string;
     talk: string;
     more: string;
     about: string;
@@ -73,17 +80,32 @@ export default class Grammer {
      *
      * @return {Promise<Grammer>} grammer service
      */
-    static async new(): Promise<Grammer> {
+    static async new(rdb = true, port = 6379, host = "0.0.0.0"): Promise<Grammer> {
+        // Check ENV
+        if (process.env.DACTLE_REDIS_PORT) {
+            port = Number.parseInt(process.env.DACTLE_REDIS_PORT, 10);
+        }
+
+        if (process.env.DACTLE_REDIS_HOST) {
+            host = process.env.DACTLE_REDIS_HOST;
+        }
+
+        // Generate API
         const api = await autoAPI();
         const config = new Config();
         const grammer: IGrammer = yml.safeLoad(
             fs.readFileSync(path.resolve(__dirname, "static/grammer.yml"), "utf8")
         );
 
-        const db: BotDb = new BotDb(
-            path.resolve(config.path.root, "cache/boby.json"),
-            grammer.faucet.config.supply,
-        );
+        let db: BotDb;
+        if (rdb) {
+            db = new RDb(port, host);
+        } else {
+            db = new JDb(
+                path.resolve(config.path.root, "cache/boby.json"),
+                grammer.faucet.config.supply,
+            );
+        }
 
         return new Grammer({ api, config, grammer, db });
     }
@@ -132,15 +154,28 @@ export default class Grammer {
             }
 
             // reply
-            bot.sendMessage(
+            const sentMsg = await bot.sendMessage(
                 msg.chat.id,
                 await this.reply(bot, msg, match[0].slice(1)),
                 {
                     reply_to_message_id: msg.message_id,
                 }
             )
-        });
 
+            // check if should delete message
+            const that = this;
+            if (sentMsg.text) {
+                if (sentMsg.text && (
+                    sentMsg.text === this.grammer.faucet.only.trim() ||
+                    sentMsg.text === this.grammer.faucet.invite.trim()
+                )) {
+                    await this.deleteMsg(bot, msg);
+                    setTimeout(async () => {
+                        await that.deleteMsg(bot, sentMsg);
+                    }, 30000);
+                }
+            }
+        });
     }
 
     private async reply(
@@ -153,6 +188,8 @@ export default class Grammer {
                 return this.grammer.book;
             case "docs":
                 return this.grammer.docs;
+            case "dev":
+                return this.grammer.dev;
             case "talk":
                 return this.grammer.talk;
             case "more":
@@ -175,37 +212,41 @@ export default class Grammer {
         if (
             msg.text === undefined ||
             msg.from === undefined ||
-            msg.from.username === undefined
+            msg.from.id === undefined
         ) {
-            return this.grammer.faucet.address;
+            return this.grammer.faucet.invalid;
         }
 
-        // Get addr
-        const matches = msg.text.match(/\/(\w+)\S+\s+(\S+)/);
-        if (matches === null || matches.length < 3) {
-            return this.grammer.faucet.address;
+        // Check if user in channel @DarwiniaFaucet
+        if (msg.chat.id !== -1001364443637) {
+            return this.grammer.faucet.invite;
         }
 
-        const addr = matches[2];
-        log.trace(`trying to tansfer to ${addr}`);
-        if (addr.indexOf("CRAB") < 0 || addr.length !== 48) {
-            return this.grammer.faucet.address;
-        }
-
-        // check addr
-        if (this.db.hasReceived(addr)) {
-            return this.grammer.faucet.received;
+        // Check if user in channel @DarwiniaNetwork
+        try {
+            const res = await bot.getChatMember("@DarwiniaNetwork", msg.from.id.toString());
+            const status: string = res.status;
+            if (
+                status !== "creator" &&
+                status !== "member" &&
+                status !== "administrator"
+            ) {
+                return this.grammer.faucet.only;
+            }
+        } catch (_) {
+            return this.grammer.faucet.only;
         }
 
         // check supply
         const date = new Date().toJSON().slice(0, 10);
-        if (!this.db.hasSupply(date, this.grammer.faucet.config.supply)) {
+        const hasSupply = await this.db.hasSupply(date, this.grammer.faucet.config.supply);
+        if (!hasSupply) {
             return this.grammer.faucet.supply;
         }
 
         // check user
-        const nextDrop: number = this.db.nextDrop(
-            msg.from.username,
+        const nextDrop: number = await this.db.nextDrop(
+            msg.from.id,
             this.grammer.faucet.config.interval
         );
 
@@ -215,8 +256,34 @@ export default class Grammer {
             );
         }
 
+        // Get addr
+        const matches = msg.text.match(/\/(\w+)\s+(\S+)/);
+        if (matches === null || matches.length < 3) {
+            return this.grammer.faucet.empty;
+        }
+
+        const addr = matches[2];
+        log.trace(`${new Date()} trying to tansfer to ${addr}`);
+        if (addr.length !== 48) {
+            return this.grammer.faucet.length;
+        } else if (!addr.startsWith("5")) {
+            return this.grammer.faucet.prefix;
+        } else if (!addr.match(/CRAB/g)) {
+            return this.grammer.faucet.address;
+        }
+
+        // check addr
+        const received: boolean = await this.db.hasReceived(addr);
+        if (received) {
+            log.trace(`${new Date()}: ${addr} has already reviced the airdrop`)
+            return this.grammer.faucet.received;
+        }
+
         // transfer to address
-        bot.sendMessage(msg.chat.id, "Copy that! Well! Oh yes wait a minute mister postman!");
+        bot.sendMessage(
+            msg.chat.id,
+            "Copy that! Well! Oh yes wait a minute mister postman!",
+        );
         let hash = "";
         const ex = await this.api.transfer(
             addr, this.grammer.faucet.config.amount * 1000000000
@@ -227,12 +294,20 @@ export default class Grammer {
         // return exHash
         if (ex) {
             hash = (ex as ExResult).exHash;
-            this.db.addAddr(addr);
-            this.db.burnSupply(date, this.grammer.faucet.config.supply);
-            this.db.lastDrop(msg.from.username, new Date().getTime())
+            await this.db.addAddr(addr);
+            await this.db.burnSupply(date, this.grammer.faucet.config.supply);
+            await this.db.lastDrop(msg.from.id, new Date().getTime())
             return this.grammer.faucet.succeed.replace("${hash}", hash);
         } else {
             return this.grammer.faucet.failed;
         }
+    }
+
+    private async deleteMsg(bot: TelegramBot, msg: TelegramBot.Message): Promise<void> {
+        await bot.deleteMessage(
+            msg.chat.id, msg.message_id.toString(),
+        ).catch((_: any) => {
+            log.warn(`doesn't have the access for deleting messages`);
+        });
     }
 }

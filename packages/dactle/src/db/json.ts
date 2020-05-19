@@ -1,19 +1,20 @@
 import fs from "fs"
 import path from "path"
+import BotDb from "./schema";
 
 /**
  * Database of bot
  */
-interface IBotScheme {
+export interface IBotScheme {
     addrs: string[],
-    users: Record<string, number>,
+    users: Record<number, number>,
     supply: Record<string, number>,
 }
 
 /**
  * This database is just for the telegram bot currently now
  */
-export class BotDb {
+export class JDb extends BotDb {
     private _: IBotScheme;
     private path: string;
 
@@ -21,6 +22,7 @@ export class BotDb {
         _path: string,
         supply = 0,
     ) {
+        super();
         // ensure the path of database
         if (!fs.existsSync(_path)) {
             fs.mkdirSync(path.dirname(_path), { recursive: true });
@@ -42,12 +44,12 @@ export class BotDb {
     /**
      * Validate address
      */
-    public addAddr(addr: string) {
+    public async addAddr(addr: string) {
         this._.addrs.push(addr);
         this.save();
     }
 
-    public hasReceived(addr: string) {
+    public async hasReceived(addr: string): Promise<boolean> {
         if (this._.addrs.indexOf(addr) > -1) {
             return true;
         }
@@ -57,7 +59,7 @@ export class BotDb {
     /**
      * Validate user id
      */
-    public nextDrop(id: string, interval: number): number {
+    public async nextDrop(id: number, interval: number): Promise<number> {
         const last: number = this._.users[id];
         if (last !== undefined) {
             const sub = interval - ((new Date().getTime() - last) / 1000 / 60 / 60);
@@ -66,7 +68,7 @@ export class BotDb {
         return 0;
     }
 
-    public lastDrop(id: string, last: number) {
+    public async lastDrop(id: number, last: number) {
         this._.users[id] = last;
         this.save();
     }
@@ -74,12 +76,12 @@ export class BotDb {
     /**
      * Validate supply
      */
-    public hasSupply(date: string, supply: number): boolean {
+    public async hasSupply(date: string, supply: number): Promise<boolean> {
         this.fillSupply(date, supply);
         return this._.supply[date] > 0;
     }
 
-    public burnSupply(date: string, supply: number) {
+    public async burnSupply(date: string, supply: number): Promise<void> {
         this.fillSupply(date, supply);
         this._.supply[date] -= 1;
         this.save();
@@ -100,4 +102,4 @@ export class BotDb {
     }
 }
 
-export default BotDb;
+export default JDb;
