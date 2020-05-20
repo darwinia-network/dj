@@ -143,7 +143,7 @@ export default class Grammer {
     public async run(key: string) {
         const bot = new TelegramBot(key, { polling: true });
         bot.on("polling_error", (msg) => log.err(msg));
-        bot.onText(/\/\w+/, async (msg) => {
+        bot.onText(/^\/\w+/, async (msg) => {
             if (msg.text === undefined) {
                 return false;
             }
