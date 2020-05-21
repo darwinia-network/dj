@@ -160,6 +160,15 @@ export class API {
     }
 
     /**
+     * get the specify extrinsic
+     *
+     * @param {string} hash - hash of extrinsic
+     */
+    public static async getExtrinsic(hash: string): Promise<Extrinsic> {
+        return await Subscan.getExtrinsic(hash);
+    }
+
+    /**
      * Encode darwiniaEthBlock to scale codec
      *
      * @param {IDarwiniaEthBlock} block - darwinia eth block
@@ -195,15 +204,6 @@ export class API {
         }
 
         return await this._.rpc.chain.getBlock(hash);
-    }
-
-    /**
-     * get the specify extrinsic
-     *
-     * @param {string} hash - hash of extrinsic
-     */
-    public async getExtrinsic(hash: string): Promise<Extrinsic> {
-        return await Subscan.getExtrinsic(hash);
     }
 
     /**
