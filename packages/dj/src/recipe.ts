@@ -1,7 +1,7 @@
 import yargs from "yargs";
 import { autoAPI, API, ShadowAPI } from "@darwinia/api";
 import { Vec, Struct } from "@polkadot/types";
-import { Config, IDarwiniaEthBlock, log } from "@darwinia/util";
+import { Config, log } from "@darwinia/util";
 
 /**
  * Helpers
@@ -15,26 +15,6 @@ async function recipeBalance(api: API, args: yargs.Arguments) {
     const balance = await api.getBalance(addr);
     const s = balance + " RING 💰";
     log.ox(s);
-}
-
-async function recipeBestHeader(api: API, shadow: ShadowAPI) {
-    const bestHeaderHash = await api._.query.ethRelay.bestHeaderHash();
-    const last = await shadow.getBlock(bestHeaderHash.toString());
-    log.ox(JSON.stringify(last, null, 2));
-}
-
-async function recipeHeader(api: API, args: yargs.Arguments, shadow: ShadowAPI) {
-    const block = (args.block as string);
-    let header: IDarwiniaEthBlock | null = null;
-    if (block === "") {
-        const hash = await api._.query.ethRelay.bestHeaderHash();
-        header = await shadow.getBlock(hash.toString());
-    }
-
-    if (header === null) {
-        header = await shadow.getBlock(block);
-    }
-    log.ox(JSON.stringify(header, null, 2));
 }
 
 async function recipeCodec(api: API, args: yargs.Arguments, shadow: ShadowAPI) {
@@ -106,12 +86,6 @@ const cmdRecipe: yargs.CommandModule = {
         switch (args.recipe) {
             case "balance":
                 await recipeBalance(api, args);
-                break;
-            case "bestHeader":
-                await recipeBestHeader(api, shadow);
-                break;
-            case "header":
-                await recipeHeader(api, args, shadow);
                 break;
             case "codec":
                 await recipeCodec(api, args, shadow);

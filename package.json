@@ -36,6 +36,7 @@
     "test": "jest --forceExit --detectOpenHandles",
     "deps": "lerna exec yarn",
     "lint": "lerna run lint",
+    "version": "learna version --no-git-tag-version --no-push",
     "canary": "lerna publish --canary --ignore-prepublish --preid canary --yes"
   },
   "husky": {

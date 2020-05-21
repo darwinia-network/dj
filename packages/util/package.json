@@ -1,6 +1,6 @@
 {
   "name": "@darwinia/util",
-  "version": "0.1.28-alpha.1",
+  "version": "0.1.29-alpha.0",
   "description": "Util for developing darwinia javascript library.",
   "homepage": "https://github.com/darwinia-network/darwinia.js",
   "repository": {
@@ -10,7 +10,9 @@
   "author": "darwinia-network <hello@darwinia.network>",
   "license": "GPL-3.0",
   "main": "lib/index.js",
-  "files": ["lib/**/*"],
+  "files": [
+    "lib/**/*"
+  ],
   "dependencies": {
     "@polkadot/util": "^2.9.1",
     "chalk": "^4.0.0",
