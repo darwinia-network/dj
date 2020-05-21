@@ -20,6 +20,7 @@
     "@types/js-yaml": "^3.12.3",
     "@types/node": "^13.11.1",
     "@types/progress": "^2.0.3",
+    "@types/prompts": "^2.0.8",
     "@types/tar": "^4.0.3",
     "@types/yargs": "^15.0.4",
     "husky": "^4.2.5",

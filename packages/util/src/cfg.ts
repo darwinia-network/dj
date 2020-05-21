@@ -2,7 +2,7 @@ import child_process from "child_process";
 import fs from "fs";
 import os from "os";
 import path from "path";
-
+import prompts from "prompts";
 import { download } from "./download";
 import { log } from "./log";
 import rawCj from "./static/config.json";
@@ -32,6 +32,14 @@ export interface IConfigPath {
  * @property {String} seed - darwinia account seed
  */
 export class Config {
+    static async seedPrompt(): Promise<string> {
+        return String(await prompts({
+            type: "text",
+            name: "seed",
+            message: "Please input your darwinia seed:",
+        }));
+    }
+
     static warn(config: Config) {
         if (config.shadow === "") {
             log.warn([
@@ -76,6 +84,11 @@ export class Config {
         } else {
             const curConfig = JSON.parse(fs.readFileSync(conf, "utf8"));
             const mergeConfig = Object.assign(rawCj, curConfig);
+            if (mergeConfig.seed === "") {
+                Config.seedPrompt().then((seed: string) => {
+                    mergeConfig.seed = seed;
+                })
+            }
             if (mergeConfig !== curConfig) {
                 fs.writeFileSync(conf, JSON.stringify(cj, null, 2));
             }
