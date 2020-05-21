@@ -76,4 +76,4 @@ faucet:
   config:
     amount: 1000
     supply: 400
-    interval: 24
+    interval: 48
