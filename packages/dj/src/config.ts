@@ -18,7 +18,7 @@ const config: yargs.CommandModule = {
         });
     },
     command: "config [edit]",
-    describe: "show config",
+    describe: "Show config",
     handler: async (args: yargs.Arguments) => {
         const cfg = new Config();
 

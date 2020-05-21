@@ -115,7 +115,7 @@ export class API {
      * ```
      */
     public static async new(
-        account: KeyringPair,
+        seed: string,
         node: string,
         types: Record<string, any>,
     ): Promise<API> {
@@ -124,6 +124,7 @@ export class API {
             types,
         });
 
+        const account = await API.seed(seed);
         log.trace("init darwinia api succeed");
         return new API(account, (api as ApiPromise), types);
     }

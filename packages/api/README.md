@@ -24,12 +24,14 @@ import { autoAPI } from "@darwinia/api";
 })();
 ```
 
-| method     | params                         | return          |
-|------------|--------------------------------|-----------------|
-| getBalance | (addr: string)                 | balance: string |
-| relay      | (block: string/number)         | res: ExResult   |
-| transfer   | (addr: string, amount: number) | res: ExResult   |
-| redeem     | (receipt: IReceipt)            | res: ExResult   |
+| method       | params                         | return       |
+|--------------|--------------------------------|--------------|
+| getBalance   | (addr: string)                 | string       |
+| relay        | (block: string/number)         | ExResult     |
+| transfer     | (addr: string, amount: number) | ExResult     |
+| redeem       | (receipt: IReceipt)            | ExResult     |
+| getBlock     | (block: number or string       | SingendBlock |
+| getExtrinsic | (hash: string)                 | Extrinsic    |
 
 
 ## LICENSE
