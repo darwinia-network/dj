@@ -6,6 +6,6 @@ import { Config } from "@darwinia/util";
  */
 export async function autoAPI(): Promise<API> {
     const cfg = new Config();
-    const seed = await API.seed(cfg.seed);
+    const seed = await cfg.checkSeed();
     return await API.new(seed, cfg.node, cfg.types);
 }

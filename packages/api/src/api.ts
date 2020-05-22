@@ -7,6 +7,9 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { DispatchError, EventRecord } from "@polkadot/types/interfaces/types";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 import { Vec, Struct } from "@polkadot/types";
+import { SignedBlock } from "@polkadot/types/interfaces";
+import * as Subscan from "./subscan";
+import { Extrinsic } from "./types/extrinsic";
 
 export interface IErrorDoc {
     name: string;
@@ -112,7 +115,7 @@ export class API {
      * ```
      */
     public static async new(
-        account: KeyringPair,
+        seed: string,
         node: string,
         types: Record<string, any>,
     ): Promise<API> {
@@ -121,6 +124,7 @@ export class API {
             types,
         });
 
+        const account = await API.seed(seed);
         log.trace("init darwinia api succeed");
         return new API(account, (api as ApiPromise), types);
     }
@@ -157,6 +161,15 @@ export class API {
     }
 
     /**
+     * get the specify extrinsic
+     *
+     * @param {string} hash - hash of extrinsic
+     */
+    public static async getExtrinsic(hash: string): Promise<Extrinsic> {
+        return await Subscan.getExtrinsic(hash);
+    }
+
+    /**
      * Encode darwiniaEthBlock to scale codec
      *
      * @param {IDarwiniaEthBlock} block - darwinia eth block
@@ -177,6 +190,21 @@ export class API {
     public async getBalance(addr: string): Promise<string> {
         const account = await this._.query.system.account(addr);
         return account.data.free.toString();
+    }
+
+    /**
+     * get the specify block
+     *
+     * @param {string|number} block - hash or number of the block
+     */
+    public async getBlock(block: string | number): Promise<SignedBlock> {
+        let hash: string = "";
+        if (typeof block === "number") {
+            const h = await this._.query.system.blockHash(block);
+            hash = h.toString();
+        }
+
+        return await this._.rpc.chain.getBlock(hash);
     }
 
     /**

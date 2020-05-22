@@ -1,7 +1,7 @@
 {
   "private": false,
   "name": "@darwinia/dj",
-  "version": "0.1.26-alpha.1",
+  "version": "0.1.29-alpha.0",
   "description": "High-level darwinia.js api",
   "homepage": "https://github.com/darwinia-network/darwinia.js",
   "repository": {
@@ -16,8 +16,8 @@
   },
   "files": ["lib/**/*"],
   "dependencies": {
-    "@darwinia/api": "0.1.26",
-    "@darwinia/util": "0.1.26",
+    "@darwinia/api": "^0.1.29-alpha.0",
+    "@darwinia/util": "^0.1.29-alpha.0",
     "yargs": "^15.3.1"
   },
   "scripts": {

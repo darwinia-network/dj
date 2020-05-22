@@ -1,5 +1,5 @@
 import yargs from "yargs";
-import Grammer from "./_bot";
+import Grammer from "./_grammer";
 
 const cmdBot: yargs.CommandModule = {
     builder: (argv: yargs.Argv) => {
@@ -8,12 +8,17 @@ const cmdBot: yargs.CommandModule = {
             describe: "the telegram-bot key",
             default: "",
             type: "string",
+        }).positional("config", {
+            alias: "c",
+            describe: "the path of grammer.yml",
+            default: "",
+            type: "string",
         });
     },
-    command: "bot <key>",
+    command: "bot <key> [config]",
     describe: "start darwinia telegram bot",
     handler: async (args: yargs.Arguments) => {
-        const g = await Grammer.new();
+        const g = await Grammer.new((args.config as string));
         g.run((args.key as string));
     }
 }

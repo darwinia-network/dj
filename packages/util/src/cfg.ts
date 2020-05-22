@@ -2,7 +2,7 @@ import child_process from "child_process";
 import fs from "fs";
 import os from "os";
 import path from "path";
-
+import prompts from "prompts";
 import { download } from "./download";
 import { log } from "./log";
 import rawCj from "./static/config.json";
@@ -47,9 +47,9 @@ export class Config {
 
     public node: string;
     public path: IConfigPath;
-    public seed: string;
     public shadow: string;
     public types: Record<string, any>;
+    private seed: string;
 
     constructor() {
         const home = os.homedir();
@@ -77,7 +77,7 @@ export class Config {
             const curConfig = JSON.parse(fs.readFileSync(conf, "utf8"));
             const mergeConfig = Object.assign(rawCj, curConfig);
             if (mergeConfig !== curConfig) {
-                fs.writeFileSync(conf, JSON.stringify(cj, null, 2));
+                fs.writeFileSync(conf, JSON.stringify(mergeConfig, null, 2));
             }
 
             // assign cj
@@ -99,6 +99,36 @@ export class Config {
 
         // Warn config
         Config.warn(this);
+    }
+
+    /**
+     * Raise a prompt if seed not exists
+     */
+    public async checkSeed(): Promise<string> {
+        if (this.seed !== "") {
+            return this.seed;
+        }
+
+        const ans = await prompts({
+            type: "text",
+            name: "seed",
+            message: "Please input your darwinia seed:",
+        }, {
+            onCancel: () => {
+                log.ex("You can fill the seed field in `~/.darwinia/config.json` manually");
+            }
+        });
+
+        const curConfig: IConfig = JSON.parse(fs.readFileSync(this.path.conf, "utf8"));
+        const seed = String(ans.seed).trim();
+        curConfig.seed = seed;
+        this.seed = seed;
+        fs.writeFileSync(
+            this.path.conf,
+            JSON.stringify(curConfig, null, 2)
+        );
+
+        return seed;
     }
 
     /**

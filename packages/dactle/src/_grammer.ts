@@ -7,6 +7,11 @@ import TelegramBot from "node-telegram-bot-api"
 import { BotDb, JDb, RDb } from "./db";
 
 /**
+ * Constants
+ */
+const STATIC_GRAMMER_CONFIG: string = path.resolve(__dirname, "static/grammer.yml");
+
+/**
  * command arguments
  */
 export interface ICommandArgs {
@@ -68,7 +73,7 @@ export interface IGrammerConfig {
 /**
  * Grammer Service
  *
- * @property {Config} config - dj.json
+ * @property {Config} config - ~/.darwinia/config.json
  * @property {Number} port - port of grammer server
  * @property {API} api - darwinia api
  * @property {IGrammerCommandsConfig} commands - commands config from `dj.json`
@@ -78,9 +83,22 @@ export default class Grammer {
     /**
      * Async init grammer service
      *
+     * @param {string} grammerConfig - the path of grammer.yml
+     * @param {number} port          - redis port
+     * @param {string} host          - redis host
      * @return {Promise<Grammer>} grammer service
      */
-    static async new(rdb = true, port = 6379, host = "0.0.0.0"): Promise<Grammer> {
+    static async new(
+        grammerConfig = STATIC_GRAMMER_CONFIG,
+        rdb = true,
+        port = 6379,
+        host = "0.0.0.0"
+    ): Promise<Grammer> {
+        // revert config if path is empty
+        if (grammerConfig === "") {
+            grammerConfig = STATIC_GRAMMER_CONFIG;
+        }
+
         // Check ENV
         if (process.env.DACTLE_REDIS_PORT) {
             port = Number.parseInt(process.env.DACTLE_REDIS_PORT, 10);
@@ -93,10 +111,7 @@ export default class Grammer {
         // Generate API
         const api = await autoAPI();
         const config = new Config();
-        const grammer: IGrammer = yml.safeLoad(
-            fs.readFileSync(path.resolve(__dirname, "static/grammer.yml"), "utf8")
-        );
-
+        const grammer: IGrammer = yml.safeLoad(fs.readFileSync(grammerConfig, "utf8"));
         let db: BotDb;
         if (rdb) {
             db = new RDb(port, host);
@@ -143,7 +158,7 @@ export default class Grammer {
     public async run(key: string) {
         const bot = new TelegramBot(key, { polling: true });
         bot.on("polling_error", (msg) => log.err(msg));
-        bot.onText(/\/\w+/, async (msg) => {
+        bot.onText(/^\/\w+/, async (msg) => {
             if (msg.text === undefined) {
                 return false;
             }

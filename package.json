@@ -20,6 +20,7 @@
     "@types/js-yaml": "^3.12.3",
     "@types/node": "^13.11.1",
     "@types/progress": "^2.0.3",
+    "@types/prompts": "^2.0.8",
     "@types/tar": "^4.0.3",
     "@types/yargs": "^15.0.4",
     "husky": "^4.2.5",
@@ -35,6 +36,7 @@
     "test": "jest --forceExit --detectOpenHandles",
     "deps": "lerna exec yarn",
     "lint": "lerna run lint",
+    "version": "learna version --no-git-tag-version --no-push",
     "canary": "lerna publish --canary --ignore-prepublish --preid canary --yes"
   },
   "husky": {
