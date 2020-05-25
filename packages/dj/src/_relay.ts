@@ -40,6 +40,9 @@ export default class Relay {
         this._ = new ShadowAPI(config.shadow);
     }
 
+    /**
+     * relay single block
+     */
     public async relay(block: number) {
         const bp = isNaN(block) ?
             await this.startFromBestHeaderHash() :
@@ -54,34 +57,6 @@ export default class Relay {
             log.ox(chalk.cyan.underline(
                 `https://crab.subscan.io/extrinsic/${(res as ExResult).exHash}`
             ));
-        }
-    }
-
-    /**
-     * Start relay service
-     */
-    public async batchStart(batch: number): Promise<void> {
-        this.alive = true;
-        let bps = await this.batchStartFromBestHeaderHash(batch);
-
-        while (this.alive) {
-            for (let i = 0; i++; i < bps.length) {
-                const bp = bps[i];
-                const res = await this.api.relay(bp[0], bp[1], false);
-                if (!res.isOk) {
-                    log.err(res.toString());
-                } else {
-                    log.ok(`Extrinsic relay header ${bp[0].number} is in block!`);
-                }
-
-                if (+i === (batch - 1)) {
-                    bps = res.isOk ?
-                        await this.batchBps(
-                            bps[0][0].number + batch - 1,
-                            batch,
-                        ) : await this.batchStartFromBestHeaderHash(batch);
-                }
-            }
         }
     }
 
@@ -107,6 +82,34 @@ export default class Relay {
                 log.ok(`relay eth header ${next[0].number} succeed!`);
                 log(`current darwinia eth height is: ${next[0].number}`);
                 next = await this._.getBlockWithProof(next[0].number + 1);
+            }
+        }
+    }
+
+    /**
+     * Start relay service
+     */
+    public async batchStart(batch: number): Promise<void> {
+        this.alive = true;
+        let bps = await this.batchStartFromBestHeaderHash(batch);
+
+        while (this.alive) {
+            for (const i in bps) {
+                let bp = bps[i];
+                const res = await this.api.relay(bp[0], bp[1], false);
+                if (!res.isOk) {
+                    log.err(res.toString());
+                } else {
+                    log.ok(`Extrinsic relay header ${bp[0].number} is in block!`);
+                }
+
+                if (+i === (batch - 1)) {
+                    bps = res.isOk ?
+                        await this.batchBps(
+                            bps[0][0].number + batch - 1,
+                            batch,
+                        ) : await this.batchStartFromBestHeaderHash(batch);
+                }
             }
         }
     }
@@ -145,32 +148,12 @@ export default class Relay {
     }
 
     private async batchBps(last: number, batch: number): Promise<BlockWithProof[]> {
-        log(`fetching proofs from ${last} to ${last + batch}`);
-        const bps: BlockWithProof[] = [];
+        log(`fetching proofs from ${last} to ${last + batch}...`);
+        let bps: BlockWithProof[] = [];
         for (let i = 1; i < batch + 1; i++) {
             bps.push(await this._.getBlockWithProof(last + i));
         }
         return bps;
-    }
-    /**
-     * Start relay from BestHeaderHash in darwinia, this function has two
-     * usages:
-     *
-     * - first start this process
-     * - restart this process from error
-     */
-    private async batchStartFromBestHeaderHash(batch: number): Promise<BlockWithProof[]> {
-        log("start from the lastest eth header of darwinia...");
-        const bestHeaderHash = await this.api._.query.ethRelay.bestHeaderHash();
-
-        // fetch header from shadow service
-        log.trace(`current best header hash is: ${bestHeaderHash.toString()}`);
-        const last = Number.parseInt(
-            (await this._.getBlock(bestHeaderHash.toString())).number as any,
-            16
-        );
-
-        return await this.batchBps(last, batch);
     }
 
     /**
@@ -189,5 +172,26 @@ export default class Relay {
 
         const last = await this._.getBlock(bestHeaderHash.toString());
         return await this._.getBlockWithProof((Number.parseInt(last.number as any, 16)) + 1);
+    }
+
+    /**
+     * Batch Start relay from BestHeaderHash in darwinia, this function has
+     * two usages:
+     *
+     * - first start this process
+     * - restart this process from error
+     */
+    private async batchStartFromBestHeaderHash(batch: number): Promise<BlockWithProof[]> {
+        log("start from the lastest eth header of darwinia...");
+        const bestHeaderHash = await this.api._.query.ethRelay.bestHeaderHash();
+
+        // fetch header from shadow service
+        log.trace(`current best header hash is: ${bestHeaderHash.toString()}`);
+        const last = Number.parseInt(
+            (await this._.getBlock(bestHeaderHash.toString())).number as any,
+            16
+        );
+
+        return await this.batchBps(last, batch);
     }
 }

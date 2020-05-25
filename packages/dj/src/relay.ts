@@ -21,13 +21,17 @@ const cmdRelay: yargs.CommandModule = {
     describe: "Relay eth header to darwinia",
     handler: async (args: yargs.Arguments) => {
         const relayer = await Relay.new();
-        if (!isNaN(args.block as number)) {
+        if (!isNaN(args.number as number)) {
             await relayer.relay(args.block as number).catch((err: ExResult) => {
                 log.ex(err.toString());
             });
         } else { /* use else to avoid exiting process manually */
-            // await relayer.forever();
-            await relayer.batchForever(args.batch as number);
+            let batch = args.batch as number;
+            if (batch === 1) {
+                await relayer.forever();
+            } else {
+                await relayer.batchForever(batch);
+            }
         }
     },
 }
