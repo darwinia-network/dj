@@ -5,14 +5,19 @@ import { log } from "@darwinia/util";
 
 const cmdRelay: yargs.CommandModule = {
     builder: (argv: yargs.Argv) => {
-        return argv.positional("block", {
-            alias: "b",
+        return argv.positional("number", {
+            alias: "n",
             default: NaN,
             type: "number",
             describe: "relay specfied eth header to darwinia"
+        }).positional("batch", {
+            alias: "b",
+            default: 1,
+            type: "number",
+            describe: "relay multiple blocks on every time"
         });
     },
-    command: "relay [block]",
+    command: "relay [number] [batch]",
     describe: "Relay eth header to darwinia",
     handler: async (args: yargs.Arguments) => {
         const relayer = await Relay.new();
@@ -21,7 +26,8 @@ const cmdRelay: yargs.CommandModule = {
                 log.ex(err.toString());
             });
         } else { /* use else to avoid exiting process manually */
-            relayer.forever();
+            // await relayer.forever();
+            await relayer.batchForever(args.batch as number);
         }
     },
 }

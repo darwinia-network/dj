@@ -2,7 +2,7 @@
  * The is a shadow command
  */
 import { API, autoAPI, ShadowAPI, ExResult } from "@darwinia/api";
-import { BlockWithProof, Config, chalk, log, Service } from "@darwinia/util";
+import { BlockWithProof, Config, chalk, log } from "@darwinia/util";
 
 /**
  * Keep relay ethereum blocks to darwinia
@@ -13,7 +13,7 @@ import { BlockWithProof, Config, chalk, log, Service } from "@darwinia/util";
  * @property {API} api - darwinia substrate api
  * @property {Config} config - darwinia.js config
  */
-export default class Relay extends Service {
+export default class Relay {
     /**
      * Async init shadow service
      *
@@ -33,7 +33,6 @@ export default class Relay extends Service {
     private _: ShadowAPI;
 
     constructor(api: API, config: Config) {
-        super();
         this.alive = false;
         this.api = api;
         this.config = config;
@@ -59,10 +58,31 @@ export default class Relay extends Service {
     }
 
     /**
-     * @deprecated no need to serve
+     * Start relay service
      */
-    public async serve(_: number): Promise<void> {
-        await this.start();
+    public async batchStart(batch: number): Promise<void> {
+        this.alive = true;
+        let bps = await this.batchStartFromBestHeaderHash(batch);
+
+        while (this.alive) {
+            for (let i = 0; i++; i < bps.length) {
+                const bp = bps[i];
+                const res = await this.api.relay(bp[0], bp[1], false);
+                if (!res.isOk) {
+                    log.err(res.toString());
+                } else {
+                    log.ok(`Extrinsic relay header ${bp[0].number} is in block!`);
+                }
+
+                if (+i === (batch - 1)) {
+                    bps = res.isOk ?
+                        await this.batchBps(
+                            bps[0][0].number + batch - 1,
+                            batch,
+                        ) : await this.batchStartFromBestHeaderHash(batch);
+                }
+            }
+        }
     }
 
     /**
@@ -79,7 +99,6 @@ export default class Relay extends Service {
         // service loop
         while (this.alive) {
             const res = await this.api.relay(next[0], next[1], true);
-
             // to next loop
             if (!res.isOk) {
                 log.err(res.toString());
@@ -93,10 +112,65 @@ export default class Relay extends Service {
     }
 
     /**
+     * Forever serve
+     */
+    public async forever(): Promise<void> {
+        await this.start().catch((e) => {
+            log.err(e.toString());
+            log.event("restart service in 3s...");
+            setTimeout(async () => {
+                await this.forever();
+            }, 3000);
+        });
+    }
+
+    /**
+     * Forever batch serve
+     */
+    public async batchForever(batch: number): Promise<void> {
+        await this.batchStart(batch).catch((e) => {
+            log.err(e.toString());
+            log.event("restart service in 3s...");
+            setTimeout(async () => {
+                await this.batchForever(batch);
+            }, 3000);
+        });
+    }
+
+    /**
      * Stop relay service
      */
     public async stop(): Promise<void> {
         this.alive = false;
+    }
+
+    private async batchBps(last: number, batch: number): Promise<BlockWithProof[]> {
+        log(`fetching proofs from ${last} to ${last + batch}`);
+        const bps: BlockWithProof[] = [];
+        for (let i = 1; i < batch + 1; i++) {
+            bps.push(await this._.getBlockWithProof(last + i));
+        }
+        return bps;
+    }
+    /**
+     * Start relay from BestHeaderHash in darwinia, this function has two
+     * usages:
+     *
+     * - first start this process
+     * - restart this process from error
+     */
+    private async batchStartFromBestHeaderHash(batch: number): Promise<BlockWithProof[]> {
+        log("start from the lastest eth header of darwinia...");
+        const bestHeaderHash = await this.api._.query.ethRelay.bestHeaderHash();
+
+        // fetch header from shadow service
+        log.trace(`current best header hash is: ${bestHeaderHash.toString()}`);
+        const last = Number.parseInt(
+            (await this._.getBlock(bestHeaderHash.toString())).number as any,
+            16
+        );
+
+        return await this.batchBps(last, batch);
     }
 
     /**
@@ -112,6 +186,7 @@ export default class Relay extends Service {
 
         // fetch header from shadow service
         log.trace(`current best header hash is: ${bestHeaderHash.toString()}`);
+
         const last = await this._.getBlock(bestHeaderHash.toString());
         return await this._.getBlockWithProof((Number.parseInt(last.number as any, 16)) + 1);
     }
