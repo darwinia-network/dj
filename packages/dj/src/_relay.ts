@@ -94,8 +94,8 @@ export default class Relay {
         let bps = await this.batchStartFromBestHeaderHash(batch);
 
         while (this.alive) {
-            for (const i in bps) {
-                let bp = bps[i];
+            for (let i = 0; i < bps.length; i++) {
+                const bp = bps[i];
                 const res = await this.api.relay(bp[0], bp[1], false);
                 if (!res.isOk) {
                     log.err(res.toString());
@@ -149,7 +149,7 @@ export default class Relay {
 
     private async batchBps(last: number, batch: number): Promise<BlockWithProof[]> {
         log(`fetching proofs from ${last} to ${last + batch}...`);
-        let bps: BlockWithProof[] = [];
+        const bps: BlockWithProof[] = [];
         for (let i = 1; i < batch + 1; i++) {
             bps.push(await this._.getBlockWithProof(last + i));
         }

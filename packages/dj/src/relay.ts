@@ -26,7 +26,7 @@ const cmdRelay: yargs.CommandModule = {
                 log.ex(err.toString());
             });
         } else { /* use else to avoid exiting process manually */
-            let batch = args.batch as number;
+            const batch = args.batch as number;
             if (batch === 1) {
                 await relayer.forever();
             } else {
