@@ -3,7 +3,6 @@ import { Config, TYPES_URL } from "./src/cfg";
 import { download } from "./src/download";
 import { log } from "./src/log";
 import { whereisPj } from "./src/pj";
-import { Service } from "./src/service";
 import chalk from "chalk";
 
 /**
@@ -26,7 +25,6 @@ export {
     download,
     IDarwiniaEthBlock, IEthBlock,
     log,
-    Service,
     TYPES_URL,
     whereisPj,
 }

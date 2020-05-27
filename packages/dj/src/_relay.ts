@@ -63,33 +63,7 @@ export default class Relay {
     /**
      * Start relay service
      */
-    public async start(): Promise<void> {
-        // stay alive
-        this.alive = true;
-
-        // keep relay
-        let next = await this.startFromBestHeaderHash();
-        log(`the next height is ${next[0].number}`);
-
-        // service loop
-        while (this.alive) {
-            const res = await this.api.relay(next[0], next[1], true);
-            // to next loop
-            if (!res.isOk) {
-                log.err(res.toString());
-                next = await this.startFromBestHeaderHash();
-            } else {
-                log.ok(`relay eth header ${next[0].number} succeed!`);
-                log(`current darwinia eth height is: ${next[0].number}`);
-                next = await this._.getBlockWithProof(next[0].number + 1);
-            }
-        }
-    }
-
-    /**
-     * Start relay service
-     */
-    public async batchStart(batch: number): Promise<void> {
+    public async start(batch = 1): Promise<void> {
         this.alive = true;
         let bps = await this.batchStartFromBestHeaderHash(batch);
 
@@ -115,27 +89,14 @@ export default class Relay {
     }
 
     /**
-     * Forever serve
-     */
-    public async forever(): Promise<void> {
-        await this.start().catch((e) => {
-            log.err(e.toString());
-            log.event("restart service in 3s...");
-            setTimeout(async () => {
-                await this.forever();
-            }, 3000);
-        });
-    }
-
-    /**
      * Forever batch serve
      */
-    public async batchForever(batch: number): Promise<void> {
-        await this.batchStart(batch).catch((e) => {
+    public async forever(batch: number): Promise<void> {
+        await this.start(batch).catch((e) => {
             log.err(e.toString());
             log.event("restart service in 3s...");
             setTimeout(async () => {
-                await this.batchForever(batch);
+                await this.forever(batch);
             }, 3000);
         });
     }
