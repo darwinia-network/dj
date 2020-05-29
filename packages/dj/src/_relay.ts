@@ -39,6 +39,7 @@ export default class Relay {
         this.config = config;
         this.port = 0;
         this._ = new ShadowAPI(config.shadow);
+        this.lastRelayTime = + new Date().getTime();
     }
 
     /**
@@ -75,7 +76,7 @@ export default class Relay {
                 if (!res.isOk) {
                     log.err(res.toString());
                 } else {
-                    this.lastRelayTime = + new Date().getTime() / 1000 | 0;
+                    this.lastRelayTime = + new Date().getTime();
                     log.ok(`Extrinsic relay header ${bp[0].number} is in block!`);
                 }
 
@@ -96,7 +97,7 @@ export default class Relay {
     public async forever(batch: number): Promise<void> {
         let interval: NodeJS.Timeout;
         setInterval(async () => {
-            const now = + new Date().getTime() / 1000 | 0;
+            const now = + new Date().getTime();
             if (now - this.lastRelayTime >= 1000 * 60) {
                 clearInterval(interval);
                 log("restart relay service because the process has been stuck for 1 min");
