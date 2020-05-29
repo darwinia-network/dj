@@ -31,6 +31,7 @@ export default class Relay {
     public port: number;
     protected config: Config;
     private _: ShadowAPI;
+    private lastRelayTime: number;
 
     constructor(api: API, config: Config) {
         this.alive = false;
@@ -74,6 +75,7 @@ export default class Relay {
                 if (!res.isOk) {
                     log.err(res.toString());
                 } else {
+                    this.lastRelayTime = + new Date().getTime() / 1000 | 0;
                     log.ok(`Extrinsic relay header ${bp[0].number} is in block!`);
                 }
 
@@ -92,13 +94,23 @@ export default class Relay {
      * Forever batch serve
      */
     public async forever(batch: number): Promise<void> {
-        await this.start(batch).catch((e) => {
-            log.err(e.toString());
-            log.event("restart service in 3s...");
-            setTimeout(async () => {
-                await this.forever(batch);
-            }, 3000);
-        });
+        let interval: NodeJS.Timeout;
+        setInterval(async () => {
+            const now = + new Date().getTime() / 1000 | 0;
+            if (now - this.lastRelayTime >= 1000 * 60) {
+                clearInterval(interval);
+                log("restart relay service because the process has been stuck for 1 min");
+                interval = setInterval(async () => {
+                    await this.start(batch).catch((e) => {
+                        log.err(e.toString());
+                        log.event("restart service in 3s...");
+                        setTimeout(async () => {
+                            await this.forever(batch);
+                        }, 3000);
+                    });
+                }, 9999);
+            }
+        }, 3000);
     }
 
     /**
