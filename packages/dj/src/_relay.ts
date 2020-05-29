@@ -110,10 +110,7 @@ export default class Relay {
 
     private async batchBps(last: number, batch: number): Promise<BlockWithProof[]> {
         log(`fetching proofs from ${last} to ${last + batch}...`);
-        const bps: BlockWithProof[] = [];
-        for (let i = 1; i < batch + 1; i++) {
-            bps.push(await this._.getBlockWithProof(last + i));
-        }
+        const bps: BlockWithProof[] = await this._.batchBlockWithProofByNumber(last, batch);
         return bps;
     }
 
