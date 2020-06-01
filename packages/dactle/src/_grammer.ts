@@ -248,7 +248,8 @@ export default class Grammer {
             ) {
                 return this.grammer.faucet.only;
             }
-        } catch (_) {
+        } catch (e) {
+            log.err(e);
             return this.grammer.faucet.only;
         }
 
@@ -307,7 +308,7 @@ export default class Grammer {
         });
 
         // return exHash
-        if (ex) {
+        if (ex && (ex as ExResult).isOk) {
             hash = (ex as ExResult).exHash;
             await this.db.addAddr(addr);
             await this.db.burnSupply(date, this.grammer.faucet.config.supply);
