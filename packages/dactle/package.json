@@ -20,7 +20,7 @@
     "@darwinia/util": "^0.1.29-alpha.1",
     "ioredis": "^4.16.3",
     "js-yaml": "^3.13.1",
-    "node-telegram-bot-api": "^0.40.0",
+    "node-telegram-bot-api": "^0.50.0",
     "yargs": "^15.3.1"
   },
   "scripts": {
