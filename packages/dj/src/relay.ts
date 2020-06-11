@@ -3,6 +3,20 @@ import Relay from "./_relay";
 import { ExResult } from "@darwinia/api";
 import { log } from "@darwinia/util";
 
+async function handler(args: yargs.Arguments) {
+    const relayer = await Relay.new();
+    if (!isNaN(args.number as number)) {
+        await relayer.relay(args.block as number).catch((err: ExResult) => {
+            log.ex(err.toString());
+        });
+    } else { /* use else to avoid exiting process manually */
+        await relayer.forever(args.batch as number).catch(async (e: any) => {
+            log.err(e);
+            await handler(args);
+        });
+    }
+}
+
 const cmdRelay: yargs.CommandModule = {
     builder: (argv: yargs.Argv) => {
         return argv.positional("number", {
@@ -19,16 +33,7 @@ const cmdRelay: yargs.CommandModule = {
     },
     command: "relay [number] [batch]",
     describe: "Relay eth header to darwinia",
-    handler: async (args: yargs.Arguments) => {
-        const relayer = await Relay.new();
-        if (!isNaN(args.number as number)) {
-            await relayer.relay(args.block as number).catch((err: ExResult) => {
-                log.ex(err.toString());
-            });
-        } else { /* use else to avoid exiting process manually */
-            await relayer.forever(args.batch as number);
-        }
-    },
+    handler,
 }
 
 export default cmdRelay;

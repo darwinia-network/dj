@@ -72,7 +72,7 @@ export default class Relay {
                 const res = await this.api.relay(bp[0], bp[1], false);
                 if (!res.isOk) {
                     log.err(`Last relay time: ${new Date(this.lastRelayTime)}`);
-                    log.err(res.toString());
+                    continue;
                 } else {
                     this.lastRelayTime = + new Date().getTime();
                     log.trace(`Current time: ${new Date(this.lastRelayTime)}`);
@@ -93,25 +93,29 @@ export default class Relay {
     /**
      * Forever batch serve
      */
-    public async forever(batch: number): Promise<void> {
-        const interval = setInterval(() => {
-            const now = + new Date().getTime();
-            log.trace(`From last relay: ${(now - this.lastRelayTime) / 1000}s`);
-            if ((now - this.lastRelayTime) > 60 * 1000 * 1000) {
-                log.event("The relay process has stuck for 30s, restart it again.");
-                this.forever(batch);
-                clearInterval(interval);
-                return;
-            }
-        }, 3000);
-
-        log("starting relay service...");
-        return await this.start(batch).catch(async (e) => {
-            log.err(e);
-            log.event("restart service in 3s...");
-            setTimeout(async () => {
-                await this.forever(batch);
+    public async forever(batch: number) {
+        const that = this;
+        return new Promise(async (_, reject) => {
+            // The wathcer
+            const interval = setInterval(() => {
+                const now = + new Date().getTime();
+                log.trace(`From last relay: ${(now - that.lastRelayTime) / 1000}s`);
+                if ((now - that.lastRelayTime) > 60 * 1000) {
+                    log.event("Relay service has been stuck for 60s, trying to retsart...");
+                    clearInterval(interval);
+                    reject("Trigger start");
+                }
             }, 3000);
+
+            log("starting relay service...");
+            await this.start(batch).catch((e) => {
+                that.lastRelayTime = + new Date().getTime();
+                log.err(e);
+                log.event("restart service in 3s...");
+                setTimeout(async () => {
+                    await that.forever(batch)
+                }, 3000);
+            });
         });
     }
 
