@@ -45,10 +45,8 @@ export default class Relay {
     /**
      * relay single block
      */
-    public async relay(block: number) {
-        const bp = isNaN(block) ?
-            await this.startFromBestHeaderHash() :
-            await this._.getBlockWithProof(block);
+    public async relay(block = 1) {
+        const bp = await this._.getBlockWithProof(block);
         const res = await this.api.relay(bp[0], bp[1], true);
 
         // to next loop
@@ -68,15 +66,16 @@ export default class Relay {
     public async start(batch = 1): Promise<void> {
         this.alive = true;
         let bps = await this.batchStartFromBestHeaderHash(batch);
-
         while (this.alive) {
             for (let i = 0; i < bps.length; i++) {
                 const bp = bps[i];
                 const res = await this.api.relay(bp[0], bp[1], false);
                 if (!res.isOk) {
+                    log.err(`Last relay time: ${new Date(this.lastRelayTime)}`);
                     log.err(res.toString());
                 } else {
                     this.lastRelayTime = + new Date().getTime();
+                    log.trace(`Current time: ${new Date(this.lastRelayTime)}`);
                     log.ok(`Extrinsic relay header ${bp[0].number} is in block!`);
                 }
 
@@ -95,23 +94,26 @@ export default class Relay {
      * Forever batch serve
      */
     public async forever(batch: number): Promise<void> {
-        let interval: NodeJS.Timeout;
         setInterval(async () => {
             const now = + new Date().getTime();
-            if (now - this.lastRelayTime >= 1000 * 60) {
-                clearInterval(interval);
-                log("restart relay service because the process has been stuck for 1 min");
-                interval = setInterval(async () => {
-                    await this.start(batch).catch((e) => {
-                        log.err(e.toString());
-                        log.event("restart service in 3s...");
-                        setTimeout(async () => {
-                            await this.forever(batch);
-                        }, 3000);
-                    });
-                }, 9999);
+            log.trace(`From last relay: ${now - this.lastRelayTime}s`);
+            if ((now - this.lastRelayTime) > 60 * 1000 * 1000) {
+                log.event("The relay process has stuck for 30s, restart it again.");
+                await this.forever(batch);
             }
         }, 3000);
+
+        log("starting relay service...");
+        await this.start(batch).catch(async (e) => {
+            log.err(e);
+            await this.start(batch).catch((e) => {
+                log.err(e.toString());
+                log.event("restart service in 3s...");
+                setTimeout(async () => {
+                    await this.forever(batch);
+                }, 3000);
+            });
+        });
     }
 
     /**
@@ -123,26 +125,8 @@ export default class Relay {
 
     private async batchBps(last: number, batch: number): Promise<BlockWithProof[]> {
         log(`fetching proofs from ${last} to ${last + batch}...`);
-        const bps: BlockWithProof[] = await this._.batchBlockWithProofByNumber(last, batch);
+        const bps: BlockWithProof[] = await this._.batchBlockWithProofByNumber(last + 1, batch);
         return bps;
-    }
-
-    /**
-     * Start relay from BestHeaderHash in darwinia, this function has two
-     * usages:
-     *
-     * - first start this process
-     * - restart this process from error
-     */
-    private async startFromBestHeaderHash(): Promise<BlockWithProof> {
-        log("start from the lastest eth header of darwinia...");
-        const bestHeaderHash = await this.api._.query.ethRelay.bestHeaderHash();
-
-        // fetch header from shadow service
-        log.trace(`current best header hash is: ${bestHeaderHash.toString()}`);
-
-        const last = await this._.getBlock(bestHeaderHash.toString());
-        return await this._.getBlockWithProof((Number.parseInt(last.number as any, 16)) + 1);
     }
 
     /**
