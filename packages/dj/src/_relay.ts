@@ -94,25 +94,24 @@ export default class Relay {
      * Forever batch serve
      */
     public async forever(batch: number): Promise<void> {
-        setInterval(async () => {
+        const interval = setInterval(() => {
             const now = + new Date().getTime();
-            log.trace(`From last relay: ${now - this.lastRelayTime}s`);
+            log.trace(`From last relay: ${(now - this.lastRelayTime) / 1000}s`);
             if ((now - this.lastRelayTime) > 60 * 1000 * 1000) {
                 log.event("The relay process has stuck for 30s, restart it again.");
-                await this.forever(batch);
+                this.forever(batch);
+                clearInterval(interval);
+                return;
             }
         }, 3000);
 
         log("starting relay service...");
-        await this.start(batch).catch(async (e) => {
+        return await this.start(batch).catch(async (e) => {
             log.err(e);
-            await this.start(batch).catch((e) => {
-                log.err(e.toString());
-                log.event("restart service in 3s...");
-                setTimeout(async () => {
-                    await this.forever(batch);
-                }, 3000);
-            });
+            log.event("restart service in 3s...");
+            setTimeout(async () => {
+                await this.forever(batch);
+            }, 3000);
         });
     }
 
