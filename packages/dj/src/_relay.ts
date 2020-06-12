@@ -2,7 +2,7 @@
  * The is a shadow command
  */
 import { API, autoAPI, ShadowAPI, ExResult } from "@darwinia/api";
-import { BlockWithProof, Config, chalk, log, Service } from "@darwinia/util";
+import { BlockWithProof, Config, chalk, log } from "@darwinia/util";
 
 /**
  * Keep relay ethereum blocks to darwinia
@@ -13,7 +13,7 @@ import { BlockWithProof, Config, chalk, log, Service } from "@darwinia/util";
  * @property {API} api - darwinia substrate api
  * @property {Config} config - darwinia.js config
  */
-export default class Relay extends Service {
+export default class Relay {
     /**
      * Async init shadow service
      *
@@ -31,20 +31,22 @@ export default class Relay extends Service {
     public port: number;
     protected config: Config;
     private _: ShadowAPI;
+    private lastRelayTime: number;
 
     constructor(api: API, config: Config) {
-        super();
         this.alive = false;
         this.api = api;
         this.config = config;
         this.port = 0;
         this._ = new ShadowAPI(config.shadow);
+        this.lastRelayTime = + new Date().getTime();
     }
 
-    public async relay(block: number) {
-        const bp = isNaN(block) ?
-            await this.startFromBestHeaderHash() :
-            await this._.getBlockWithProof(block);
+    /**
+     * relay single block
+     */
+    public async relay(block = 1) {
+        const bp = await this._.getBlockWithProof(block);
         const res = await this.api.relay(bp[0], bp[1], true);
 
         // to next loop
@@ -59,37 +61,62 @@ export default class Relay extends Service {
     }
 
     /**
-     * @deprecated no need to serve
+     * Start relay service
      */
-    public async serve(_: number): Promise<void> {
-        await this.start();
+    public async start(batch = 1): Promise<void> {
+        this.alive = true;
+        let bps = await this.batchStartFromBestHeaderHash(batch);
+        while (this.alive) {
+            for (let i = 0; i < bps.length; i++) {
+                const bp = bps[i];
+                const res = await this.api.relay(bp[0], bp[1], false);
+                if (!res.isOk) {
+                    log.err(`Last relay time: ${new Date(this.lastRelayTime)}`);
+                    continue;
+                } else {
+                    this.lastRelayTime = + new Date().getTime();
+                    log.trace(`Current time: ${new Date(this.lastRelayTime)}`);
+                    log.ok(`Extrinsic relay header ${bp[0].number} is in block!`);
+                }
+
+                if (+i === (batch - 1)) {
+                    bps = res.isOk ?
+                        await this.batchBps(
+                            bps[0][0].number + batch - 1,
+                            batch,
+                        ) : await this.batchStartFromBestHeaderHash(batch);
+                }
+            }
+        }
     }
 
     /**
-     * Start relay service
+     * Forever batch serve
      */
-    public async start(): Promise<void> {
-        // stay alive
-        this.alive = true;
+    public async forever(batch: number) {
+        const that = this;
+        return new Promise(async (_, reject) => {
+            // The wathcer
+            const interval = setInterval(() => {
+                const now = + new Date().getTime();
+                log.trace(`From last relay: ${(now - that.lastRelayTime) / 1000}s`);
+                if ((now - that.lastRelayTime) > 60 * 1000) {
+                    log.event("Relay service has been stuck for 60s, trying to retsart...");
+                    clearInterval(interval);
+                    reject("Trigger start");
+                }
+            }, 3000);
 
-        // keep relay
-        let next = await this.startFromBestHeaderHash();
-        log(`the next height is ${next[0].number}`);
-
-        // service loop
-        while (this.alive) {
-            const res = await this.api.relay(next[0], next[1], true);
-
-            // to next loop
-            if (!res.isOk) {
-                log.err(res.toString());
-                next = await this.startFromBestHeaderHash();
-            } else {
-                log.ok(`relay eth header ${next[0].number} succeed!`);
-                log(`current darwinia eth height is: ${next[0].number}`);
-                next = await this._.getBlockWithProof(next[0].number + 1);
-            }
-        }
+            log("starting relay service...");
+            await this.start(batch).catch((e) => {
+                that.lastRelayTime = + new Date().getTime();
+                log.err(e);
+                log.event("restart service in 3s...");
+                setTimeout(async () => {
+                    await that.forever(batch)
+                }, 3000);
+            });
+        });
     }
 
     /**
@@ -99,20 +126,30 @@ export default class Relay extends Service {
         this.alive = false;
     }
 
+    private async batchBps(last: number, batch: number): Promise<BlockWithProof[]> {
+        log(`fetching proofs from ${last} to ${last + batch}...`);
+        const bps: BlockWithProof[] = await this._.batchBlockWithProofByNumber(last + 1, batch);
+        return bps;
+    }
+
     /**
-     * Start relay from BestHeaderHash in darwinia, this function has two
-     * usages:
+     * Batch Start relay from BestHeaderHash in darwinia, this function has
+     * two usages:
      *
      * - first start this process
      * - restart this process from error
      */
-    private async startFromBestHeaderHash(): Promise<BlockWithProof> {
+    private async batchStartFromBestHeaderHash(batch: number): Promise<BlockWithProof[]> {
         log("start from the lastest eth header of darwinia...");
         const bestHeaderHash = await this.api._.query.ethRelay.bestHeaderHash();
 
         // fetch header from shadow service
         log.trace(`current best header hash is: ${bestHeaderHash.toString()}`);
-        const last = await this._.getBlock(bestHeaderHash.toString());
-        return await this._.getBlockWithProof((Number.parseInt(last.number as any, 16)) + 1);
+        const last = Number.parseInt(
+            (await this._.getBlock(bestHeaderHash.toString())).number as any,
+            16
+        );
+
+        return await this.batchBps(last, batch);
     }
 }

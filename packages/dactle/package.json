@@ -16,8 +16,8 @@
   },
   "files": ["lib/**/*"],
   "dependencies": {
-    "@darwinia/api": "^0.1.29-alpha.0",
-    "@darwinia/util": "^0.1.29-alpha.0",
+    "@darwinia/api": "^0.1.29-alpha.1",
+    "@darwinia/util": "^0.1.29-alpha.1",
     "ioredis": "^4.16.3",
     "js-yaml": "^3.13.1",
     "node-telegram-bot-api": "^0.50.0",
