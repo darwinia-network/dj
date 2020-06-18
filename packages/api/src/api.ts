@@ -200,8 +200,8 @@ export class API {
     public async getBlock(block: string | number): Promise<SignedBlock> {
         let hash: string = "";
         if (typeof block === "number") {
-            const h = await this._.query.system.blockHash(block);
-            hash = h.toString();
+            const h = await this._.rpc.chain.getBlockHash(block);
+            hash = h.toHex();
         }
 
         return await this._.rpc.chain.getBlock(hash);
