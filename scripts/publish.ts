@@ -1,29 +1,31 @@
 import * as child_process from "child_process";
+import * as path from "path";
 import { findPjs } from "./packages";
 
 /**
  * publish packages
  */
 export function publish(canary = true): void {
+    child_process.spawnSync("yrm", ["use", "npm"], { stdio: "inherit" });
+    child_process.spawnSync("lerna", ["run", "build"], { stdio: "inherit" });
+
+    // publish packages
     findPjs(false).forEach((pp: [string, Record<string, any>]) => {
-        child_process.fork(
-            "npm", [
+        const cwd = path.resolve(pp[0], "..");
+        child_process.spawnSync(
+            `npm`, [
             "publish",
-            canary ? "--tag" : "",
-            canary ? "canary" : ""
-        ], {
-            cwd: pp[0],
-        }).stdout.on("data", (data: any) => {
-            console.log(data);
-        });
+            "--tag",
+            canary ? "canary" : "latest",
+        ], { cwd, stdio: "inherit" });
     });
 }
 
 (() => {
     let canary = true;
-    if (process.argv.length == 3 && process.argv[2] === "stable") {
+    if (process.argv.indexOf("--stable") > -1) {
         canary = false;
     }
+
     publish(canary);
-    console.log(`Publishing ${canary ? "patch" : "minor"} version...ok`);
 })();
