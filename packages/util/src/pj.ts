@@ -9,7 +9,7 @@ import path from "path";
  */
 export function whereisPj(): Record<string, any> {
     let ptr = __dirname;
-    let pj: Record<string, any> = {"": ""};
+    let pj: Record<string, any> = { "": "" };
 
     while (pj.version === undefined) {
         const files = fs.readdirSync(ptr);

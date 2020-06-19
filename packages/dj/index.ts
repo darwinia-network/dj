@@ -12,7 +12,7 @@ import cmdTx from "./src/tx";
 
 // main
 (async () => {
-    const pj = JSON.parse(fs.readFileSync("./package.json").toString());
+    const pj = whereisPj();
 
     // enable logger
     if (process.env.LOGGER === undefined) {

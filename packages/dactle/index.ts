@@ -2,10 +2,11 @@
 import fs from "fs";
 import yargs from "yargs";
 import cmdBot from "./src/bot";
+import { whereisPj } from "@darwinia/util";
 
 // main
 (async () => {
-    const pj = JSON.parse(fs.readFileSync("./package.json").toString());
+    const pj = whereisPj();
 
     // enable logger
     if (process.env.LOGGER === undefined) {
