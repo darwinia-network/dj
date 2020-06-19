@@ -1,40 +1,5 @@
 import * as fs from "fs";
-import * as path from "path";
-
-const PACKAGES = [
-    "api",
-    "dactle",
-    "dj",
-    "util",
-];
-
-/**
- * Find all `package.json`
- *
- * @returns {Record<string, any>} - package.json files
- */
-function findPjs(): [string, Record<string, any>][] {
-    let root = path.resolve(__dirname, "../packages");
-
-    const pjs: [string, Record<string, any>][] = [];
-    for (let s in PACKAGES) {
-        pjs.push([PACKAGES[s], JSON.parse(fs.readFileSync(
-            path.resolve(root, PACKAGES[s], "package.json"),
-        ).toString())]);
-    }
-
-    return pjs;
-}
-
-/**
- * Add prefix for package names
- *
- * @param {string[]} names - package names
- * @returns {string} - package name with prefix
- */
-function fillNames(names: string[]): string[] {
-    return names.map((e) => "@darwinia/" + e);
-}
+import { PACKAGES, findPjs, fillNames } from "./packages";
 
 /**
  * Update minor version
@@ -42,30 +7,36 @@ function fillNames(names: string[]): string[] {
  * @param {string} version - the target version
  * @returns {string} version
  */
-function updateVersion(ver: string): string {
+function updateVersion(ver: string, patch = true): string {
     const vers: string[] = ver.split(".");
-    vers[vers.length - 1] = "" + Number.parseInt(vers[vers.length - 1]) + 1;
+    const pos = patch ? 1 : 2;
+    vers[vers.length - pos] = "" + (Number.parseInt(vers[vers.length - pos]) + 1);
     return vers.join(".");
 }
 
 /**
  * Main func
  */
-function main(): void {
+export function version(patch = true): void {
     const pjs = findPjs();
     pjs.forEach((pp) => {
         let [p, j] = pp;
-        j.version = updateVersion(j.version);
+        j.version = updateVersion(j.version, patch);
         fillNames(PACKAGES).forEach((n) => {
             if (j["dependencies"][n]) {
-                j["dependencies"][n] = updateVersion(j["dependencies"][n]);
+                j["dependencies"][n] = updateVersion(j["dependencies"][n], patch);
             }
         });
 
-        fs.writeFileSync(p, j);
+        fs.writeFileSync(p, JSON.stringify(j, null, 2));
     });
 }
 
 (() => {
-    main();
-})
+    let patch = true;
+    if (process.argv.length == 3 && process.argv[2] === "minor") {
+        patch = false;
+    }
+    version(patch);
+    console.log(`Updating ${patch ? "patch" : "minor"} version...ok`);
+})();
