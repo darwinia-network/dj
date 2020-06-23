@@ -1,4 +1,5 @@
 import fs from "fs";
+import os from "os";
 import path from "path";
 import * as yml from "js-yaml";
 import { API, autoAPI, ExResult } from "@darwinia/api";
@@ -9,6 +10,7 @@ import { BotDb, JDb, RDb } from "./db";
 /**
  * Constants
  */
+const LOCKER = path.resolve(os.tmpdir(), "faucet.lock");
 const STATIC_GRAMMER_CONFIG: string = path.resolve(__dirname, "static/grammer.yml");
 
 /**
@@ -86,7 +88,7 @@ export default class Grammer {
      * @param {string} grammerConfig - the path of grammer.yml
      * @param {number} port          - redis port
      * @param {string} host          - redis host
-     * @return {Promise<Grammer>} grammer service
+     * @returns {Promise<Grammer>} grammer service
      */
     static async new(
         grammerConfig = STATIC_GRAMMER_CONFIG,
@@ -156,6 +158,10 @@ export default class Grammer {
      * @param {string} key - telegram bot key
      */
     public async run(key: string) {
+        // run locker
+        this.locker();
+
+        // start bot
         const bot = new TelegramBot(key, { polling: true });
         bot.on("polling_error", (msg) => log.err(msg));
         bot.onText(/^\/\w+/, async (msg) => {
@@ -193,6 +199,20 @@ export default class Grammer {
         });
     }
 
+    private async locker() {
+        const that = this;
+        setInterval(async () => {
+            const balance = await that.api.getBalance(that.api.account.address);
+            if (Number.parseInt(balance, 10) < 1000 * 1000000000) {
+                fs.writeFileSync(LOCKER, "");
+            } else {
+                if (fs.existsSync(LOCKER)) {
+                    fs.unlinkSync(LOCKER);
+                }
+            }
+        }, 1000 * 30);
+    }
+
     private async reply(
         bot: TelegramBot,
         msg: TelegramBot.Message,
@@ -212,7 +232,11 @@ export default class Grammer {
             case "about":
                 return this.grammer.about;
             case "faucet":
-                return await this.transfer(bot, msg);
+                if (fs.existsSync(LOCKER)) {
+                    return this.grammer.faucet.failed;
+                } else {
+                    return await this.transfer(bot, msg);
+                }
             default:
                 return this.grammer.help;
         }
@@ -300,16 +324,20 @@ export default class Grammer {
             msg.chat.id,
             "Copy that! Well! Oh yes wait a minute mister postman!",
         );
-        let hash = "";
-        const ex = await this.api.transfer(
-            addr, this.grammer.faucet.config.amount * 1000000000
-        ).catch(() => {
-            hash = "";
-        });
+
+        // check if tx failed
+        let ex: ExResult | null = null;
+        try {
+            ex = await this.api.transfer(
+                addr, this.grammer.faucet.config.amount * 1000000000
+            );
+        } catch (_) {
+            return this.grammer.faucet.failed;
+        }
 
         // return exHash
         if (ex && (ex as ExResult).isOk) {
-            hash = (ex as ExResult).exHash;
+            const hash = (ex as ExResult).exHash;
             await this.db.addAddr(addr);
             await this.db.burnSupply(date, this.grammer.faucet.config.supply);
             await this.db.lastDrop(msg.from.id, new Date().getTime())

@@ -265,7 +265,7 @@ export class API {
      * @param {SubmittableExtrinsic<"promise">} ex - extrinsic
      * @param {Boolean} inBlock - if resolve when inBlock
      */
-    private async blockFinalized(
+    private blockFinalized(
         ex: SubmittableExtrinsic<"promise">,
         inFinialize?: boolean,
     ): Promise<ExResult> {
@@ -275,7 +275,7 @@ export class API {
             "", // exHash
         );
 
-        return await new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             ex.signAndSend(this.account, {}, (sr: SubmittableResult) => {
                 const status = sr.status;
                 const events = sr.events;
