@@ -2,7 +2,7 @@
 **/*.lock
 **/*.log
 **/*.yarn
-**/*lib
-**/*node_modules
-**/*package-lock.json
+**/lib
+**/node_modules
+**/package-lock.json
 .idea
