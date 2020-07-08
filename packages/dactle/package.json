@@ -1,7 +1,7 @@
 {
   "private": false,
   "name": "@darwinia/dactle",
-  "version": "0.1.40",
+  "version": "0.1.40-alpha.0",
   "description": "darwinia ctl",
   "homepage": "https://github.com/darwinia-network/darwinia.js",
   "repository": {
@@ -14,9 +14,7 @@
   "bin": {
     "dactle": "lib/index.js"
   },
-  "files": [
-    "lib/**/*"
-  ],
+  "files": ["lib/**/*"],
   "dependencies": {
     "@darwinia/api": "^0.1.39",
     "@darwinia/util": "^0.1.39",

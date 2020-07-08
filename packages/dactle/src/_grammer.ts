@@ -331,7 +331,8 @@ export default class Grammer {
             ex = await this.api.transfer(
                 addr, this.grammer.faucet.config.amount * 1000000000
             );
-        } catch (_) {
+        } catch (err) {
+            log.err(err);
             return this.grammer.faucet.failed;
         }
 
