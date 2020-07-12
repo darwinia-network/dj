@@ -1,7 +1,7 @@
 {
   "private": false,
   "name": "@darwinia/dactle",
-  "version": "0.1.40-alpha.0",
+  "version": "0.1.40-alpha.2",
   "description": "darwinia ctl",
   "homepage": "https://github.com/darwinia-network/darwinia.js",
   "repository": {

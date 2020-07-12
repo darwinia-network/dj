@@ -330,6 +330,7 @@ export default class Grammer {
         try {
             /// **Ugly FIX**
             /// Check if the BUG comes from the ws connection problem
+            this.api._.disconnect();
             this.api = await autoAPI();
 
             /// Transfer to account

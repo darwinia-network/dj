@@ -6,7 +6,7 @@ import { whereisPj } from "@darwinia/util";
 
 // main
 (async () => {
-    const pj = whereisPj();
+    // const pj = whereisPj();
 
     // enable logger
     if (process.env.LOGGER === undefined) {
@@ -15,11 +15,11 @@ import { whereisPj } from "@darwinia/util";
 
     // parser
     const _ = yargs
-        .usage("dactle <hello@darwinia.network>")
-        .help("help").alias("help", "h")
-        .version("version", pj.version).alias("version", "V")
-        .command(cmdBot)
-        .argv;
+          .usage("dactle <hello@darwinia.network>")
+          .help("help").alias("help", "h")
+          .version("version", "0.1.40-alpha.2").alias("version", "V")
+          .command(cmdBot)
+          .argv;
 
     // show help if no input
     if (process.argv.length < 3) {
