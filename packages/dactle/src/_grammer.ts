@@ -328,6 +328,11 @@ export default class Grammer {
         // check if tx failed
         let ex: ExResult | null = null;
         try {
+            /// **Ugly FIX**
+            /// Check if the BUG comes from the ws connection problem
+            this.api = await autoAPI();
+
+            /// Transfer to account
             ex = await this.api.transfer(
                 addr, this.grammer.faucet.config.amount * 1000000000
             );
