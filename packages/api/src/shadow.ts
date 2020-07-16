@@ -22,27 +22,11 @@ export class ShadowAPI {
      */
     public async getBlock(block: number | string): Promise<IDarwiniaEthBlock> {
         let r: AxiosResponse;
-        if (typeof (block) === "number") {
-            r = await axios.post(this.api, {
-                method: "shadow_getEthHeaderByNumber",
-                params: {
-                    block_num: block,
-                    id: 0,
-                }
-            })
-        } else {
-            r = await axios.post(this.api, {
-                method: "shadow_getEthHeaderByHash",
-                params: {
-                    hash: block,
-                    id: 0,
-                }
-            })
-        }
+        r = await axios.get(this.api + "/header/" + block);
 
         // Trace the back data
         log.trace(JSON.stringify(r.data, null, 2));
-        return Block.from(r.data.result.header);
+        return Block.from(r.data);
     }
 
     /**
@@ -51,34 +35,13 @@ export class ShadowAPI {
      * @param {number} block - block number
      */
     async getBlockWithProof(block: number | string, format = "raw"): Promise<BlockWithProof> {
-        let r: AxiosResponse;
-        if (typeof (block) === "number") {
-            r = await axios.post(this.api, {
-                method: "shadow_getEthHeaderWithProofByNumber",
-                params: {
-                    block_num: block,
-                    id: 0,
-                    options: {
-                        format,
-                    },
-                }
-            });
-        } else {
-            r = await axios.post(this.api, {
-                method: "shadow_getEthHeaderWithProofByHash",
-                params: {
-                    hash: block,
-                    id: 0,
-                    options: {
-                        format,
-                    },
-                }
-            });
-        }
+        const r: AxiosResponse = await axios.get(
+            this.api + "/proof/" + block + "?format=" + format,
+        );
 
         // Trace the back data
         log.trace(JSON.stringify(r.data, null, 2))
-        return [r.data.result.eth_header, r.data.result.proof];
+        return [r.data.eth_header, r.data.ethash_proof];
     }
 
     /**
@@ -87,22 +50,14 @@ export class ShadowAPI {
      * @param {number} block - block number
      */
     async batchBlockWithProofByNumber(block: number, batch = 1, format = "raw"): Promise<BlockWithProof[]> {
-        const r: AxiosResponse = await axios.post(this.api, {
-            method: "shadow_batchEthHeaderWithProofByNumber",
-            params: {
-                number: block,
-                batch,
-                id: 0,
-                options: {
-                    format,
-                },
-            }
-        });
+        const r: AxiosResponse = await axios.get(
+            this.api + "/batch/" + block + "?batch=" + batch + "&format=" + format,
+        );
 
         // Trace the back data
         log.trace(JSON.stringify(r.data, null, 2))
-        return r.data.result.map(
-            (result: Record<string, any>) => [result.eth_header, result.proof]
+        return r.data.map(
+            (result: Record<string, any>) => [result.eth_header, result.ethash_proof]
         );
     }
 }
