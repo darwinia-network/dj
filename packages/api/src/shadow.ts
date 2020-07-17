@@ -70,6 +70,27 @@ export class ShadowAPI {
      *
      * @param {number} block - block number
      */
+    async getProposal(
+        members: number[],
+        lastLeaf: number,
+        format = "raw",
+    ): Promise<IReceiptWithProof> {
+        const r: AxiosResponse = await axios.post(this.api + "/proposal", {
+            members,
+            last_leaf: lastLeaf,
+            format,
+        });
+
+        // Trace the back data
+        log.trace(JSON.stringify(r.data, null, 2))
+        return r.data;
+    }
+
+    /**
+     * Get darwinia block with eth proof
+     *
+     * @param {number} block - block number
+     */
     async batchBlockWithProofByNumber(block: number, batch = 1, format = "raw"): Promise<BlockWithProof[]> {
         const r: AxiosResponse = await axios.get(
             this.api + "/batch/" + block + "?batch=" + batch + "&format=" + format,
