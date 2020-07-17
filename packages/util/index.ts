@@ -19,6 +19,16 @@ interface IReceiptWithProof {
     mmr_proof: string[],
 }
 
+interface IProposalHeader {
+    eth_header: IDarwiniaEthBlock,
+    ethash_proof: IDoubleNodeWithMerkleProof[],
+    mmr_proof: string[]
+}
+
+interface IProposalHeaders {
+    headers: IProposalHeader[],
+}
+
 type BlockWithProof = [IDarwiniaEthBlock, IDoubleNodeWithMerkleProof[]];
 
 // exports
@@ -29,6 +39,7 @@ export {
     chalk,
     IDoubleNodeWithMerkleProof,
     IReceiptWithProof,
+    IProposalHeaders,
     download,
     IDarwiniaEthBlock, IEthBlock,
     log,

@@ -4,6 +4,7 @@ import {
     BlockWithProof,
     IDarwiniaEthBlock,
     IReceiptWithProof,
+    IProposalHeaders,
     Block,
     log,
 } from "@darwinia/util";
@@ -74,7 +75,7 @@ export class ShadowAPI {
         members: number[],
         lastLeaf: number,
         format = "raw",
-    ): Promise<IReceiptWithProof> {
+    ): Promise<IProposalHeaders> {
         const r: AxiosResponse = await axios.post(this.api + "/proposal", {
             members,
             last_leaf: lastLeaf,
