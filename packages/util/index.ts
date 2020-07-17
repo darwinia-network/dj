@@ -13,6 +13,12 @@ interface IDoubleNodeWithMerkleProof {
     proof: string[],
 }
 
+interface IReceiptWithProof {
+    header: IDarwiniaEthBlock,
+    receipt_proof: string,
+    mmr_proof: string[],
+}
+
 type BlockWithProof = [IDarwiniaEthBlock, IDoubleNodeWithMerkleProof[]];
 
 // exports
@@ -22,6 +28,7 @@ export {
     Config,
     chalk,
     IDoubleNodeWithMerkleProof,
+    IReceiptWithProof,
     download,
     IDarwiniaEthBlock, IEthBlock,
     log,

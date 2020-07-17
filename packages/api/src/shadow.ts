@@ -1,6 +1,12 @@
 import axios, { AxiosResponse } from "axios";
 
-import { BlockWithProof, IDarwiniaEthBlock, Block, log } from "@darwinia/util";
+import {
+    BlockWithProof,
+    IDarwiniaEthBlock,
+    IReceiptWithProof,
+    Block,
+    log,
+} from "@darwinia/util";
 
 /**
  * Shadow APIs
@@ -42,6 +48,21 @@ export class ShadowAPI {
         // Trace the back data
         log.trace(JSON.stringify(r.data, null, 2))
         return [r.data.eth_header, r.data.ethash_proof];
+    }
+
+    /**
+     * Get darwinia block with eth proof
+     *
+     * @param {number} block - block number
+     */
+    async getReceipt(tx: string, last: number): Promise<IReceiptWithProof> {
+        const r: AxiosResponse = await axios.get(
+            this.api + "/receipt/" + tx + "?last=" + last
+        );
+
+        // Trace the back data
+        log.trace(JSON.stringify(r.data, null, 2))
+        return r.data;
     }
 
     /**
