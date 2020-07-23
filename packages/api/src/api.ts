@@ -1,5 +1,10 @@
 /* tslint:disable:variable-name */
-import { IDoubleNodeWithMerkleProof, IDarwiniaEthBlock, log } from "@darwinia/util";
+import {
+    IDoubleNodeWithMerkleProof,
+    IDarwiniaEthBlock,
+    IProposalHeaders,
+    log
+} from "@darwinia/util";
 import { ApiPromise, SubmittableResult, WsProvider } from "@polkadot/api";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import Keyring from "@polkadot/keyring";
@@ -161,15 +166,6 @@ export class API {
     }
 
     /**
-     * get the specify extrinsic
-     *
-     * @param {string} hash - hash of extrinsic
-     */
-    public static async getExtrinsic(hash: string): Promise<Extrinsic> {
-        return await Subscan.getExtrinsic(hash);
-    }
-
-    /**
      * Encode darwiniaEthBlock to scale codec
      *
      * @param {IDarwiniaEthBlock} block - darwinia eth block
@@ -180,6 +176,28 @@ export class API {
             this.types.EthHeader,
             proofs,
         ).toHex();
+    }
+
+    /**
+     * Encode darwiniaEthBlock to scale codec
+     *
+     * @param {IDarwiniaEthBlock} block - darwinia eth block
+     */
+    public encodeRawHeaderThing(proposalHeader: string[]): string {
+        return new Vec(
+            this._.registry,
+            this.types.RawHeaderThing,
+            proposalHeader,
+        ).toHex();
+    }
+
+    /**
+     * get the specify extrinsic
+     *
+     * @param {string} hash - hash of extrinsic
+     */
+    public static async getExtrinsic(hash: string): Promise<Extrinsic> {
+        return await Subscan.getExtrinsic(hash);
     }
 
     /**
@@ -205,6 +223,16 @@ export class API {
         }
 
         return await this._.rpc.chain.getBlock(hash);
+    }
+
+    /**
+     * get the specify block
+     *
+     * @param {string|number} block - hash or number of the block
+     */
+    public async submit_proposal(codec: string[]): Promise<any> {
+        const ex = this._.tx.relayerGame.submitProposal(codec);
+        return await this.blockFinalized(ex);
     }
 
     /**
@@ -316,6 +344,7 @@ export class API {
                         });
                     }
                 } else if (status.isInvalid) {
+                    console.log(res)
                     log.warn("Invalid Extrinsic");
                     reject(res);
                 } else if (status.isRetracted) {

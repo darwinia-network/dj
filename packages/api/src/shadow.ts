@@ -74,8 +74,8 @@ export class ShadowAPI {
     async getProposal(
         members: number[],
         lastLeaf: number,
-        format = "raw",
-    ): Promise<IProposalHeaders> {
+        format = "codec",
+    ): Promise<string[]> {
         const r: AxiosResponse = await axios.post(this.api + "/proposal", {
             members,
             last_leaf: lastLeaf,
@@ -84,7 +84,7 @@ export class ShadowAPI {
 
         // Trace the back data
         log.trace(JSON.stringify(r.data, null, 2))
-        return r.data;
+        return r.data.headers;
     }
 
     /**
