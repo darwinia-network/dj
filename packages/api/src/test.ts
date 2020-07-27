@@ -1,35 +1,38 @@
-// import { Config } from "@darwinia/util";
+import { log } from "@darwinia/util";
 import { ShadowAPI } from "./shadow";
 import { autoAPI } from "./auto";
 
 (async () => {
-    // const cfg = new Config();
     const api = await autoAPI();
     const shadow = new ShadowAPI("http://localhost:3001/api/v1");
-    const proposalHeaders: string[] = (
-        await shadow.getProposal([1], 3)
-    );
+    const target: string[] = (await shadow.getProposal([19], 19));
 
     // Subscribe to system events via storage
     api._.query.system.events((events) => {
-        console.log(`\nReceived ${events.length} events:`);
-
         // Loop through the Vec<EventRecord>
-        events.forEach((record) => {
+        events.forEach(async (record) => {
             // Extract the phase, event and the event types
             const { event, phase } = record;
             const types = event.typeDef;
 
             // Show what we are busy with
-            console.log(`\t${event.section}:${event.method}:: (phase=${phase.toString()})`);
-            console.log(`\t\t${event.meta.documentation.toString()}`);
+            if (event.method === "NewRound") {
+                log.trace(`\t${event.section}:${event.method}:: (phase=${phase.toString()})`);
+                log.trace(`\t\t${event.meta.documentation.toString()}`);
 
-            // Loop through each of the parameters, displaying the type and data
-            event.data.forEach((data, index) => {
-                console.log(`\t\t\t${types[index].type}: ${data.toString()}`);
-            });
+                // Samples
+                const lastLeaf = Math.max(...(event.data[1].toJSON() as number[]));
+                const members = event.data[2].toJSON() as number[];
+                await api.submit_proposal(await shadow.getProposal(members, lastLeaf));
+
+                // Loop through each of the parameters, displaying the type and data
+                event.data.forEach((data, index) => {
+                    log.trace(`\t\t\t${types[index].type}: ${data.toString()}`);
+                });
+            }
         });
     });
 
-    await api.submit_proposal(proposalHeaders);
+    const r = await api.submit_proposal(target);
+    console.log(r);
 })();
