@@ -6,6 +6,7 @@ import { whereisPj } from "@darwinia/util";
 import cmdBalance from "./src/balance";
 import cmdCodec from "./src/codec";
 import cmdConfig from "./src/config";
+import cmdProposal from "./src/proposal";
 import cmdRelay from "./src/relay";
 import cmdTransfer from "./src/transfer";
 import cmdTx from "./src/tx";
@@ -27,6 +28,7 @@ import cmdTx from "./src/tx";
           .command(cmdBalance)
           .command(cmdCodec)
           .command(cmdConfig)
+          .command(cmdProposal)
           .command(cmdRelay)
           .command(cmdTransfer)
           .command(cmdTx)

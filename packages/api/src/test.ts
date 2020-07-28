@@ -22,7 +22,8 @@ import { autoAPI } from "./auto";
 
                 // Samples
                 const lastLeaf = Math.max(...(event.data[1].toJSON() as number[]));
-                const members = event.data[2].toJSON() as number[];
+                const members: number[] = event.data[1].toJSON() as number[];
+
                 await api.submit_proposal(await shadow.getProposal(members, lastLeaf));
 
                 // Loop through each of the parameters, displaying the type and data
