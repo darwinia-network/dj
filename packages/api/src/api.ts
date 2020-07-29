@@ -2,7 +2,6 @@
 import {
     IDoubleNodeWithMerkleProof,
     IDarwiniaEthBlock,
-    IProposalHeaders,
     log
 } from "@darwinia/util";
 import { ApiPromise, SubmittableResult, WsProvider } from "@polkadot/api";

@@ -3,13 +3,14 @@ import { autoAPI, ShadowAPI, API } from "@darwinia/api";
 import { log, Config } from "@darwinia/util";
 import path from "path";
 import fs from "fs";
+import { DispatchError } from "@polkadot/types/interfaces/types";
 
-const cache = path.resolve((new Config()).path.root, "blocks");
+const cache = path.resolve((new Config()).path.root, "cache/blocks");
 
 // Init Cache
 function initCache() {
     if (fs.existsSync(cache)) {
-        fs.rmdirSync(cache);
+        fs.rmdirSync(cache, { recursive: true });
     }
 
     fs.mkdirSync(cache, { recursive: true });
@@ -29,6 +30,22 @@ function getBlock(block: number): string {
 function setBlock(block: number, codec: string) {
     fs.writeFileSync(path.resolve(cache, `${block}.block`), codec);
 }
+
+/// block 19: Uncle
+/// diff:
+///   block
+///   ethash_proof
+///   mmr_root
+///   mmr_proof
+///
+/// block 1-18: Normal ----- [19, 18]
+/// diff:
+///    mmr_proof
+
+/// chain-0       chain-1
+/// ---------------------------
+/// real [19]      mock [19]
+/// real [19,18]   mock [19,18]
 
 // Listen and submit proposals
 function startListener(api: API, shadow: ShadowAPI) {
@@ -71,8 +88,30 @@ function startListener(api: API, shadow: ShadowAPI) {
                     log.trace(`\t\t\t${types[index].type}: ${data.toString()}`);
                 });
             }
+
+            if (event.data[0] && (event.data[0] as DispatchError).isModule) {
+                log.err(api._.registry.findMetaError(
+                    (event.data[0] as DispatchError).asModule.toU8a(),
+                ));
+            }
         });
     });
+}
+
+/// proposal a block
+export async function proposal(block: number) {
+    initCache();
+
+    const conf = new Config();
+    const api = await autoAPI();
+    const shadow = new ShadowAPI(conf.shadow);
+
+    // Start proposal linstener
+    startListener(api, shadow);
+
+    // The target block
+    const target = await shadow.getProposal([block], block);
+    log.trace(await api.submit_proposal(target));
 }
 
 // The proposal API

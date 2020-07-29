@@ -1,11 +1,13 @@
 import { log } from "@darwinia/util";
-import { ShadowAPI } from "./shadow";
 import { autoAPI } from "./auto";
+import { headers } from "./0.json";
+import { DispatchError } from "@polkadot/types/interfaces/types";
 
-(async () => {
+// Starts from block uncle 19
+export async function uncle_proposal() {
+    // const cfg = new Config();
     const api = await autoAPI();
-    const shadow = new ShadowAPI("http://localhost:3001/api/v1");
-    const target: string[] = (await shadow.getProposal([19], 19));
+    await api.submit_proposal([headers[19]]);
 
     // Subscribe to system events via storage
     api._.query.system.events((events) => {
@@ -21,19 +23,25 @@ import { autoAPI } from "./auto";
                 log.trace(`\t\t${event.meta.documentation.toString()}`);
 
                 // Samples
-                const lastLeaf = Math.max(...(event.data[1].toJSON() as number[]));
-                const members: number[] = event.data[1].toJSON() as number[];
+                log.trace(`new proposal: ${event.data[1].toJSON() as number[]}`);
 
-                await api.submit_proposal(await shadow.getProposal(members, lastLeaf));
+                /// # MOCK
+                ///
+                /// Map the mock headers
+                const members = (event.data[1].toJSON() as number[]).map((i: number) => headers[i]);
+                setTimeout(async () => await api.submit_proposal(members), 5000);
 
                 // Loop through each of the parameters, displaying the type and data
                 event.data.forEach((data, index) => {
                     log.trace(`\t\t\t${types[index].type}: ${data.toString()}`);
                 });
             }
+
+            if (event.data[0] && (event.data[0] as DispatchError).isModule) {
+                log.err(api._.registry.findMetaError(
+                    (event.data[0] as DispatchError).asModule.toU8a(),
+                ));
+            }
         });
     });
-
-    const r = await api.submit_proposal(target);
-    console.log(r);
-})();
+}
