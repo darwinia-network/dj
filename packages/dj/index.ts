@@ -24,7 +24,7 @@ import cmdTx from "./src/tx";
     const _ = yargs
         .usage("dj <hello@darwinia.network>")
         .help("help").alias("help", "h")
-          .version("version", pj.version).alias("version", "V")
+          .version("version", "0.1.39-alpha.2").alias("version", "V")
           .command(cmdBalance)
           .command(cmdCodec)
           .command(cmdConfig)

@@ -29,7 +29,7 @@ export async function uncle_proposal() {
                 ///
                 /// Map the mock headers
                 const members = (event.data[1].toJSON() as number[]).map((i: number) => headers[i]);
-                setTimeout(async () => await api.submit_proposal(members), 5000);
+                setTimeout(async () => await api.submit_proposal(members), 10000);
 
                 // Loop through each of the parameters, displaying the type and data
                 event.data.forEach((data, index) => {
