@@ -7,7 +7,11 @@
 Utils for developing darwinia javascript library.
 
 
-### Config
+### Usage
+
+```
+yarn add @darwinia/api
+```
 
 ```javascript
 import { API, Config } from "@darwinia-network/util";
@@ -27,23 +31,11 @@ The config root of `darwinia.js` is at `~/.darwinia`, once you `new Config()`, t
 files will generate automatically.
 
 ```json
+// ~/.darwinia/config.json
 {
-  "eth": {
-    "node": "",                  // ethereum node url, you can input an infura url
-    "secret": ""                 // ethereum secret key, used for crash service
-  },
-  "grammer": {                   // this field is for grammer server
-    "commands": {
-      "faucet": {
-        "supply": 400,
-        "amount": 1000,
-        "interval": 24
-      }
-    },
-    "port": 1439
-  },
-  "node": "ws://0.0.0.0:9944",   // darwinia node, should start with `ws://`
-  "seed": "//Alice"              // darwinia account seed
+  "shadow": "shadow service api, refer github.com/darwini-network/darwinia.go",
+  "node": "darwinia node, should start with `ws://` or `wss://`, eg: ws://0.0.0.0:9944",
+  "seed": "darwinia account seed, eg: //Alice"
 }
 ```
 
@@ -98,4 +90,4 @@ GPL-3.0
 
 [github]: https://github.com/darwinia-network/darwinia.js
 [workflow-badge]: https://github.com/darwinia-network/darwinia.js/workflows/Node.js%20CI/badge.svg
-[types.json]: https://github.com/darwinia-network/darwinia/blob/master/runtime/crab/types.json
+[types.json]: https://github.com/darwinia-network/darwinia/blob/master/runtime/crab/darwinia_types.json
