@@ -6,6 +6,7 @@ import { whereisPj } from "@darwinia/util";
 import cmdBalance from "./src/balance";
 import cmdCodec from "./src/codec";
 import cmdConfig from "./src/config";
+import cmdProposal from "./src/proposal";
 import cmdRelay from "./src/relay";
 import cmdTransfer from "./src/transfer";
 import cmdTx from "./src/tx";
@@ -23,10 +24,11 @@ import cmdTx from "./src/tx";
     const _ = yargs
         .usage("dj <hello@darwinia.network>")
         .help("help").alias("help", "h")
-          .version("version", pj.version).alias("version", "V")
+          .version("version", "0.1.39-alpha.2").alias("version", "V")
           .command(cmdBalance)
           .command(cmdCodec)
           .command(cmdConfig)
+          .command(cmdProposal)
           .command(cmdRelay)
           .command(cmdTransfer)
           .command(cmdTx)

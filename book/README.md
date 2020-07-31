@@ -13,7 +13,7 @@ Gather common javascript usages for [Darwinia Network](https://darwinia.network)
 + [@darwinia/api][api]
 + [@darwinia/util][util]
 
-More guide pleave visit https://darwinia-network.github.io/darwinia.js to get started with darwinia.js.
+More guide pleave visit [https://darwinia-network.github.io/darwinia.js][book] to get started with darwinia.js.
 
 
 ### Config
@@ -53,3 +53,4 @@ GPL-3.0
 [api]: https://github.com/darwinia-network/darwinia.js/tree/master/packages/api
 [dactle]: https://github.com/darwinia-network/darwinia.js/tree/master/packages/dactle
 [util]: https://github.com/darwinia-network/darwinia.js/tree/master/packages/util
+[book]: https://darwinia-network.github.io/darwinia.js
