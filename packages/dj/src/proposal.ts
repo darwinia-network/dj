@@ -55,6 +55,10 @@ function startListener(api: API, shadow: ShadowAPI) {
             const { event, phase } = record;
             const types = event.typeDef;
 
+            if (event.method === "GameOver") {
+                log.ox("A new proposal has been submitted");
+            }
+
             // Show what we are busy with
             if (event.method === "NewRound") {
                 log.trace(`\t${event.section}:${event.method}:: (phase=${phase.toString()})`);
