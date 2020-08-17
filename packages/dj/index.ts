@@ -10,6 +10,7 @@ import cmdProposal from "./src/proposal";
 import cmdRelay from "./src/relay";
 import cmdTransfer from "./src/transfer";
 import cmdTx from "./src/tx";
+import cmdGuard from "./src/guard";
 
 // main
 (async () => {
@@ -32,6 +33,7 @@ import cmdTx from "./src/tx";
           .command(cmdRelay)
           .command(cmdTransfer)
           .command(cmdTx)
+          .command(cmdGuard)
           .argv;
 
     // show help if no input

@@ -30,7 +30,7 @@ interface IProposalHeaders {
     headers: IProposalHeader[],
 }
 
-type BlockWithProof = [IDarwiniaEthBlock, IDoubleNodeWithMerkleProof[]];
+type BlockWithProof = [IDarwiniaEthBlock, IDoubleNodeWithMerkleProof[], string];
 
 // exports
 export {

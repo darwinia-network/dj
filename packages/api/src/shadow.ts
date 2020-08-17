@@ -4,7 +4,6 @@ import {
     BlockWithProof,
     IDarwiniaEthBlock,
     IReceiptWithProof,
-    IProposalHeaders,
     Block,
     log,
 } from "@darwinia/util";
@@ -48,7 +47,7 @@ export class ShadowAPI {
 
         // Trace the back data
         log.trace(JSON.stringify(r.data, null, 2))
-        return [r.data.eth_header, r.data.ethash_proof];
+        return [r.data.eth_header, r.data.ethash_proof, r.data.mmr_root];
     }
 
     /**

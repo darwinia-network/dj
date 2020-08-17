@@ -225,11 +225,27 @@ export class API {
     }
 
     /**
+     * Approve block in relayer game
+     */
+    public async approveBlock(block: string | number): Promise<ExResult> {
+        const ex = this._.tx.relayerGame.approvePendingHeader(block);
+        return await this.blockFinalized(ex);
+    }
+
+    /**
+     * Approve block in relayer game
+     */
+    public async rejectBlock(block: string | number): Promise<ExResult> {
+        const ex = this._.tx.relayerGame.rejectPendingHeader(block);
+        return await this.blockFinalized(ex);
+    }
+
+    /**
      * get the specify block
      *
      * @param {string|number} block - hash or number of the block
      */
-    public async submit_proposal(codec: string[]): Promise<any> {
+    public async submit_proposal(codec: string[]): Promise<ExResult> {
         const ex = this._.tx.relayerGame.submitProposal(codec);
         return await this.blockFinalized(ex);
     }
