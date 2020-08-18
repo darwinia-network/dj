@@ -85,7 +85,7 @@ function startListener(api: API, shadow: ShadowAPI) {
                 proposals = proposals.concat(newProposals);
 
                 // Submit new proposals
-                await api.submit_proposal(await shadow.getProposal(members, lastLeaf));
+                await api.submitProposal(await shadow.getProposal(members, lastLeaf));
 
                 // Loop through each of the parameters, displaying the type and data
                 event.data.forEach((data, index) => {
@@ -115,7 +115,7 @@ export async function proposal(block: number) {
 
     // The target block
     const target = await shadow.getProposal([block], block);
-    log.trace(await api.submit_proposal(target));
+    log.trace(await api.submitProposal(target));
 }
 
 // The proposal API
@@ -132,7 +132,7 @@ async function handler(args: yargs.Arguments) {
 
     // The target block
     const target = await shadow.getProposal([block], block);
-    log.trace(await api.submit_proposal(target));
+    log.trace(await api.submitProposal(target));
 }
 
 const cmdProposal: yargs.CommandModule = {

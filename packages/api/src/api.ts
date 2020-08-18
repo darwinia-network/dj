@@ -227,16 +227,22 @@ export class API {
     /**
      * Approve block in relayer game
      */
-    public async approveBlock(block: string | number): Promise<ExResult> {
-        const ex = this._.tx.relayerGame.approvePendingHeader(block);
+    public async approveBlock(block: number, root = false): Promise<ExResult> {
+        let ex = this._.tx.ethereumRelay.approvePendingHeader(block);
+        if (root) {
+            ex = this._.tx.sudo.sudo(ex);
+        }
         return await this.blockFinalized(ex);
     }
 
     /**
      * Approve block in relayer game
      */
-    public async rejectBlock(block: string | number): Promise<ExResult> {
-        const ex = this._.tx.relayerGame.rejectPendingHeader(block);
+    public async rejectBlock(block: string | number, root = false): Promise<ExResult> {
+        let ex = this._.tx.ethereumRelay.rejectPendingHeader(block);
+        if (root) {
+            ex = this._.tx.sudo.sudo(ex);
+        }
         return await this.blockFinalized(ex);
     }
 
@@ -245,8 +251,8 @@ export class API {
      *
      * @param {string|number} block - hash or number of the block
      */
-    public async submit_proposal(codec: string[]): Promise<ExResult> {
-        const ex = this._.tx.relayerGame.submitProposal(codec);
+    public async submitProposal(codec: string[]): Promise<ExResult> {
+        const ex = this._.tx.ethereumRelay.submitRawProposal(codec);
         return await this.blockFinalized(ex);
     }
 
