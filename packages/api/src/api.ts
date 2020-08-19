@@ -231,6 +231,8 @@ export class API {
         let ex = this._.tx.ethereumRelay.approvePendingHeader(block);
         if (root) {
             ex = this._.tx.sudo.sudo(ex);
+        } else {
+            ex = this._.tx.council.execute(ex, ex.length);
         }
         return await this.blockFinalized(ex);
     }
