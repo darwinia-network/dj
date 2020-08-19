@@ -3,13 +3,19 @@ import { autoAPI, ExResult, ShadowAPI } from "@darwinia/api";
 import { log, Config } from "@darwinia/util";
 
 export const cmdGuard: yargs.CommandModule = {
+    builder: (argv: yargs.Argv) => argv.options(
+        "root", {
+        alias: "r",
+        type: "boolean",
+        describte: "If use root origin",
+    }),
     command: "guard",
     describe: "Set up an relayer game guard",
     handler: async (_: yargs.Arguments) => {
-        log.event("Relayer Game Guard has been started");
         const api = await autoAPI();
         const cfg = new Config();
         const shadow = new ShadowAPI(cfg.shadow);
+        log.event("Relayer Game Guard has started");
 
         /// Blocks that handled
         const handled: number[] = [];
