@@ -129,8 +129,8 @@
   "EthHeaderThing": {
     "eth_header": "EthHeader",
     "ethash_proof": "Vec<EthashProof>",
-    "mmr_root": "MMRHash",
-    "mmr_proof": "Vec<MMRHash>"
+    "mmr_root": "H256",
+    "mmr_proof": "Vec<H256>"
   },
   "EthHeader": {
     "parent_hash": "H256",
