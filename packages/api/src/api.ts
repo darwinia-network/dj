@@ -1,9 +1,5 @@
 /* tslint:disable:variable-name */
-import {
-    IDoubleNodeWithMerkleProof,
-    IDarwiniaEthBlock,
-    log
-} from "@darwinia/util";
+import { log, IDarwiniaEthBlock } from "@darwinia/util";
 import { ApiPromise, SubmittableResult, WsProvider } from "@polkadot/api";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import Keyring from "@polkadot/keyring";
@@ -14,7 +10,7 @@ import { Vec, Struct } from "@polkadot/types";
 import { SignedBlock } from "@polkadot/types/interfaces";
 import * as Subscan from "./subscan";
 import { Extrinsic } from "./types/extrinsic";
-import { IEthHeaderThing } from "./types/block";
+import { IEthHeaderThing, IDoubleNodeWithMerkleProof } from "./types/block";
 
 export interface IErrorDoc {
     name: string;

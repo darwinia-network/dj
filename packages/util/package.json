@@ -10,13 +10,10 @@
   "author": "darwinia-network <hello@darwinia.network>",
   "license": "GPL-3.0",
   "main": "lib/index.js",
-  "files": [
-    "lib/**/*"
-  ],
+  "files": ["lib/**/*"],
   "dependencies": {
     "@polkadot/util": "^3.2.1",
     "chalk": "^4.0.0",
-    "ethereumjs-util": "^7.0.0",
     "got": "^10.7.0",
     "javascript-stringify": "^2.0.1",
     "progress": "^2.0.3",

@@ -11,9 +11,7 @@
   "author": "darwinia-network <hello@darwinia.network>",
   "license": "GPL-3.0",
   "main": "lib/index.js",
-  "files": [
-    "lib/**/*"
-  ],
+  "files": ["lib/**/*"],
   "dependencies": {
     "@darwinia/util": "^0.1.47",
     "@polkadot/api": "1.30.0-beta.0",
