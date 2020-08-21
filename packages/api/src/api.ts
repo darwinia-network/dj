@@ -14,6 +14,7 @@ import { Vec, Struct } from "@polkadot/types";
 import { SignedBlock } from "@polkadot/types/interfaces";
 import * as Subscan from "./subscan";
 import { Extrinsic } from "./types/extrinsic";
+import { IEthHeaderThing } from "./types/block";
 
 export interface IErrorDoc {
     name: string;
@@ -253,10 +254,10 @@ export class API {
     /**
      * get the specify block
      *
-     * @param {string|number} block - hash or number of the block
+     * @param {IEthHeaderThing} headerThings - Eth Header Things
      */
-    public async submitProposal(codec: string[]): Promise<ExResult> {
-        const ex = this._.tx.ethereumRelay.submitRawProposal(codec);
+    public async submitProposal(headerThings: IEthHeaderThing[]): Promise<ExResult> {
+        const ex = this._.tx.ethereumRelay.submitProposal(headerThings);
         return await this.blockFinalized(ex);
     }
 
