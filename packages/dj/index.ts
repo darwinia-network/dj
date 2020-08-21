@@ -7,7 +7,7 @@ import cmdBalance from "./src/balance";
 import cmdCodec from "./src/codec";
 import cmdConfig from "./src/config";
 import cmdProposal from "./src/proposal";
-import cmdRelay from "./src/relay";
+// import cmdRelay from "./src/relay";
 import cmdTransfer from "./src/transfer";
 import cmdTx from "./src/tx";
 import cmdGuard from "./src/guard";
@@ -16,7 +16,7 @@ import cmdGuard from "./src/guard";
 (async () => {
     const pj = whereisPj();
 
-    // enable logger
+    // Enable logger
     if (process.env.LOGGER === undefined) {
         process.env.LOGGER = "INFO";
     }
@@ -30,7 +30,7 @@ import cmdGuard from "./src/guard";
           .command(cmdCodec)
           .command(cmdConfig)
           .command(cmdProposal)
-          .command(cmdRelay)
+          // .command(cmdRelay)
           .command(cmdTransfer)
           .command(cmdTx)
           .command(cmdGuard)

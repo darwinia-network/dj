@@ -18,7 +18,8 @@
     "javascript-stringify": "^2.0.1",
     "progress": "^2.0.3",
     "prompts": "^2.3.2",
-    "tar": "^6.0.2"
+    "tar": "^6.0.2",
+    "ethereumjs-util": "^7.0.0"
   },
   "scripts": {
     "build": "tsc --strict",

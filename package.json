@@ -36,8 +36,8 @@
     "test": "jest --forceExit --detectOpenHandles",
     "deps": "lerna exec yarn",
     "lint": "lerna run lint",
-    "version": "ts-node scripts/version",
-    "canary": "ts-node scripts/version"
+    "version": "ts-node scripts/version.ts --stable",
+    "publish": "ts-node scripts/publish.ts --stable"
   },
   "husky": {
     "hooks": {
