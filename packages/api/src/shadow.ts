@@ -1,13 +1,13 @@
 import axios, { AxiosResponse } from "axios";
 
 import {
-    BlockWithProof,
-    IDarwiniaEthBlock,
-    IReceiptWithProof,
-    IProposalHeaders,
-    Block,
-    log,
+    log, Block, IDarwiniaEthBlock,
 } from "@darwinia/util";
+import {
+    BlockWithProof,
+    IReceiptWithProof,
+    IEthHeaderThing,
+} from "./types/block";
 
 /**
  * Shadow APIs
@@ -48,7 +48,7 @@ export class ShadowAPI {
 
         // Trace the back data
         log.trace(JSON.stringify(r.data, null, 2))
-        return [r.data.eth_header, r.data.ethash_proof];
+        return [r.data.eth_header, r.data.ethash_proof, r.data.mmr_root];
     }
 
     /**
@@ -74,12 +74,12 @@ export class ShadowAPI {
     async getProposal(
         members: number[],
         lastLeaf: number,
-        format = "codec",
-    ): Promise<string[]> {
+        // format = "codec",
+    ): Promise<IEthHeaderThing[]> {
         const r: AxiosResponse = await axios.post(this.api + "/proposal", {
             members,
             last_leaf: lastLeaf,
-            format,
+            // format,
         });
 
         // Trace the back data

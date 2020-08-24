@@ -1,9 +1,5 @@
 /* tslint:disable:variable-name */
-import {
-    IDoubleNodeWithMerkleProof,
-    IDarwiniaEthBlock,
-    log
-} from "@darwinia/util";
+import { log, IDarwiniaEthBlock } from "@darwinia/util";
 import { ApiPromise, SubmittableResult, WsProvider } from "@polkadot/api";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import Keyring from "@polkadot/keyring";
@@ -14,6 +10,7 @@ import { Vec, Struct } from "@polkadot/types";
 import { SignedBlock } from "@polkadot/types/interfaces";
 import * as Subscan from "./subscan";
 import { Extrinsic } from "./types/extrinsic";
+import { IEthHeaderThing, IDoubleNodeWithMerkleProof } from "./types/block";
 
 export interface IErrorDoc {
     name: string;
@@ -225,12 +222,38 @@ export class API {
     }
 
     /**
+     * Approve block in relayer game
+     */
+    public async approveBlock(block: number, root = false): Promise<ExResult> {
+        let ex = this._.tx.ethereumRelay.approvePendingHeader(block);
+        if (root) {
+            ex = this._.tx.sudo.sudo(ex);
+        } else {
+            ex = this._.tx.council.execute(ex, ex.length);
+        }
+        return await this.blockFinalized(ex);
+    }
+
+    /**
+     * Approve block in relayer game
+     */
+    public async rejectBlock(block: string | number, root = false): Promise<ExResult> {
+        let ex = this._.tx.ethereumRelay.rejectPendingHeader(block);
+        if (root) {
+            ex = this._.tx.sudo.sudo(ex);
+        } else {
+            ex = this._.tx.council.execute(ex, ex.length);
+        }
+        return await this.blockFinalized(ex);
+    }
+
+    /**
      * get the specify block
      *
-     * @param {string|number} block - hash or number of the block
+     * @param {IEthHeaderThing} headerThings - Eth Header Things
      */
-    public async submit_proposal(codec: string[]): Promise<any> {
-        const ex = this._.tx.relayerGame.submitProposal(codec);
+    public async submitProposal(headerThings: IEthHeaderThing[]): Promise<ExResult> {
+        const ex = this._.tx.ethereumRelay.submitProposal(headerThings);
         return await this.blockFinalized(ex);
     }
 

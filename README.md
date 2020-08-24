@@ -47,7 +47,7 @@ If you want to test Darwinia using `darwinia.js`, check the `@darwinia/dj` proje
 GPL-3.0
 
 [github]: https://github.com/darwinia-network/darwinia.js
-[workflow-badge]: https://github.com/darwinia-network/darwinia.js/workflows/Node.js%20CI/badge.svg
+[workflow-badge]: https://github.com/darwinia-network/darwinia.js/workflows/CI/badge.svg
 [types.json]: https://github.com/darwinia-network/darwinia/blob/master/runtime/crab/types.json
 [dj]: https://github.com/darwinia-network/darwinia.js/tree/master/packages/dj
 [api]: https://github.com/darwinia-network/darwinia.js/tree/master/packages/api

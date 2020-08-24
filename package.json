@@ -14,7 +14,7 @@
   "devDependencies": {
     "@commitlint/cli": "^8.3.5",
     "@commitlint/config-conventional": "^8.3.4",
-    "@polkadot/types": "^1.16.1",
+    "@polkadot/types": "1.30.0-beta.0",
     "@types/ioredis": "^4.16.2",
     "@types/jest": "^25.2.2",
     "@types/js-yaml": "^3.12.3",
@@ -36,8 +36,8 @@
     "test": "jest --forceExit --detectOpenHandles",
     "deps": "lerna exec yarn",
     "lint": "lerna run lint",
-    "version": "ts-node scripts/version",
-    "canary": "ts-node scripts/version"
+    "version": "ts-node scripts/version.ts --stable",
+    "publish": "ts-node scripts/publish.ts --stable"
   },
   "husky": {
     "hooks": {

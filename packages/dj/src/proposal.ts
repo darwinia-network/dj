@@ -4,6 +4,7 @@ import { log, Config } from "@darwinia/util";
 import path from "path";
 import fs from "fs";
 import { DispatchError } from "@polkadot/types/interfaces/types";
+import { IEthHeaderThing } from "@darwinia/api/src/types/block"
 
 const cache = path.resolve((new Config()).path.root, "cache/blocks");
 
@@ -17,18 +18,18 @@ function initCache() {
 }
 
 // Get block from cache
-function getBlock(block: number): string {
+function getBlock(block: number): IEthHeaderThing | null {
     const f = path.resolve(cache, `${block}.block`);
     if (fs.existsSync(f)) {
-        return fs.readFileSync(f).toString();
-    } else {
-        return "";
+        return JSON.parse(fs.readFileSync(f).toString());
+    }  else {
+        return null;
     }
 }
 
 // Get block from cache
-function setBlock(block: number, codec: string) {
-    fs.writeFileSync(path.resolve(cache, `${block}.block`), codec);
+function setBlock(block: number, headerThing: IEthHeaderThing) {
+    fs.writeFileSync(path.resolve(cache, `${block}.block`), JSON.stringify(headerThing));
 }
 
 /// block 19: Uncle
@@ -55,6 +56,10 @@ function startListener(api: API, shadow: ShadowAPI) {
             const { event, phase } = record;
             const types = event.typeDef;
 
+            if (event.method === "GameOver") {
+                log.ox("A new proposal has been submitted");
+            }
+
             // Show what we are busy with
             if (event.method === "NewRound") {
                 log.trace(`\t${event.section}:${event.method}:: (phase=${phase.toString()})`);
@@ -66,10 +71,10 @@ function startListener(api: API, shadow: ShadowAPI) {
                 const leftMembers: number[] = [];
 
                 // Get proposals
-                let proposals: string[] = [];
+                let proposals: IEthHeaderThing[] = [];
                 members.forEach((i: number) => {
                     const block = getBlock(i);
-                    if (block.length > 0) {
+                    if (block) {
                         proposals.push(block);
                     } else {
                         leftMembers.push(i);
@@ -77,11 +82,11 @@ function startListener(api: API, shadow: ShadowAPI) {
                 })
 
                 const newProposals = await shadow.getProposal(leftMembers, lastLeaf);
-                newProposals.forEach((c: string, i: number) => setBlock(i, c));
+                newProposals.forEach((c: IEthHeaderThing, i: number) => setBlock(i, c));
                 proposals = proposals.concat(newProposals);
 
                 // Submit new proposals
-                await api.submit_proposal(await shadow.getProposal(members, lastLeaf));
+                await api.submitProposal(await shadow.getProposal(members, lastLeaf));
 
                 // Loop through each of the parameters, displaying the type and data
                 event.data.forEach((data, index) => {
@@ -111,7 +116,7 @@ export async function proposal(block: number) {
 
     // The target block
     const target = await shadow.getProposal([block], block);
-    log.trace(await api.submit_proposal(target));
+    log.trace(await api.submitProposal(target));
 }
 
 // The proposal API
@@ -128,7 +133,7 @@ async function handler(args: yargs.Arguments) {
 
     // The target block
     const target = await shadow.getProposal([block], block);
-    log.trace(await api.submit_proposal(target));
+    log.trace(await api.submitProposal(target));
 }
 
 const cmdProposal: yargs.CommandModule = {
