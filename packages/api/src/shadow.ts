@@ -58,7 +58,7 @@ export class ShadowAPI {
      */
     async getReceipt(tx: string, last: number): Promise<IReceiptWithProof> {
         const r: AxiosResponse = await axios.get(
-            this.api + "/receipt/" + tx + "?last=" + last
+            this.api + "/eth/receipt/" + tx + "?last=" + last
         );
 
         // Trace the back data
@@ -76,7 +76,7 @@ export class ShadowAPI {
         lastLeaf: number,
         // format = "codec",
     ): Promise<IEthHeaderThing[]> {
-        const r: AxiosResponse = await axios.post(this.api + "/proposal", {
+        const r: AxiosResponse = await axios.post(this.api + "/eth/proposal", {
             members,
             last_leaf: lastLeaf,
             // format,
@@ -84,7 +84,7 @@ export class ShadowAPI {
 
         // Trace the back data
         log.trace(JSON.stringify(r.data, null, 2))
-        return r.data.headers;
+        return r.data;
     }
 
     /**
