@@ -11,12 +11,18 @@
   "author": "darwinia-network <hello@darwinia.network>",
   "license": "GPL-3.0",
   "main": "lib/index.js",
-  "files": ["lib/**/*"],
+  "files": [
+    "lib/**/*"
+  ],
   "dependencies": {
     "@polkadot/api": "1.30.0-beta.0",
     "@polkadot/keyring": "3.2.1",
     "@polkadot/util-crypto": "3.2.1",
     "axios": "^0.19.2",
+    "ethereumjs-util": "^7.0.4",
+    "got": "^11.5.2",
+    "javascript-stringify": "^2.0.1",
+    "progress": "^2.0.3",
     "yargs": "^15.4.1"
   },
   "devDependencies": {
