@@ -1,6 +1,6 @@
 import yargs from "yargs";
-import { autoAPI, ExResult, ShadowAPI } from "@darwinia/api";
-import { log, Config } from "@darwinia/util";
+import { autoAPI, ExResult, ShadowAPI } from "../api";
+import { log, Config } from "../util";
 
 export const cmdGuard: yargs.CommandModule = {
     builder: (argv: yargs.Argv) => argv.options(

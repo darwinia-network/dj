@@ -1,45 +1,37 @@
-<h1 align="center">
-𝒹𝒶𝓇𝓌𝒾𝓃𝒾𝒶.𝒿𝓈
-</h1>
+# @darwinia/api
 
 [![Node.js CI][workflow-badge]][github]
 
-## Getting Started
+## SPEC
 
-Gather common javascript usages for [Darwinia Network](https://darwinia.network).
+High-level darwinia.js api
 
-+ [@darwinia/dj][dj]
-+ [@darwinia/dactle][dactle]
-+ [@darwinia/api][api]
-+ [@darwinia/util][util]
+## Usage
 
-More guide pleave visit https://darwinia-network.github.io/darwinia.js to get started with darwinia.js.
-
-
-### Config
-
-The config part is shared with all projects building with `darwinia.js`, 
-we strongly recommand you to read this sample before you starting your
-`darwinia.js` trip!
-
-```json
-// ~/.darwinia/config.json
-{
-  "shadow": "shadow service api, refer github.com/darwini-network/darwinia.go",
-  "node": "darwinia node, should start with `ws://` or `wss://`, eg: ws://0.0.0.0:9944",
-  "seed": "darwinia account seed, eg: //Alice"
-}
+```
+yarn add @darwinia/api
 ```
 
-### For Developers
+If you have global config at `~/.darwinia/config.json`
 
-If you want to use `darwinia.js` developing your own `darwinia.js` based apps, you might
-want to try `@darwinia/api` and `@darwinia/util`.
+```javascript
+import { autoAPI } from "@darwinia/api";
 
+(async () => {
+    const api = await autoAPI();
+    const balance = await api.getBalance(api.account.address);
+    log(balance);
+})();
+```
 
-### For Testers and Users
-
-If you want to test Darwinia using `darwinia.js`, check the `@darwinia/dj` project.
+| method       | params                         | return       |
+|--------------|--------------------------------|--------------|
+| getBalance   | (addr: string)                 | string       |
+| relay        | (block: string/number)         | ExResult     |
+| transfer     | (addr: string, amount: number) | ExResult     |
+| redeem       | (receipt: IReceipt)            | ExResult     |
+| getBlock     | (block: number or string       | SingendBlock |
+| getExtrinsic | (hash: string)                 | Extrinsic    |
 
 
 ## LICENSE
@@ -47,9 +39,5 @@ If you want to test Darwinia using `darwinia.js`, check the `@darwinia/dj` proje
 GPL-3.0
 
 [github]: https://github.com/darwinia-network/darwinia.js
-[workflow-badge]: https://github.com/darwinia-network/darwinia.js/workflows/CI/badge.svg
-[types.json]: https://github.com/darwinia-network/darwinia/blob/master/runtime/crab/types.json
-[dj]: https://github.com/darwinia-network/darwinia.js/tree/master/packages/dj
-[api]: https://github.com/darwinia-network/darwinia.js/tree/master/packages/api
-[dactle]: https://github.com/darwinia-network/darwinia.js/tree/master/packages/dactle
-[util]: https://github.com/darwinia-network/darwinia.js/tree/master/packages/util
+[workflow-badge]: https://github.com/darwinia-network/darwinia.js/workflows/Node.js%20CI/badge.svg
+

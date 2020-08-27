@@ -1,10 +1,10 @@
 import yargs from "yargs";
-import { autoAPI, ShadowAPI, API } from "@darwinia/api";
-import { log, Config } from "@darwinia/util";
+import { autoAPI, ShadowAPI, API } from "../api";
+import { log, Config } from "../util";
 import path from "path";
 import fs from "fs";
 import { DispatchError } from "@polkadot/types/interfaces/types";
-import { IEthHeaderThing } from "@darwinia/api/src/types/block"
+import { IEthHeaderThing } from "../api/types/block";
 
 const cache = path.resolve((new Config()).path.root, "cache/blocks");
 
@@ -22,7 +22,7 @@ function getBlock(block: number): IEthHeaderThing | null {
     const f = path.resolve(cache, `${block}.block`);
     if (fs.existsSync(f)) {
         return JSON.parse(fs.readFileSync(f).toString());
-    }  else {
+    } else {
         return null;
     }
 }

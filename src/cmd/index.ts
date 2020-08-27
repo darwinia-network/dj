@@ -1,19 +1,18 @@
-#!/usr/bin/env node
 import fs from "fs";
 import yargs from "yargs";
-import { whereisPj } from "@darwinia/util";
+import { whereisPj } from "../util";
 
-import cmdBalance from "./src/balance";
-import cmdCodec from "./src/codec";
-import cmdConfig from "./src/config";
-import cmdProposal from "./src/proposal";
-// import cmdRelay from "./src/relay";
-import cmdTransfer from "./src/transfer";
-import cmdTx from "./src/tx";
-import cmdGuard from "./src/guard";
+import cmdBalance from "./balance";
+import cmdCodec from "./codec";
+import cmdConfig from "./config";
+import cmdProposal from "./proposal";
+// import cmdRelay from "./relay";
+import cmdTransfer from "./transfer";
+import cmdTx from "./tx";
+import cmdGuard from "./guard";
 
 // main
-(async () => {
+export default async function exec() {
     const pj = whereisPj();
 
     // Enable logger
@@ -23,7 +22,7 @@ import cmdGuard from "./src/guard";
 
     // parser
     const _ = yargs
-        .usage("dj <hello@darwinia.network>")
+        .usage("dj <hello...network>")
         .help("help").alias("help", "h")
           .version("version", pj.version).alias("version", "V")
           .command(cmdBalance)
@@ -40,4 +39,4 @@ import cmdGuard from "./src/guard";
     if (process.argv.length < 3) {
         yargs.showHelp();
     }
-})();
+}

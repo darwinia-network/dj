@@ -1,7 +1,7 @@
 import yargs from "yargs";
 import Relay from "./_relay";
-import { ExResult } from "@darwinia/api";
-import { log } from "@darwinia/util";
+import { ExResult } from "../api";
+import { log } from "../util";
 
 async function handler(args: yargs.Arguments) {
     const relayer = await Relay.new();

@@ -1,7 +1,7 @@
 import yargs from "yargs";
 import {
     Config, chalk, log, TYPES_URL,
-} from "@darwinia/util";
+} from "../util";
 
 const config: yargs.CommandModule = {
     builder: (argv: yargs.Argv) => {

@@ -1,6 +1,6 @@
 import yargs from "yargs";
-import { API } from "@darwinia/api";
-import { log } from "@darwinia/util";
+import { API } from "../api";
+import { log } from "../util";
 
 const cmdTx: yargs.CommandModule = {
     command: "tx <hash>",

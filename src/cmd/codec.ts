@@ -1,7 +1,7 @@
 import yargs from "yargs";
-import { autoAPI, ShadowAPI } from "@darwinia/api";
+import { autoAPI, ShadowAPI } from "../api";
 import { Vec, Struct } from "@polkadot/types";
-import { Config, log } from "@darwinia/util";
+import { Config, log } from "../util";
 
 /**
  * Command Recipe

@@ -1,6 +1,6 @@
 import yargs from "yargs";
-import { autoAPI } from "@darwinia/api";
-import { log } from "@darwinia/util";
+import { autoAPI } from "../api";
+import { log } from "../util";
 
 const cmdBalance: yargs.CommandModule = {
     command: "block <numberOrHash>",

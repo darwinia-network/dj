@@ -1,8 +1,8 @@
 /**
  * The is a shadow command
  */
-import { API, autoAPI, ShadowAPI, ExResult, BlockWithProof } from "@darwinia/api";
-import { Config, chalk, log } from "@darwinia/util";
+import { API, autoAPI, ShadowAPI, ExResult, BlockWithProof } from "../api";
+import { Config, chalk, log } from "../util";
 
 /**
  * Keep relay ethereum blocks to darwinia
