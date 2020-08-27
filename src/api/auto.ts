@@ -1,5 +1,5 @@
 import { API } from "./api";
-import { Config } from "@darwinia/util";
+import { Config } from "../util";
 
 /**
  * @return {API} api - generate API automatically

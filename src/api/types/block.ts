@@ -1,4 +1,4 @@
-import { IDarwiniaEthBlock } from "@darwinia/util";
+import { IDarwiniaEthBlock } from "../../util";
 
 /// EthashProof Interface
 export interface IDoubleNodeWithMerkleProof {

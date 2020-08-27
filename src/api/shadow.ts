@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from "axios";
 
 import {
     log, Block, IDarwiniaEthBlock,
-} from "@darwinia/util";
+} from "../util";
 import {
     BlockWithProof,
     IReceiptWithProof,

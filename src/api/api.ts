@@ -1,5 +1,5 @@
 /* tslint:disable:variable-name */
-import { log, IDarwiniaEthBlock } from "@darwinia/util";
+import { log, IDarwiniaEthBlock } from "../util";
 import { ApiPromise, SubmittableResult, WsProvider } from "@polkadot/api";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import Keyring from "@polkadot/keyring";
