@@ -34,11 +34,4 @@ jobs:
           restore-keys: |
             ${{ matrix.os }}-${{ matrix.node-version }}-yarn-
 
-      - run: yarn && yarn deps
-      - run: yarn lint
-      - run: yarn build
-
-      - uses: actions/upload-artifact@v2
-        with:
-          name: lib-${{ matrix.os }}
-          path: packages/*/lib/
+      - run: yarn && yarn lint && yarn build
