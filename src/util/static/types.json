@@ -118,7 +118,7 @@
     "kton_bond": "Balance"
   },
   "__[pallet.bridge.eth]__": {},
-  "EthTransactionIndex": "(H256, u64)",
+  "EthereumTransactionIndex": "(H256, u64)",
   "EthHeaderBrief": {
     "total_difficulty": "U256",
     "parent_hash": "H256",
@@ -126,7 +126,8 @@
     "relayer": "AccountId"
   },
   "EthBlockNumber": "u64",
-  "EthHeaderThing": {
+  "EthereumBlockNumber": "u64",
+  "EthereumHeaderThingWithProof": {
     "eth_header": "EthHeader",
     "ethash_proof": "Vec<EthashProof>",
     "mmr_root": "H256",
@@ -203,7 +204,7 @@
   },
   "__[pallet.relayer-game]__": {},
   "Round": "u64",
-  "TcBlockNumber": "u64",
+  "TcBlockNumber": "Vec<u8>",
   "TcHeaderHash": "Vec<u8>",
   "TcHeaderMMR": "Vec<u8>",
   "MMRHash": "Vec<u8>",
@@ -231,5 +232,6 @@
   },
   "StakingRuntimeDispatchInfo": {
     "power": "Power"
-  }
+  },
+  "TcHeaderThing": "Vec<u8>"
 }
