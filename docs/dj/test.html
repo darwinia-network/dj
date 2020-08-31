@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>@darwinia/dj - The Darwinia.js Book</title>
+        <title>How to test dj locally? - The Darwinia.js Book</title>
         
         
 
@@ -89,7 +89,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">The Darwinia.js Book</a></li><li class="chapter-item expanded affix "><a href="../dj/index.html" class="active">@darwinia/dj</a></li><li class="chapter-item expanded "><a href="../dj/test.html"><strong aria-hidden="true">1.</strong> How to test dj locally?</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">The dj Book</a></li><li class="chapter-item expanded "><a href="../dj/test.html" class="active"><strong aria-hidden="true">1.</strong> How to test dj locally?</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -159,15 +159,33 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#darwiniadj" id="darwiniadj">@darwinia/dj</a></h1>
-<p><a href="https://github.com/darwinia-network/darwinia.js"><img src="https://github.com/darwinia-network/darwinia.js/workflows/Node.js%20CI/badge.svg" alt="Node.js CI" /></a></p>
-<p>darwinia.js command-line tools</p>
-<h2><a class="header" href="#usage" id="usage">Usage</a></h2>
-<p>Install <code>dj</code> globally</p>
-<pre><code class="language-shell">yarn global add @darwinia/dj
+                        <h1><a class="header" href="#how-to-test-dj-locally" id="how-to-test-dj-locally">How to test dj locally?</a></h1>
+<h2><a class="header" href="#1-run-your-darwinia-node" id="1-run-your-darwinia-node">1. Run your darwinia node</a></h2>
+<p>You can <a href="https://github.com/darwinia-network/darwinia/releases">download</a> the lastest <code>darwinia</code> binary or <a href="https://github.com/darwinia-network/darwinia#4-building">build</a> a <code>darwinia</code> node yourselves.</p>
+<pre><code class="language-shell"># Remove the old db
+$ darwinia purge-chain --dev
+
+# Start the node
+$ darwinia --dev
 </code></pre>
-<p>Input <kbd>dj</kbd> to your command-line.</p>
-<pre><code class="language-text"> 𝝺 dj
+<h2><a class="header" href="#2-run-your-shadow-service" id="2-run-your-shadow-service">2. Run your shadow service</a></h2>
+<p>Download and build <code>shadow</code> service, the guide is <a href="https://github.com/darwinia-network/shadow#getting-started">here</a>.</p>
+<pre><code class="language-shell">$ shadow run --verbose --fetch
+</code></pre>
+<h2><a class="header" href="#3-configure-your-dj" id="3-configure-your-dj">3. Configure your dj</a></h2>
+<p>Edit your <code>.darwinia/config.json</code></p>
+<pre><code class="language-json">{
+  &quot;node&quot;: &quot;ws://0.0.0.0:9944&quot;,
+  &quot;shadow&quot;: &quot;http://0.0.0.0:3000/api/v1&quot;,
+  &quot;seed&quot;: &quot;//Alice&quot;
+}
+</code></pre>
+<h2><a class="header" href="#4-install--run-dj" id="4-install--run-dj">4. Install &amp;&amp; Run dj</a></h2>
+<p>Install the canary version <code>dj</code></p>
+<pre><code>$ yarn global add @darwinia/dj@canary
+</code></pre>
+<p>Run <code>dj</code></p>
+<pre><code>$ dj 
 dj &lt;hello@darwinia.network&gt;
 
 Commands:
@@ -183,8 +201,9 @@ Options:
   --help, -h     Show help                                             [boolean]
   --version, -V  Show version number                                   [boolean]
 </code></pre>
-<h2><a class="header" href="#license" id="license">LICENSE</a></h2>
-<p>GPL-3.0</p>
+<h2><a class="header" href="#example----how-to-test-ethereum-relay" id="example----how-to-test-ethereum-relay">Example -- How to test ethereum relay?</a></h2>
+<pre><code>$ dj proposal 19
+</code></pre>
 
                     </main>
 
@@ -196,10 +215,6 @@ Options:
                             </a>
                         
 
-                        
-                            <a rel="next" href="../dj/test.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
-                            </a>
                         
 
                         <div style="clear: both"></div>
@@ -214,10 +229,6 @@ Options:
                     </a>
                 
 
-                
-                    <a rel="next" href="../dj/test.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
-                    </a>
                 
             </nav>
 

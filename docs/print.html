@@ -3,7 +3,9 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>How to test dj locally? - The Darwinia.js Book</title>
+        <title>The Darwinia.js Book</title>
+        
+        <meta name="robots" content="noindex" />
         
         
 
@@ -17,23 +19,23 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
-        <link rel="icon" href="../favicon.svg">
-        <link rel="shortcut icon" href="../favicon.png">
-        <link rel="stylesheet" href="../css/variables.css">
-        <link rel="stylesheet" href="../css/general.css">
-        <link rel="stylesheet" href="../css/chrome.css">
-        <link rel="stylesheet" href="../css/print.css" media="print">
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
 
         <!-- Fonts -->
-        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
         
-        <link rel="stylesheet" href="../fonts/fonts.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
         
 
         <!-- Highlight.js Stylesheets -->
-        <link rel="stylesheet" href="../highlight.css">
-        <link rel="stylesheet" href="../tomorrow-night.css">
-        <link rel="stylesheet" href="../ayu-highlight.css">
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
         
@@ -43,7 +45,7 @@
     <body>
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
-            var path_to_root = "../";
+            var path_to_root = "";
             var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "ayu" : "dark";
         </script>
 
@@ -89,7 +91,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">The Darwinia.js Book</a></li><li class="chapter-item expanded affix "><a href="../dj/index.html">@darwinia/dj</a></li><li class="chapter-item expanded "><a href="../dj/test.html" class="active"><strong aria-hidden="true">1.</strong> How to test dj locally?</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="index.html">The dj Book</a></li><li class="chapter-item expanded "><a href="dj/test.html"><strong aria-hidden="true">1.</strong> How to test dj locally?</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -124,7 +126,7 @@
                     <h1 class="menu-title">The Darwinia.js Book</h1>
 
                     <div class="right-buttons">
-                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
                         
@@ -159,7 +161,33 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#how-to-test-dj-locally" id="how-to-test-dj-locally">How to test dj locally?</a></h1>
+                        <h1><a class="header" href="#darwiniadj" id="darwiniadj">@darwinia/dj</a></h1>
+<p><a href="https://github.com/darwinia-network/darwinia.js"><img src="https://github.com/darwinia-network/darwinia.js/workflows/Node.js%20CI/badge.svg" alt="Node.js CI" /></a></p>
+<p>darwinia.js command-line tools</p>
+<h2><a class="header" href="#usage" id="usage">Usage</a></h2>
+<p>Install <code>dj</code> globally</p>
+<pre><code class="language-shell">yarn global add @darwinia/dj
+</code></pre>
+<p>Input <kbd>dj</kbd> to your command-line.</p>
+<pre><code class="language-text"> 𝝺 dj
+dj &lt;hello@darwinia.network&gt;
+
+Commands:
+  dj balance [address]            Get balance of account address
+  dj codec &lt;block&gt;                Get info of recipes
+  dj config [edit]                Show config
+  dj proposal &lt;block&gt;             Submit a relay proposal to darwinia
+  dj relay [number] [batch]       Relay eth header to darwinia
+  dj transfer &lt;address&gt; &lt;amount&gt;  Transfer RING to darwinia account
+  dj tx &lt;hash&gt;                    Get tx by hash
+
+Options:
+  --help, -h     Show help                                             [boolean]
+  --version, -V  Show version number                                   [boolean]
+</code></pre>
+<h2><a class="header" href="#license" id="license">LICENSE</a></h2>
+<p>GPL-3.0</p>
+<h1><a class="header" href="#how-to-test-dj-locally" id="how-to-test-dj-locally">How to test dj locally?</a></h1>
 <h2><a class="header" href="#1-run-your-darwinia-node" id="1-run-your-darwinia-node">1. Run your darwinia node</a></h2>
 <p>You can <a href="https://github.com/darwinia-network/darwinia/releases">download</a> the lastest <code>darwinia</code> binary or <a href="https://github.com/darwinia-network/darwinia#4-building">build</a> a <code>darwinia</code> node yourselves.</p>
 <pre><code class="language-shell"># Remove the old db
@@ -210,10 +238,6 @@ Options:
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="../dj/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
-                                <i class="fa fa-angle-left"></i>
-                            </a>
-                        
 
                         
 
@@ -223,10 +247,6 @@ Options:
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                
-                    <a rel="prev" href="../dj/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
-                        <i class="fa fa-angle-left"></i>
-                    </a>
                 
 
                 
@@ -264,18 +284,26 @@ Options:
         
 
         
-        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
         
 
-        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
-        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
 
         <!-- Custom JS scripts -->
         
 
+        
+        
+        <script type="text/javascript">
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+        
         
 
     </body>
