@@ -117,7 +117,6 @@ async function handler(args: yargs.Arguments) {
     startListener(api, shadow);
 
     // The target block
-    // const leaf = (block < last) ? last : block;
     const target = await shadow.getProposal(last ? [last, block] : [block], block);
     log.trace(await api.submitProposal(target));
 }
