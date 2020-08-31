@@ -103,36 +103,22 @@ function startListener(api: API, shadow: ShadowAPI) {
     });
 }
 
-/// proposal a block
-export async function proposal(block: number) {
-    initCache();
-
-    const conf = new Config();
-    const api = await autoAPI();
-    const shadow = new ShadowAPI(conf.shadow);
-
-    // Start proposal linstener
-    startListener(api, shadow);
-
-    // The target block
-    const target = await shadow.getProposal([block], block);
-    log.trace(await api.submitProposal(target));
-}
-
 // The proposal API
 async function handler(args: yargs.Arguments) {
     initCache();
 
     const conf = new Config();
     const api = await autoAPI();
-    const shadow = new ShadowAPI(conf.shadow);
     const block = (args.block as number);
+    const last = await api.lastConfirm();
+    const shadow = new ShadowAPI(conf.shadow);
 
     // Start proposal linstener
     startListener(api, shadow);
 
     // The target block
-    const target = await shadow.getProposal([block], block);
+    // const leaf = (block < last) ? last : block;
+    const target = await shadow.getProposal(last ? [last, block] : [block], block);
     log.trace(await api.submitProposal(target));
 }
 

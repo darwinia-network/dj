@@ -149,12 +149,15 @@ export class API {
     }
 
     /**
-     * get the specify extrinsic
-     *
-     * @param {string} hash - hash of extrinsic
+     * Get last confirm block
      */
-    public static async getExtrinsic(hash: string): Promise<Extrinsic> {
-        return await Subscan.getExtrinsic(hash);
+    public async lastConfirm(): Promise<number | null> {
+        const res = await this._.query.ethereumRelay.lastConfirmedHeaderInfo();
+        if (res.toJSON() === null) {
+            return null;
+        }
+
+        return (res.toJSON() as any)[0];
     }
 
     /**

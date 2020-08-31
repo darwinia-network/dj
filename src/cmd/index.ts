@@ -5,7 +5,6 @@ import cmdBalance from "./balance";
 import cmdConfig from "./config";
 import cmdProposal from "./proposal";
 import cmdTransfer from "./transfer";
-import cmdTx from "./tx";
 import cmdGuard from "./guard";
 
 // main
@@ -26,7 +25,6 @@ export default async function exec() {
         .command(cmdConfig)
         .command(cmdProposal)
         .command(cmdTransfer)
-        .command(cmdTx)
         .command(cmdGuard)
         .argv;
 
