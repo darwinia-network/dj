@@ -86,7 +86,7 @@ function startListener(api: API, shadow: ShadowAPI) {
                 proposals = proposals.concat(newProposals);
 
                 // Submit new proposals
-                await api.submitProposal(await shadow.getProposal(members, lastLeaf));
+                await api.submitProposal(proposals);
 
                 // Loop through each of the parameters, displaying the type and data
                 event.data.forEach((data, index) => {
