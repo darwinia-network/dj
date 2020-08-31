@@ -21,7 +21,6 @@ export const cmdGuard: yargs.CommandModule = {
         const handled: number[] = [];
         setInterval(async () => {
             const headers = (await api._.query.relayerGame.pendingHeaders()).toJSON() as string[][];
-            /// Could not  use `let h in headers` because a werid error
             for (const h of headers) {
                 const blockNumber = Number.parseInt(h[1], 10);
                 if (handled.indexOf(blockNumber) > -1) {

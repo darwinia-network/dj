@@ -149,45 +149,6 @@ export class API {
     }
 
     /**
-     * Encode darwiniaEthBlock to scale codec
-     *
-     * @param {IDarwiniaEthBlock} block - darwinia eth block
-     */
-    public encodeHeader(block: IDarwiniaEthBlock): string {
-        return new Struct(
-            this._.registry,
-            this.types.EthHeader,
-            block,
-        ).toHex();
-    }
-
-    /**
-     * Encode darwiniaEthBlock to scale codec
-     *
-     * @param {IDarwiniaEthBlock} block - darwinia eth block
-     */
-    public encodeProofs(proofs: IDoubleNodeWithMerkleProof[]): string {
-        return new Vec(
-            this._.registry,
-            this.types.EthHeader,
-            proofs,
-        ).toHex();
-    }
-
-    /**
-     * Encode darwiniaEthBlock to scale codec
-     *
-     * @param {IDarwiniaEthBlock} block - darwinia eth block
-     */
-    public encodeRawHeaderThing(proposalHeader: string[]): string {
-        return new Vec(
-            this._.registry,
-            this.types.RawHeaderThing,
-            proposalHeader,
-        ).toHex();
-    }
-
-    /**
      * get the specify extrinsic
      *
      * @param {string} hash - hash of extrinsic
@@ -267,22 +228,6 @@ export class API {
             Ring: receipt,
         });
         return await this.blockFinalized(ex);
-    }
-
-    /**
-     * relay darwinia header
-     *
-     * @param {DarwiniaEthBlock} block - darwinia style eth block
-     * @param {Bool} inBlock - if resolve when inBlock
-     */
-    public async relay(
-        block: IDarwiniaEthBlock,
-        proof: IDoubleNodeWithMerkleProof[],
-        inFinalize?: boolean,
-    ): Promise<ExResult> {
-        log.event(`relay block ${block.number} to darwinia...`);
-        const ex: SubmittableExtrinsic<"promise"> = this._.tx.ethRelay.relayHeader(block, proof);
-        return await this.blockFinalized(ex, inFinalize);
     }
 
     /**

@@ -74,12 +74,10 @@ export class ShadowAPI {
     async getProposal(
         members: number[],
         lastLeaf: number,
-        // format = "codec",
     ): Promise<IEthHeaderThing[]> {
         const r: AxiosResponse = await axios.post(this.api + "/eth/proposal", {
             members,
             last_leaf: lastLeaf,
-            // format,
         });
 
         // Trace the back data
