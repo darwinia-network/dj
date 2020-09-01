@@ -20,15 +20,16 @@ export const cmdGuard: yargs.CommandModule = {
         /// Blocks that handled
         const handled: number[] = [];
         setInterval(async () => {
-            const headers = (await api._.query.relayerGame.pendingHeaders()).toJSON() as string[][];
+            const headers = (await api._.query.ethereumRelayerGame.pendingHeaders()).toJSON() as string[][];
+            console.log(headers);
             for (const h of headers) {
                 const blockNumber = Number.parseInt(h[1], 10);
                 if (handled.indexOf(blockNumber) > -1) {
                     break;
                 }
 
-                const blockWithProof = (await shadow.getBlockWithProof(blockNumber, "codec")) as any;
-                const block: string = blockWithProof[0] + blockWithProof[2];
+                const blockWithProof = (await shadow.getBlockWithProof(blockNumber)) as any;
+                const block: string = blockWithProof.eth_header + blockWithProof.mmr_root;
                 if (block === h[2]) {
                     const res: ExResult = await api.approveBlock(blockNumber, false);
                     if (res.isOk) {

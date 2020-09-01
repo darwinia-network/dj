@@ -41,9 +41,9 @@ export class ShadowAPI {
      *
      * @param {number} block - block number
      */
-    async getBlockWithProof(block: number | string, format = "raw"): Promise<BlockWithProof> {
+    async getBlockWithProof(block: number | string): Promise<BlockWithProof> {
         const r: AxiosResponse = await axios.get(
-            this.api + "/proof/" + block + "?format=" + format,
+            this.api + "/eth/proof/" + block,
         );
 
         // Trace the back data
@@ -81,24 +81,7 @@ export class ShadowAPI {
         });
 
         // Trace the back data
-        log.trace(JSON.stringify(r.data, null, 2))
+        log.trace(JSON.stringify(r.data, null, 2));
         return r.data;
-    }
-
-    /**
-     * Get darwinia block with eth proof
-     *
-     * @param {number} block - block number
-     */
-    async batchBlockWithProofByNumber(block: number, batch = 1, format = "raw"): Promise<BlockWithProof[]> {
-        const r: AxiosResponse = await axios.get(
-            this.api + "/batch/" + block + "?batch=" + batch + "&format=" + format,
-        );
-
-        // Trace the back data
-        log.trace(JSON.stringify(r.data, null, 2))
-        return r.data.map(
-            (result: Record<string, any>) => [result.eth_header, result.ethash_proof]
-        );
     }
 }

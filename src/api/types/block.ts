@@ -30,7 +30,7 @@ export type BlockWithProof = [IDarwiniaEthBlock, IDoubleNodeWithMerkleProof[], s
 
 /// EthHeaderThing Interface
 export interface IEthHeaderThing {
-    eth_header: IDarwiniaEthBlock,
+    header: IDarwiniaEthBlock,
     ethash_proof: IDoubleNodeWithMerkleProof[],
     mmr_root: string,
     mmr_proof: string[],

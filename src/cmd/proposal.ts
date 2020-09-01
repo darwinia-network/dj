@@ -1,5 +1,5 @@
 import yargs from "yargs";
-import { autoAPI, ShadowAPI, API } from "../api";
+import { autoAPI, ShadowAPI, API, ExResult } from "../api";
 import { log, Config } from "../util";
 import path from "path";
 import fs from "fs";
@@ -32,6 +32,45 @@ function setBlock(block: number, headerThing: IEthHeaderThing) {
     fs.writeFileSync(path.resolve(cache, `${block}.block`), JSON.stringify(headerThing));
 }
 
+// Proposal guard
+function guard(api: API, shadow: ShadowAPI) {
+    const handled: number[] = [];
+    setInterval(async () => {
+        const headers = (await api._.query.ethereumRelayerGame.pendingHeaders()).toJSON() as string[][];
+        if (headers.length > 0) {
+            console.log(JSON.stringify(headers));
+        }
+
+        for (const h of headers) {
+            const blockNumber = Number.parseInt(h[1], 10);
+            if (handled.indexOf(blockNumber) > -1) {
+                break;
+            }
+
+            const block = (await shadow.getBlockWithProof(blockNumber)) as any;
+            console.log(JSON.stringify(block));
+            console.log(JSON.stringify((h[2] as any).toHex()));
+            if (JSON.stringify(block) === JSON.stringify(h[2])) {
+                const res: ExResult = await api.approveBlock(blockNumber, false);
+                if (res.isOk) {
+                    log.event(`Approved block ${blockNumber}`)
+                } else {
+                    log.err(res.toString())
+                }
+            } else {
+                const res = await api.rejectBlock(h[1], true);
+                if (res.isOk) {
+                    log.event(`Rejected block ${blockNumber}`)
+                } else {
+                    log.err(res)
+                    log.err(res.toString())
+                }
+            }
+            handled.push(blockNumber);
+        }
+    }, 10000);
+}
+
 /// block 19: Uncle
 /// diff:
 ///   block
@@ -57,7 +96,7 @@ function startListener(api: API, shadow: ShadowAPI) {
             const types = event.typeDef;
 
             if (event.method === "GameOver") {
-                log.ox("A new proposal has been submitted");
+                log.ok("Gameover");
             }
 
             // Show what we are busy with
@@ -112,6 +151,9 @@ async function handler(args: yargs.Arguments) {
     const block = (args.block as number);
     const last = await api.lastConfirm();
     const shadow = new ShadowAPI(conf.shadow);
+
+    // Start guard
+    guard(api, shadow);
 
     // Start proposal linstener
     startListener(api, shadow);
