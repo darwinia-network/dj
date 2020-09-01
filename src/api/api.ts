@@ -195,7 +195,7 @@ export class API {
         } else {
             ex = this._.tx.council.execute(ex, ex.length);
         }
-        return await this.blockFinalized(ex);
+        return await this.blockFinalized(ex, true);
     }
 
     /**
@@ -265,7 +265,7 @@ export class API {
      */
     private blockFinalized(
         ex: SubmittableExtrinsic<"promise">,
-        inFinialize?: boolean,
+        inFinialize = false,
     ): Promise<ExResult> {
         const res = new ExResult(
             false,

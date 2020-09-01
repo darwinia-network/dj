@@ -34,13 +34,19 @@ function setBlock(block: number, headerThing: IEthHeaderThing) {
 
 // Proposal guard
 function guard(api: API, shadow: ShadowAPI) {
+    let lock = false;
     const handled: number[] = [];
     setInterval(async () => {
-        const headers = (await api._.query.ethereumRelayerGame.pendingHeaders()).toJSON() as string[][];
-        if (headers.length > 0) {
-            console.log(JSON.stringify(headers));
+        if (lock) {
+            return;
         }
 
+        const headers = (await api._.query.ethereumRelayerGame.pendingHeaders()).toJSON() as string[][];
+        if (headers.length === 0) {
+            return;
+        }
+
+        lock = true;
         for (const h of headers) {
             const blockNumber = Number.parseInt(h[1], 10);
             if (handled.indexOf(blockNumber) > -1) {
@@ -48,8 +54,6 @@ function guard(api: API, shadow: ShadowAPI) {
             }
 
             const block = (await shadow.getBlockWithProof(blockNumber)) as any;
-            console.log(JSON.stringify(block));
-            console.log(JSON.stringify((h[2] as any).toHex()));
             if (JSON.stringify(block) === JSON.stringify(h[2])) {
                 const res: ExResult = await api.approveBlock(blockNumber, false);
                 if (res.isOk) {
@@ -67,6 +71,7 @@ function guard(api: API, shadow: ShadowAPI) {
                 }
             }
             handled.push(blockNumber);
+            lock = false;
         }
     }, 10000);
 }
