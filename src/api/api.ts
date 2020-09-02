@@ -185,12 +185,14 @@ export class API {
     /**
      * Approve block in relayer game
      */
-    public async approveBlock(block: number, root = false): Promise<ExResult> {
+    public async approveBlock(block: number, perms = 4): Promise<ExResult> {
         let ex = this._.tx.ethereumRelay.approvePendingHeader(block);
-        if (root) {
+        if (perms === 7) {
             ex = this._.tx.sudo.sudo(ex);
-        } else {
+        } else if (perms === 5) {
             ex = this._.tx.council.execute(ex, ex.length);
+        } else {
+            return new ExResult(false, "", "");
         }
         return await this.blockFinalized(ex, true);
     }
@@ -198,12 +200,14 @@ export class API {
     /**
      * Approve block in relayer game
      */
-    public async rejectBlock(block: string | number, root = false): Promise<ExResult> {
+    public async rejectBlock(block: string | number, perms = 4): Promise<ExResult> {
         let ex = this._.tx.ethereumRelay.rejectPendingHeader(block);
-        if (root) {
+        if (perms === 7) {
             ex = this._.tx.sudo.sudo(ex);
-        } else {
+        } else if (perms === 5) {
             ex = this._.tx.council.execute(ex, ex.length);
+        } else {
+            return new ExResult(false, "", "");
         }
         return await this.blockFinalized(ex);
     }
