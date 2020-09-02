@@ -93,7 +93,7 @@ function guard(api: API, shadow: ShadowAPI) {
 /// real [19,18]   mock [19,18]
 
 // Listen and submit proposals
-function startListener(api: API, shadow: ShadowAPI, proposed: number) {
+function startListener(api: API, shadow: ShadowAPI) {
     // Subscribe to system events via storage
     api._.query.system.events((events) => {
         events.forEach(async (record) => {
@@ -112,20 +112,25 @@ function startListener(api: API, shadow: ShadowAPI, proposed: number) {
                 // Samples
                 const lastLeaf = Math.max(...(event.data[1].toJSON() as number[]));
                 const members: number[] = event.data[1].toJSON() as number[];
-                const leftMembers: number[] = [];
 
                 // Get proposals
+                let newMember: number = 0;
                 let proposals: IEthereumHeaderThingWithProof[] = [];
                 members.forEach((i: number) => {
                     const block = getBlock(i);
                     if (block) {
                         proposals.push(block);
                     } else {
-                        leftMembers.push(i);
+                        newMember = i;
                     }
                 })
 
-                const newProposal = await shadow.getProposal(leftMembers, proposed, lastLeaf);
+                const newProposal = await shadow.getProposal([newMember], newMember, lastLeaf);
+                setBlock(newMember, Object.assign(JSON.parse(JSON.stringify(newProposal)), {
+                    ethash_proof: [],
+                    mmr_root: "",
+                    mmr_proof: [],
+                }));
                 proposals = proposals.concat(newProposal);
 
                 // Submit new proposals
@@ -169,7 +174,7 @@ async function handler(args: yargs.Arguments) {
     log.trace(await api.submitProposal([proposal]));
 
     // Start proposal linstener
-    startListener(api, shadow, block);
+    startListener(api, shadow);
 }
 
 const cmdProposal: yargs.CommandModule = {
