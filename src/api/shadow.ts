@@ -1,5 +1,5 @@
+/* tslint:disable:variable-name */
 import axios, { AxiosResponse } from "axios";
-
 import {
     log, Block, IDarwiniaEthBlock,
 } from "../util";
@@ -72,12 +72,14 @@ export class ShadowAPI {
      * @param {number} block - block number
      */
     async getProposal(
-        members: number[],
+        leaves: number[],
         target: number,
-    ): Promise<IEthereumHeaderThingWithProof[]> {
+        last_leaf: number,
+    ): Promise<IEthereumHeaderThingWithProof> {
         const r: AxiosResponse = await axios.post(this.api + "/eth/proposal", {
-            members,
+            leaves,
             target,
+            last_leaf,
         });
 
         // Trace the back data

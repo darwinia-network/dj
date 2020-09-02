@@ -71,8 +71,8 @@ function guard(api: API, shadow: ShadowAPI) {
                 }
             }
             handled.push(blockNumber);
-            lock = false;
         }
+        lock = false;
     }, 10000);
 }
 
@@ -93,7 +93,7 @@ function guard(api: API, shadow: ShadowAPI) {
 /// real [19,18]   mock [19,18]
 
 // Listen and submit proposals
-function startListener(api: API, shadow: ShadowAPI) {
+function startListener(api: API, shadow: ShadowAPI, proposed: number) {
     // Subscribe to system events via storage
     api._.query.system.events((events) => {
         events.forEach(async (record) => {
@@ -125,9 +125,8 @@ function startListener(api: API, shadow: ShadowAPI) {
                     }
                 })
 
-                const newProposals = await shadow.getProposal(leftMembers, lastLeaf);
-                newProposals.forEach((c: IEthereumHeaderThingWithProof, i: number) => setBlock(i, c));
-                proposals = proposals.concat(newProposals);
+                const newProposal = await shadow.getProposal(leftMembers, proposed, lastLeaf);
+                proposals = proposals.concat(newProposal);
 
                 // Submit new proposals
                 await api.submitProposal(proposals);
@@ -154,18 +153,23 @@ async function handler(args: yargs.Arguments) {
     const conf = new Config();
     const api = await autoAPI();
     const block = (args.block as number);
-    const last = await api.lastConfirm();
+    const lastConfirmedBlock = await api.lastConfirm();
     const shadow = new ShadowAPI(conf.shadow);
 
     // Start guard
     guard(api, shadow);
 
-    // Start proposal linstener
-    startListener(api, shadow);
-
     // The target block
-    const target = await shadow.getProposal(last ? [last, block] : [block], block);
-    log.trace(await api.submitProposal(target));
+    const lastLeaf = block > 1 ? block - 1 : 0;
+    const proposal = await shadow.getProposal(
+        lastConfirmedBlock
+            ? [lastConfirmedBlock]
+            : [], block, lastLeaf
+    );
+    log.trace(await api.submitProposal([proposal]));
+
+    // Start proposal linstener
+    startListener(api, shadow, block);
 }
 
 const cmdProposal: yargs.CommandModule = {
