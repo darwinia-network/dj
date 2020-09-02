@@ -26,13 +26,13 @@ export interface IProposalHeaders {
     headers: IProposalHeader[],
 }
 
-export interface BlockWithProof {
+export interface IEthereumHeaderThing {
     header: IDarwiniaEthBlock,
     mmr_root: string,
 }
 
 /// EthHeaderThing Interface
-export interface IEthHeaderThing {
+export interface IEthereumHeaderThingWithProof {
     header: IDarwiniaEthBlock,
     ethash_proof: IDoubleNodeWithMerkleProof[],
     mmr_root: string,

@@ -4,7 +4,7 @@ import { log, Config } from "../util";
 import path from "path";
 import fs from "fs";
 import { DispatchError } from "@polkadot/types/interfaces/types";
-import { IEthHeaderThing } from "../api/types/block";
+import { IEthereumHeaderThingWithProof } from "../api/types/block";
 
 const cache = path.resolve((new Config()).path.root, "cache/blocks");
 
@@ -18,7 +18,7 @@ function initCache() {
 }
 
 // Get block from cache
-function getBlock(block: number): IEthHeaderThing | null {
+function getBlock(block: number): IEthereumHeaderThingWithProof | null {
     const f = path.resolve(cache, `${block}.block`);
     if (fs.existsSync(f)) {
         return JSON.parse(fs.readFileSync(f).toString());
@@ -28,7 +28,7 @@ function getBlock(block: number): IEthHeaderThing | null {
 }
 
 // Get block from cache
-function setBlock(block: number, headerThing: IEthHeaderThing) {
+function setBlock(block: number, headerThing: IEthereumHeaderThingWithProof) {
     fs.writeFileSync(path.resolve(cache, `${block}.block`), JSON.stringify(headerThing));
 }
 
@@ -53,7 +53,7 @@ function guard(api: API, shadow: ShadowAPI) {
                 break;
             }
 
-            const block = (await shadow.getBlockWithProof(blockNumber)) as any;
+            const block = (await shadow.getHeaderThing(blockNumber)) as any;
             if (JSON.stringify(block) === JSON.stringify(h[2])) {
                 const res: ExResult = await api.approveBlock(blockNumber, false);
                 if (res.isOk) {
@@ -115,7 +115,7 @@ function startListener(api: API, shadow: ShadowAPI) {
                 const leftMembers: number[] = [];
 
                 // Get proposals
-                let proposals: IEthHeaderThing[] = [];
+                let proposals: IEthereumHeaderThingWithProof[] = [];
                 members.forEach((i: number) => {
                     const block = getBlock(i);
                     if (block) {
@@ -126,7 +126,7 @@ function startListener(api: API, shadow: ShadowAPI) {
                 })
 
                 const newProposals = await shadow.getProposal(leftMembers, lastLeaf);
-                newProposals.forEach((c: IEthHeaderThing, i: number) => setBlock(i, c));
+                newProposals.forEach((c: IEthereumHeaderThingWithProof, i: number) => setBlock(i, c));
                 proposals = proposals.concat(newProposals);
 
                 // Submit new proposals

@@ -4,9 +4,9 @@ import {
     log, Block, IDarwiniaEthBlock,
 } from "../util";
 import {
-    BlockWithProof,
     IReceiptWithProof,
-    IEthHeaderThing,
+    IEthereumHeaderThing,
+    IEthereumHeaderThingWithProof,
 } from "./types/block";
 
 /**
@@ -41,9 +41,9 @@ export class ShadowAPI {
      *
      * @param {number} block - block number
      */
-    async getBlockWithProof(block: number | string): Promise<BlockWithProof> {
+    async getHeaderThing(block: number | string): Promise<IEthereumHeaderThing> {
         const r: AxiosResponse = await axios.get(
-            this.api + "/eth/proof/" + block,
+            this.api + "/eth/header/" + block,
         );
 
         // Trace the back data
@@ -74,7 +74,7 @@ export class ShadowAPI {
     async getProposal(
         members: number[],
         target: number,
-    ): Promise<IEthHeaderThing[]> {
+    ): Promise<IEthereumHeaderThingWithProof[]> {
         const r: AxiosResponse = await axios.post(this.api + "/eth/proposal", {
             members,
             target,

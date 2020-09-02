@@ -6,11 +6,8 @@ import Keyring from "@polkadot/keyring";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { DispatchError, EventRecord } from "@polkadot/types/interfaces/types";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
-import { Vec, Struct } from "@polkadot/types";
 import { SignedBlock } from "@polkadot/types/interfaces";
-import * as Subscan from "./subscan";
-import { Extrinsic } from "./types/extrinsic";
-import { IEthHeaderThing, IDoubleNodeWithMerkleProof } from "./types/block";
+import { IEthereumHeaderThingWithProof } from "./types/block";
 
 export interface IErrorDoc {
     name: string;
@@ -216,7 +213,7 @@ export class API {
      *
      * @param {IEthHeaderThing} headerThings - Eth Header Things
      */
-    public async submitProposal(headerThings: IEthHeaderThing[]): Promise<ExResult> {
+    public async submitProposal(headerThings: IEthereumHeaderThingWithProof[]): Promise<ExResult> {
         const ex = this._.tx.ethereumRelay.submitProposal(headerThings);
         return await this.blockFinalized(ex);
     }
