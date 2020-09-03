@@ -6,11 +6,8 @@ import Keyring from "@polkadot/keyring";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { DispatchError, EventRecord } from "@polkadot/types/interfaces/types";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
-import { Vec, Struct } from "@polkadot/types";
 import { SignedBlock } from "@polkadot/types/interfaces";
-import * as Subscan from "./subscan";
-import { Extrinsic } from "./types/extrinsic";
-import { IEthHeaderThing, IDoubleNodeWithMerkleProof } from "./types/block";
+import { IEthereumHeaderThingWithProof } from "./types/block";
 
 export interface IErrorDoc {
     name: string;
@@ -149,51 +146,15 @@ export class API {
     }
 
     /**
-     * Encode darwiniaEthBlock to scale codec
-     *
-     * @param {IDarwiniaEthBlock} block - darwinia eth block
+     * Get last confirm block
      */
-    public encodeHeader(block: IDarwiniaEthBlock): string {
-        return new Struct(
-            this._.registry,
-            this.types.EthHeader,
-            block,
-        ).toHex();
-    }
+    public async lastConfirm(): Promise<number | null> {
+        const res = await this._.query.ethereumRelay.lastConfirmedHeaderInfo();
+        if (res.toJSON() === null) {
+            return null;
+        }
 
-    /**
-     * Encode darwiniaEthBlock to scale codec
-     *
-     * @param {IDarwiniaEthBlock} block - darwinia eth block
-     */
-    public encodeProofs(proofs: IDoubleNodeWithMerkleProof[]): string {
-        return new Vec(
-            this._.registry,
-            this.types.EthHeader,
-            proofs,
-        ).toHex();
-    }
-
-    /**
-     * Encode darwiniaEthBlock to scale codec
-     *
-     * @param {IDarwiniaEthBlock} block - darwinia eth block
-     */
-    public encodeRawHeaderThing(proposalHeader: string[]): string {
-        return new Vec(
-            this._.registry,
-            this.types.RawHeaderThing,
-            proposalHeader,
-        ).toHex();
-    }
-
-    /**
-     * get the specify extrinsic
-     *
-     * @param {string} hash - hash of extrinsic
-     */
-    public static async getExtrinsic(hash: string): Promise<Extrinsic> {
-        return await Subscan.getExtrinsic(hash);
+        return (res.toJSON() as any)[0];
     }
 
     /**
@@ -224,25 +185,29 @@ export class API {
     /**
      * Approve block in relayer game
      */
-    public async approveBlock(block: number, root = false): Promise<ExResult> {
+    public async approveBlock(block: number, perms = 4): Promise<ExResult> {
         let ex = this._.tx.ethereumRelay.approvePendingHeader(block);
-        if (root) {
+        if (perms === 7) {
             ex = this._.tx.sudo.sudo(ex);
-        } else {
+        } else if (perms === 5) {
             ex = this._.tx.council.execute(ex, ex.length);
+        } else {
+            return new ExResult(false, "", "");
         }
-        return await this.blockFinalized(ex);
+        return await this.blockFinalized(ex, true);
     }
 
     /**
      * Approve block in relayer game
      */
-    public async rejectBlock(block: string | number, root = false): Promise<ExResult> {
+    public async rejectBlock(block: string | number, perms = 4): Promise<ExResult> {
         let ex = this._.tx.ethereumRelay.rejectPendingHeader(block);
-        if (root) {
+        if (perms === 7) {
             ex = this._.tx.sudo.sudo(ex);
-        } else {
+        } else if (perms === 5) {
             ex = this._.tx.council.execute(ex, ex.length);
+        } else {
+            return new ExResult(false, "", "");
         }
         return await this.blockFinalized(ex);
     }
@@ -252,7 +217,7 @@ export class API {
      *
      * @param {IEthHeaderThing} headerThings - Eth Header Things
      */
-    public async submitProposal(headerThings: IEthHeaderThing[]): Promise<ExResult> {
+    public async submitProposal(headerThings: IEthereumHeaderThingWithProof[]): Promise<ExResult> {
         const ex = this._.tx.ethereumRelay.submitProposal(headerThings);
         return await this.blockFinalized(ex);
     }
@@ -267,22 +232,6 @@ export class API {
             Ring: receipt,
         });
         return await this.blockFinalized(ex);
-    }
-
-    /**
-     * relay darwinia header
-     *
-     * @param {DarwiniaEthBlock} block - darwinia style eth block
-     * @param {Bool} inBlock - if resolve when inBlock
-     */
-    public async relay(
-        block: IDarwiniaEthBlock,
-        proof: IDoubleNodeWithMerkleProof[],
-        inFinalize?: boolean,
-    ): Promise<ExResult> {
-        log.event(`relay block ${block.number} to darwinia...`);
-        const ex: SubmittableExtrinsic<"promise"> = this._.tx.ethRelay.relayHeader(block, proof);
-        return await this.blockFinalized(ex, inFinalize);
     }
 
     /**
@@ -317,7 +266,7 @@ export class API {
      */
     private blockFinalized(
         ex: SubmittableExtrinsic<"promise">,
-        inFinialize?: boolean,
+        inFinialize = false,
     ): Promise<ExResult> {
         const res = new ExResult(
             false,

@@ -1,10 +1,10 @@
 import yargs from "yargs";
-import { autoAPI, ShadowAPI, API } from "../api";
+import { autoAPI, ShadowAPI, API, ExResult } from "../api";
 import { log, Config } from "../util";
 import path from "path";
 import fs from "fs";
 import { DispatchError } from "@polkadot/types/interfaces/types";
-import { IEthHeaderThing } from "../api/types/block";
+import { IEthereumHeaderThingWithProof } from "../api/types/block";
 
 const cache = path.resolve((new Config()).path.root, "cache/blocks");
 
@@ -18,7 +18,7 @@ function initCache() {
 }
 
 // Get block from cache
-function getBlock(block: number): IEthHeaderThing | null {
+function getBlock(block: number): IEthereumHeaderThingWithProof | null {
     const f = path.resolve(cache, `${block}.block`);
     if (fs.existsSync(f)) {
         return JSON.parse(fs.readFileSync(f).toString());
@@ -28,8 +28,60 @@ function getBlock(block: number): IEthHeaderThing | null {
 }
 
 // Get block from cache
-function setBlock(block: number, headerThing: IEthHeaderThing) {
+function setBlock(block: number, headerThing: IEthereumHeaderThingWithProof) {
     fs.writeFileSync(path.resolve(cache, `${block}.block`), JSON.stringify(headerThing));
+}
+
+// Proposal guard
+async function guard(api: API, shadow: ShadowAPI) {
+    let perms = 4;
+    if ((await api._.query.sudo.key()).toJSON().indexOf(api.account.address) > -1) {
+        perms = 7;
+    } else if (((await api._.query.council.members()).toJSON() as string[]).indexOf(api.account.address) > -1) {
+        perms = 5;
+    } else {
+        return;
+    }
+
+    // start listening
+    let lock = false;
+    const handled: number[] = [];
+    setInterval(async () => {
+        if (lock) { return; }
+        const headers = (await api._.query.ethereumRelayerGame.pendingHeaders()).toJSON() as string[][];
+        if (headers.length === 0) {
+            return;
+        }
+
+        lock = true;
+        for (const h of headers) {
+            const blockNumber = Number.parseInt(h[1], 10);
+            if (handled.indexOf(blockNumber) > -1) {
+                break;
+            }
+
+            const block = (await shadow.getHeaderThing(blockNumber)) as any;
+            if (JSON.stringify(block) === JSON.stringify(h[2])) {
+                const res: ExResult = await api.approveBlock(blockNumber, perms);
+                if (res.isOk) {
+                    log.event(`Approved block ${blockNumber}`)
+                } else {
+                    log.err(res.toString())
+                }
+            } else {
+                const res = await api.rejectBlock(h[1], perms);
+                if (res.isOk) {
+                    log.event(`Rejected block ${blockNumber}`)
+                } else {
+                    log.err(res)
+                    log.err(res.toString())
+                }
+            }
+            handled.push(blockNumber);
+        }
+
+        lock = false;
+    }, 10000);
 }
 
 /// block 19: Uncle
@@ -57,7 +109,7 @@ function startListener(api: API, shadow: ShadowAPI) {
             const types = event.typeDef;
 
             if (event.method === "GameOver") {
-                log.ox("A new proposal has been submitted");
+                log.ok("Gameover");
             }
 
             // Show what we are busy with
@@ -68,25 +120,29 @@ function startListener(api: API, shadow: ShadowAPI) {
                 // Samples
                 const lastLeaf = Math.max(...(event.data[1].toJSON() as number[]));
                 const members: number[] = event.data[1].toJSON() as number[];
-                const leftMembers: number[] = [];
 
                 // Get proposals
-                let proposals: IEthHeaderThing[] = [];
+                let newMember: number = 0;
+                let proposals: IEthereumHeaderThingWithProof[] = [];
                 members.forEach((i: number) => {
                     const block = getBlock(i);
                     if (block) {
                         proposals.push(block);
                     } else {
-                        leftMembers.push(i);
+                        newMember = i;
                     }
                 })
 
-                const newProposals = await shadow.getProposal(leftMembers, lastLeaf);
-                newProposals.forEach((c: IEthHeaderThing, i: number) => setBlock(i, c));
-                proposals = proposals.concat(newProposals);
+                const newProposal = await shadow.getProposal([newMember], newMember, lastLeaf);
+                setBlock(newMember, Object.assign(JSON.parse(JSON.stringify(newProposal)), {
+                    ethash_proof: [],
+                    mmr_root: "",
+                    mmr_proof: [],
+                }));
+                proposals = proposals.concat(newProposal);
 
                 // Submit new proposals
-                await api.submitProposal(await shadow.getProposal(members, lastLeaf));
+                await api.submitProposal(proposals);
 
                 // Loop through each of the parameters, displaying the type and data
                 event.data.forEach((data, index) => {
@@ -103,37 +159,30 @@ function startListener(api: API, shadow: ShadowAPI) {
     });
 }
 
-/// proposal a block
-export async function proposal(block: number) {
-    initCache();
-
-    const conf = new Config();
-    const api = await autoAPI();
-    const shadow = new ShadowAPI(conf.shadow);
-
-    // Start proposal linstener
-    startListener(api, shadow);
-
-    // The target block
-    const target = await shadow.getProposal([block], block);
-    log.trace(await api.submitProposal(target));
-}
-
 // The proposal API
 async function handler(args: yargs.Arguments) {
     initCache();
 
     const conf = new Config();
     const api = await autoAPI();
-    const shadow = new ShadowAPI(conf.shadow);
     const block = (args.block as number);
+    const lastConfirmedBlock = await api.lastConfirm();
+    const shadow = new ShadowAPI(conf.shadow);
+
+    // Start guard
+    guard(api, shadow);
+
+    // The target block
+    const lastLeaf = block > 1 ? block - 1 : 0;
+    const proposal = await shadow.getProposal(
+        lastConfirmedBlock
+            ? [lastConfirmedBlock]
+            : [], block, lastLeaf
+    );
+    log.trace(await api.submitProposal([proposal]));
 
     // Start proposal linstener
     startListener(api, shadow);
-
-    // The target block
-    const target = await shadow.getProposal([block], block);
-    log.trace(await api.submitProposal(target));
 }
 
 const cmdProposal: yargs.CommandModule = {

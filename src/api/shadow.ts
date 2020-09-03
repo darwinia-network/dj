@@ -1,12 +1,12 @@
+/* tslint:disable:variable-name */
 import axios, { AxiosResponse } from "axios";
-
 import {
     log, Block, IDarwiniaEthBlock,
 } from "../util";
 import {
-    BlockWithProof,
     IReceiptWithProof,
-    IEthHeaderThing,
+    IEthereumHeaderThing,
+    IEthereumHeaderThingWithProof,
 } from "./types/block";
 
 /**
@@ -41,14 +41,14 @@ export class ShadowAPI {
      *
      * @param {number} block - block number
      */
-    async getBlockWithProof(block: number | string, format = "raw"): Promise<BlockWithProof> {
+    async getHeaderThing(block: number | string): Promise<IEthereumHeaderThing> {
         const r: AxiosResponse = await axios.get(
-            this.api + "/proof/" + block + "?format=" + format,
+            this.api + "/eth/header/" + block,
         );
 
         // Trace the back data
         log.trace(JSON.stringify(r.data, null, 2))
-        return [r.data.eth_header, r.data.ethash_proof, r.data.mmr_root];
+        return r.data;
     }
 
     /**
@@ -72,35 +72,18 @@ export class ShadowAPI {
      * @param {number} block - block number
      */
     async getProposal(
-        members: number[],
-        lastLeaf: number,
-        // format = "codec",
-    ): Promise<IEthHeaderThing[]> {
+        leaves: number[],
+        target: number,
+        last_leaf: number,
+    ): Promise<IEthereumHeaderThingWithProof> {
         const r: AxiosResponse = await axios.post(this.api + "/eth/proposal", {
-            members,
-            last_leaf: lastLeaf,
-            // format,
+            leaves,
+            target,
+            last_leaf,
         });
 
         // Trace the back data
-        log.trace(JSON.stringify(r.data, null, 2))
+        log.trace(JSON.stringify(r.data, null, 2));
         return r.data;
-    }
-
-    /**
-     * Get darwinia block with eth proof
-     *
-     * @param {number} block - block number
-     */
-    async batchBlockWithProofByNumber(block: number, batch = 1, format = "raw"): Promise<BlockWithProof[]> {
-        const r: AxiosResponse = await axios.get(
-            this.api + "/batch/" + block + "?batch=" + batch + "&format=" + format,
-        );
-
-        // Trace the back data
-        log.trace(JSON.stringify(r.data, null, 2))
-        return r.data.map(
-            (result: Record<string, any>) => [result.eth_header, result.ethash_proof]
-        );
     }
 }
