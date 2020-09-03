@@ -213,10 +213,14 @@ The redeem of KTON and RING is in the Issuing contract, and the redeem of the de
 #### The format of Events
 
 - RING，KTON
+```bash
 event BurnAndRedeem(address indexed token, address indexed from, uint256 amount, bytes receiver);
+```
 
 - Deposit
+```bash
 event BurnAndRedeem(uint256 indexed _depositID,  address _depositor, uint48 _months, uint48 _startAt, uint64 _unitInterest, uint128 _value, bytes _data);
+```
 
 #### Ropsten Contract Address
 - RING: [0xb52FBE2B925ab79a821b261C82c5Ba0814AAA5e0](https://ropsten.etherscan.io/address/0xb52FBE2B925ab79a821b261C82c5Ba0814AAA5e0 "0xb52FBE2B925ab79a821b261C82c5Ba0814AAA5e0")
