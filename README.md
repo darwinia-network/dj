@@ -213,14 +213,17 @@ The redeem of KTON and RING is in the Issuing contract, and the redeem of the de
 #### The format of Events
 
 - RING，KTON
+
 ```bash
 event BurnAndRedeem(address indexed token, address indexed from, uint256 amount, bytes receiver);
 ```
+The event is generated at Issuing [0x49262B932E439271d05634c32978294C7Ea15d0C](https://ropsten.etherscan.io/address/0x49262B932E439271d05634c32978294C7Ea15d0C "0x49262B932E439271d05634c32978294C7Ea15d0C")
 
 - Deposit
 ```bash
 event BurnAndRedeem(uint256 indexed _depositID,  address _depositor, uint48 _months, uint48 _startAt, uint64 _unitInterest, uint128 _value, bytes _data);
 ```
+The event is generated at GringottsBankV2 [0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e](https://ropsten.etherscan.io/address/0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e "0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e")
 
 #### Ropsten Contract Address
 - RING: [0xb52FBE2B925ab79a821b261C82c5Ba0814AAA5e0](https://ropsten.etherscan.io/address/0xb52FBE2B925ab79a821b261C82c5Ba0814AAA5e0 "0xb52FBE2B925ab79a821b261C82c5Ba0814AAA5e0")
