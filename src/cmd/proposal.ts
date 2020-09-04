@@ -167,7 +167,7 @@ async function handler(args: yargs.Arguments) {
     const conf = new Config();
     const api = await autoAPI();
     const block = (args.block as number);
-    const lastConfirmedBlock = await api.lastConfirm();
+    const lastConfirmedBlock: number | null = await api.lastConfirm();
     const shadow = new ShadowAPI(conf.shadow);
 
     // Start guard
@@ -177,7 +177,7 @@ async function handler(args: yargs.Arguments) {
     // The target block
     const lastLeaf = block > 1 ? block - 1 : 0;
     const proposal = await shadow.getProposal(
-        lastConfirmedBlock
+        lastConfirmedBlock != null
             ? [lastConfirmedBlock]
             : [], block, lastLeaf
     );

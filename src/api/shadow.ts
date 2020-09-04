@@ -29,11 +29,11 @@ export class ShadowAPI {
      */
     public async getBlock(block: number | string): Promise<IDarwiniaEthBlock> {
         let r: AxiosResponse;
-        r = await axios.get(this.api + "/header/" + block);
+        r = await axios.get(this.api + "/eth/header/" + block);
 
         // Trace the back data
-        log.trace(JSON.stringify(r.data, null, 2));
-        return Block.from(r.data);
+        log.trace(JSON.stringify(r.data.header, null, 2));
+        return Block.from(r.data.header);
     }
 
     /**
