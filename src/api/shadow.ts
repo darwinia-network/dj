@@ -33,7 +33,7 @@ export class ShadowAPI {
 
         // Trace the back data
         log.trace(JSON.stringify(r.data.header, null, 2));
-        return Block.from(r.data.header);
+        return r.data.header;
     }
 
     /**
@@ -56,9 +56,9 @@ export class ShadowAPI {
      *
      * @param {number} block - block number
      */
-    async getReceipt(tx: string, last: number): Promise<IReceiptWithProof> {
+    async getReceipt(tx: string, lastConfirmed: number): Promise<IReceiptWithProof> {
         const r: AxiosResponse = await axios.get(
-            this.api + "/eth/receipt/" + tx + "?last=" + last
+            this.api + "/eth/receipt/" + tx + "/" + lastConfirmed
         );
 
         // Trace the back data

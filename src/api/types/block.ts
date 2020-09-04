@@ -1,4 +1,21 @@
-import { IDarwiniaEthBlock } from "../../util";
+/// Darwinia Block
+export interface IDarwiniaEthBlock {
+    parent_hash: string;
+    timestamp: number;
+    number: number;
+    author: string;
+    transactions_root?: string;
+    uncles_hash: string;
+    extra_data: string;
+    state_root: string;
+    receipts_root?: string;
+    log_bloom: string;
+    gas_used: number;
+    gas_limit: number;
+    difficulty: number;
+    seal: string[];
+    hash: string;
+}
 
 /// EthashProof Interface
 export interface IDoubleNodeWithMerkleProof {

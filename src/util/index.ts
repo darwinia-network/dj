@@ -1,4 +1,4 @@
-import { Block, IEthBlock, IDarwiniaEthBlock } from "./block";
+import { Block, IDarwiniaEthBlock } from "./block";
 import { Config, TYPES_URL } from "./cfg";
 import { download } from "./download";
 import { log } from "./log";
@@ -11,7 +11,7 @@ export {
     Config,
     chalk,
     download,
-    IDarwiniaEthBlock, IEthBlock,
+    IDarwiniaEthBlock,
     log,
     TYPES_URL,
     whereisPj,
