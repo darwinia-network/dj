@@ -244,7 +244,35 @@ https://ropsten.etherscan.io/tx/0x5a7004126466ce763501c89bcbb98d14f3c328c4b310b1
 
 - https://github.com/evolutionlandorg/bank/blob/master/contracts/GringottsBankV2.sol
 
-  
+## Contributing
+
+### Environment
+
+`dj` is a typescript project. You need to install `nodejs`, `yarn` and `ts-node` and ready to go.
+
+### Run
+
+```shell
+git clone https://github.com/darwinia-network/dj.git
+cd dj
+yarn install
+ts-node index.ts help
+# run dj
+ts-node index.ts
+# run dj subcommand
+ts-node index.ts config
+```
+
+### Bugs
+
+We are using [GitHub Issues](https://github.com/darwinia-network/dj/issues) for bug tracking. 
+
+Before you report a bug, please make sure you've searched existing issues.
+
+### Contributing Guidelines
+
+[CONTRIBUTING.adoc](https://github.com/darwinia-network/dj/blob/master/CONTRIBUTING.adoc)
+
 ## LICENSE
 
 GPL-3.0
