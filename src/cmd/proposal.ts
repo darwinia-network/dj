@@ -6,6 +6,7 @@ import fs from "fs";
 import { DispatchError } from "@polkadot/types/interfaces/types";
 import { IEthereumHeaderThingWithProof } from "../api/types/block";
 
+
 const cache = path.resolve((new Config()).path.root, "cache/blocks");
 
 // Init Cache
@@ -170,6 +171,7 @@ async function handler(args: yargs.Arguments) {
     const shadow = new ShadowAPI(conf.shadow);
 
     // Start guard
+    // conf.
     guard(api, shadow);
 
     // The target block
@@ -183,6 +185,7 @@ async function handler(args: yargs.Arguments) {
 
     // Start proposal linstener
     startListener(api, shadow);
+    // addEventListener(conf.ethereumListener, console.log)
 }
 
 const cmdProposal: yargs.CommandModule = {
