@@ -7,6 +7,7 @@ import { download } from "./download";
 import { log } from "./log";
 import rawCj from "./static/config.json";
 import rawTj from "./static/types.json";
+import rawEj from "./static/ethereum_listener.json";
 
 // constants
 export const TYPES_URL = "https://raw.githubusercontent.com/darwinia-network/darwinia/master/runtime/crab/darwinia_types.json"
@@ -22,6 +23,7 @@ export interface IConfigPath {
     conf: string;
     root: string;
     types: string;
+    ethereumListener: string;
 }
 
 /**
@@ -49,6 +51,7 @@ export class Config {
     public path: IConfigPath;
     public shadow: string;
     public types: Record<string, any>;
+    public ethereumListener: Record<string, any>;
     private seed: string;
 
     constructor() {
@@ -56,12 +59,14 @@ export class Config {
         const root = path.resolve(home, ".darwinia");
         const conf = path.resolve(root, "config.json");
         const types = path.resolve(root, "types.json");
+        const ethereumListener = path.resolve(root, "ethereum_listener.json");
 
         // init pathes
         this.path = {
             conf,
             root,
-            types
+            types,
+            ethereumListener,
         };
 
         // check root
@@ -92,10 +97,19 @@ export class Config {
             tj = JSON.parse(fs.readFileSync(types, "utf8"));
         }
 
+        // Load ethereumListener.json
+        let ej: Record<string, any> = rawEj;
+        if (!fs.existsSync(ethereumListener)) {
+            fs.writeFileSync(ethereumListener, JSON.stringify(ej, null, 2));
+        } else {
+            ej = JSON.parse(fs.readFileSync(ethereumListener, "utf8"));
+        }
+
         this.node = cj.node;
         this.seed = cj.seed;
         this.shadow = cj.shadow;
         this.types = tj;
+        this.ethereumListener = ej;
 
         // Warn config
         Config.warn(this);
