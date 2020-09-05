@@ -1,13 +1,12 @@
 /* tslint:disable:variable-name */
 import axios, { AxiosResponse } from "axios";
-import {
-    log, Block, IDarwiniaEthBlock,
-} from "../util";
+import { log } from "../util";
 import {
     IReceiptWithProof,
     IEthereumHeaderThing,
     IEthereumHeaderThingWithProof,
-} from "./types/block";
+    IDarwiniaEthBlock,
+} from "./types";
 
 /**
  * Shadow APIs

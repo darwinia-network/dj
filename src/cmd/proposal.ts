@@ -4,8 +4,7 @@ import { log, Config } from "../util";
 import path from "path";
 import fs from "fs";
 import { DispatchError } from "@polkadot/types/interfaces/types";
-import { IEthereumHeaderThingWithProof } from "../api/types/block";
-
+import { IEthereumHeaderThingWithProof } from "../api/types";
 
 const cache = path.resolve((new Config()).path.root, "cache/blocks");
 
@@ -104,8 +103,8 @@ async function guard(api: API, shadow: ShadowAPI) {
 // Listen and submit proposals
 function startListener(api: API, shadow: ShadowAPI) {
     // Subscribe to system events via storage
-    api._.query.system.events((events) => {
-        events.forEach(async (record) => {
+    api._.query.system.events((events: any) => {
+        events.forEach(async (record: any) => {
             const { event, phase } = record;
             const types = event.typeDef;
 
@@ -146,7 +145,7 @@ function startListener(api: API, shadow: ShadowAPI) {
                 await api.submitProposal(proposals);
 
                 // Loop through each of the parameters, displaying the type and data
-                event.data.forEach((data, index) => {
+                event.data.forEach((data: any, index: any) => {
                     log.trace(`\t\t\t${types[index].type}: ${data.toString()}`);
                 });
             }

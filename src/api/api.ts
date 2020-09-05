@@ -1,5 +1,5 @@
 /* tslint:disable:variable-name */
-import { log, IDarwiniaEthBlock } from "../util";
+import { log } from "../util";
 import { ApiPromise, SubmittableResult, WsProvider } from "@polkadot/api";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import Keyring from "@polkadot/keyring";
@@ -7,7 +7,7 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { DispatchError, EventRecord } from "@polkadot/types/interfaces/types";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 import { SignedBlock } from "@polkadot/types/interfaces";
-import { IEthereumHeaderThingWithProof } from "./types/block";
+import { IDarwiniaEthBlock, IEthereumHeaderThingWithProof } from "./types";
 
 export interface IErrorDoc {
     name: string;
