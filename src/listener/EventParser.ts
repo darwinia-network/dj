@@ -11,15 +11,15 @@ import { LogsOptions, Log, CoundBeNullLogs } from "./types";
 export class EventParser {
   private delayBlockNumber: number = 6;
   private step: number = 300;
-  private blockchainState: BlockchainState;
+  private blockchainState: BlockchainState | null = null;
 
-  start(blockchainState: BlockchainState) {
+  start(blockchainState: BlockchainState | null) {
 
     if(!this.blockchainState) {
       this.blockchainState = blockchainState;
-    };
+    }
 
-    this.blockchainState.getState().then(() => {
+    this.blockchainState && this.blockchainState.getState().then(() => {
       const blockNumber: Blocks = blockInDB.getBlockNumber();
       console.log('EventParser::starter', blockNumber);
       if (blockNumber.lastBlockNumber - blockNumber.parsedEventBlockNumber > this.delayBlockNumber) {
@@ -56,6 +56,11 @@ export class EventParser {
 
       const logs = Promise.all([this.fetchPastLogs(issuingLogOptions), this.fetchPastLogs(bankLogOptions)]);
       logs.then(([ringLog, bankLog]) => {
+        if(ringLog === null || bankLog === null) {
+          this.scheduleParsing();
+          return;
+        }
+
         ringLog.map(log => {
           if(log.topics.includes(web3.utils.padLeft(Config.contracts["RING"].address.toLowerCase(), 64))) {
             logInDB.afterTx('ring', [log]);
@@ -80,7 +85,7 @@ export class EventParser {
         if(blockNumber.lastBlockNumber - blockNumber.parsedEventBlockNumber > this.delayBlockNumber) {
           setDelay(5000).then(() => { this.startParseNextStepLogs(blockNumber.lastBlockNumber, blockNumber.parsedEventBlockNumber)} )
         } else {
-          this.scheduleParsing()
+          this.scheduleParsing();
         }
       }).catch((err: any) => {
         console.error(`startParseNextStepLogs: ${err}`);

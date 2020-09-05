@@ -25,6 +25,6 @@ export class BlockInDB {
   }
 }
 
-let blockInDB = new BlockInDB();
+const blockInDB = new BlockInDB();
 
 export { blockInDB };
