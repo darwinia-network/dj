@@ -5,7 +5,7 @@ export class LogInDB {
     private ktonQueue: Log[] = [];
     private bankQueue: Log[] = [];
     // @ts-nocheck
-    private callback: (tx: string) => void = () => undefined;
+    private callback: (tx: string, type: LogType) => void = () => undefined;
 
     getQueue(type: LogType): Log[] {
         switch (type) {
@@ -24,11 +24,11 @@ export class LogInDB {
     afterTx(type: LogType, logs: Log[]) {
         this.getQueue(type).push(...logs);
         logs.map((log) => {
-            this.callback(log.transactionHash);
+            this.callback(log.transactionHash, type);
         })
     }
 
-    setCallback(callback: (tx: string) => void) {
+    setCallback(callback: (tx: string, type: LogType) => void) {
         this.callback = callback;
     }
 }

@@ -1,11 +1,9 @@
 import web3 from "web3";
-
 import { Blocks, blockInDB } from "./BlockInDB";
 import { logInDB } from "./LogInDB";
 import { localConfig as Config } from "./Config";
 import { setDelay } from "./Utils";
 import { BlockchainState } from "./BlockchainState";
-
 import { LogsOptions, Log, CoundBeNullLogs } from "./types";
 
 export class EventParser {

@@ -1,5 +1,3 @@
-
-
 export interface Blocks {
     lastBlockNumber: number,
     parsedEventBlockNumber: number
