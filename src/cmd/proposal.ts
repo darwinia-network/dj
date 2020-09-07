@@ -10,7 +10,7 @@ async function handler(args: yargs.Arguments) {
     const conf = new Config();
     const api = await autoAPI();
     const block = (args.block as number);
-    const lastConfirmedBlock: number | null = await api.lastConfirm();
+    const lastConfirmedBlock: number = await api.lastConfirm();
     const shadow = new ShadowAPI(conf.shadow);
 
     // Start guard

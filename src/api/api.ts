@@ -315,7 +315,6 @@ export class API {
                         });
                     }
                 } else if (status.isInvalid) {
-                    console.log(res)
                     log.warn("Invalid Extrinsic");
                     reject(res);
                 } else if (status.isRetracted) {
