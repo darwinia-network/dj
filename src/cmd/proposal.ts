@@ -19,16 +19,11 @@ async function handler(args: yargs.Arguments) {
 
     // The target block
     const lastLeaf = block > 1 ? block - 1 : 0;
-    const proposal = await shadow.getProposal(
-        lastConfirmedBlock != null
-            ? [lastConfirmedBlock]
-            : [], block, lastLeaf
-    );
+    const proposal = await shadow.getProposal([lastConfirmedBlock], block, lastLeaf);
     log.trace(await api.submitProposal([proposal]));
 
     // Start proposal linstener
     Listener.proposal(api, shadow);
-    // addEventListener(conf.ethereumListener, console.log)
 }
 
 const cmdProposal: yargs.CommandModule = {
