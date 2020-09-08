@@ -44,7 +44,7 @@ Options:
 
 ## Usage
 
-By default, `dj` is configured to point to the Infura Ethereum node and the official Darwinia crab network node. So you can immediately start using `dj` to submit Ethereum block headers to the Darwinia crab network and get rewards. 
+By default, `dj` is configured to point to the Infura Ethereum node and the official Darwinia crab network node. So you can immediately start using `dj` to submit Ethereum block headers to the Darwinia crab network and get rewards.
 
 ```bash
 dj
@@ -94,7 +94,7 @@ As mentioned earlier,  `dj` configuration file is `<your home directory>/.darwin
 
     shadow proposal endpoint ur
 
-    shadow is a service for `dj` to fetch ethereum headers with proof. 
+    shadow is a service for `dj` to fetch ethereum headers with proof.
 
     For more information about shadow, see the Shadow service section.
 
@@ -138,7 +138,7 @@ As mentioned earlier,  `dj` configuration file is `<your home directory>/.darwin
 
 Shadow is a service used by `dj` to retrieve header data and generate proof. Shadow will index the data it needs from blockchain nodes, such as Ethereum and Darwinia.
 
-`dj` uses the official shadow service by default, if you don’t want to use the official service, you can run the service yourself, and then configure `dj` to use it. 
+`dj` uses the official shadow service by default, if you don’t want to use the official service, you can run the service yourself, and then configure `dj` to use it.
 
 - Install
 
@@ -217,19 +217,19 @@ The redeem of KTON and RING is in the Issuing contract, and the redeem of the de
 ```bash
 event BurnAndRedeem(address indexed token, address indexed from, uint256 amount, bytes receiver);
 ```
-The event is generated at Issuing [0x49262B932E439271d05634c32978294C7Ea15d0C](https://ropsten.etherscan.io/address/0x49262B932E439271d05634c32978294C7Ea15d0C "0x49262B932E439271d05634c32978294C7Ea15d0C")
+The event generates at Issuing(```token_redeem_address``) [0x49262B932E439271d05634c32978294C7Ea15d0C](https://ropsten.etherscan.io/address/0x49262B932E439271d05634c32978294C7Ea15d0C "0x49262B932E439271d05634c32978294C7Ea15d0C")
 
 - Deposit
 ```bash
 event BurnAndRedeem(uint256 indexed _depositID,  address _depositor, uint48 _months, uint48 _startAt, uint64 _unitInterest, uint128 _value, bytes _data);
 ```
-The event is generated at GringottsBankV2 [0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e](https://ropsten.etherscan.io/address/0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e "0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e")
+The event generates at GringottsBankV2(```deposit_redeem_address``) [0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e](https://ropsten.etherscan.io/address/0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e "0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e")
 
 #### Ropsten Contract Address
-- RING: [0xb52FBE2B925ab79a821b261C82c5Ba0814AAA5e0](https://ropsten.etherscan.io/address/0xb52FBE2B925ab79a821b261C82c5Ba0814AAA5e0 "0xb52FBE2B925ab79a821b261C82c5Ba0814AAA5e0")
-- KTON: [0x1994100c58753793D52c6f457f189aa3ce9cEe94](https://ropsten.etherscan.io/address/0x1994100c58753793D52c6f457f189aa3ce9cEe94 "0x1994100c58753793D52c6f457f189aa3ce9cEe94")
-- GringottsBankV2: [0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e](https://ropsten.etherscan.io/address/0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e "0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e")
-- Issuing: [0x49262B932E439271d05634c32978294C7Ea15d0C](https://ropsten.etherscan.io/address/0x49262B932E439271d05634c32978294C7Ea15d0C "0x49262B932E439271d05634c32978294C7Ea15d0C")
+- RING(```ring_token_address```): [0xb52FBE2B925ab79a821b261C82c5Ba0814AAA5e0](https://ropsten.etherscan.io/address/0xb52FBE2B925ab79a821b261C82c5Ba0814AAA5e0 "0xb52FBE2B925ab79a821b261C82c5Ba0814AAA5e0")
+- KTON(```kton_token_address```): [0x1994100c58753793D52c6f457f189aa3ce9cEe94](https://ropsten.etherscan.io/address/0x1994100c58753793D52c6f457f189aa3ce9cEe94 "0x1994100c58753793D52c6f457f189aa3ce9cEe94")
+- GringottsBankV2(```deposit_redeem_address```): [0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e](https://ropsten.etherscan.io/address/0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e "0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e")
+- Issuing(```token_redeem_address```): [0x49262B932E439271d05634c32978294C7Ea15d0C](https://ropsten.etherscan.io/address/0x49262B932E439271d05634c32978294C7Ea15d0C "0x49262B932E439271d05634c32978294C7Ea15d0C")
 
 #### Tx on the Ethereum ropsten test network
 - Redeem RING
@@ -265,7 +265,7 @@ ts-node index.ts config
 
 ### Bugs
 
-We are using [GitHub Issues](https://github.com/darwinia-network/dj/issues) for bug tracking. 
+We are using [GitHub Issues](https://github.com/darwinia-network/dj/issues) for bug tracking.
 
 Before you report a bug, please make sure you've searched existing issues.
 
