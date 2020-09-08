@@ -8,6 +8,16 @@
 
 Darwinia supports the cross-chain bridge of Ethereum by implementing an Ethereum light client(Darwinia ChainRelay) on its chain. Therefore, someone needs to submit the Ethereum block headers to this light client. `dj` is such a tool, anyone can use it to submit block headers to the Ethereum light client on Darwinia and get rewards.
 
+## Theory
+
+Darwinia ChainRelay is a sub-linear light client, which means it does not store every block header of the blockchain it monitors. When initialized, it contains only one block, which is the genesis block. When a relayer submits a new block header, it might be the block header of height 10,000 or even higher. There are huge blanks in-between. If another relayer does not agree and submits a different block header claiming that's the block header data at the height of 10,000. How does ChainRelay resolve this conflict, and who is going to be the judge?
+
+Once a block header is submitted, it provides block header hash and its mmr_root of all previous block header hashes till genesis block. Therefore, if a block header submission is in question, ChainRelay will challenge the relayer for a prior block header data or more specified by a sampling function. That block header hashes must be a leaf or leaves of previously submitted mmr_root. In this way, if an adversary tries to fool ChainRelay, he must prepare the whole chain, while each block must comply with consensus rule. The attack difficulty equals attacking the original blockchain network.
+
+Ethereum Relay on Darwinia can verify specific transactions of Ethereum based on mmr_root, such as redeem of RING, KTON and deposit.
+
+The redeem of KTON and RING is in the Issuing contract, and the redeem of the deposit is in the burnAndRedeem method of the GringottsBankV2 contract. BurnAndRedeem token need to pay the bridge fee, the basic token of the fees is RING. Therefore, it is necessary to approve a amount of RING to the Issuing contract before operation to ensure execution of the contract. Ethereum Relay on Darwinia confirms the amount of redeem, receiver, sender, etc. through the tx events in the verification.
+
 ## **Prerequisites**
 
 - [nodejs](https://nodejs.org/en/)
@@ -198,40 +208,41 @@ Shadow is a service used by `dj` to retrieve header data and generate proof. Sha
     dj
     ```
 
-## Theory
-
-Darwinia ChainRelay is a sub-linear light client, which means it does not store every block header of the blockchain it monitors. When initialized, it contains only one block, which is the genesis block. When a relayer submits a new block header, it might be the block header of height 10,000 or even higher. There are huge blanks in-between. If another relayer does not agree and submits a different block header claiming that's the block header data at the height of 10,000. How does ChainRelay resolve this conflict, and who is going to be the judge?
-
-Once a block header is submitted, it provides block header hash and its mmr_root of all previous block header hashes till genesis block. Therefore, if a block header submission is in question, ChainRelay will challenge the relayer for a prior block header data or more specified by a sampling function. That block header hashes must be a leaf or leaves of previously submitted mmr_root. In this way, if an adversary tries to fool ChainRelay, he must prepare the whole chain, while each block must comply with consensus rule. The attack difficulty equals attacking the original blockchain network.
-
-Ethereum Relay on Darwinia can verify specific transactions of Ethereum based on mmr_root, such as redeem of RING, KTON and deposit.
-
-The redeem of KTON and RING is in the Issuing contract, and the redeem of the deposit is in the burnAndRedeem method of the GringottsBankV2 contract. BurnAndRedeem token need to pay the bridge fee, the basic token of the fees is RING. Therefore, it is necessary to approve a amount of RING to the Issuing contract before operation to ensure execution of the contract. Ethereum Relay on Darwinia confirms the amount of redeem, receiver, sender, etc. through the tx events in the verification.
-
 ------------
 
-#### The format of Events
+## Cross-chain Receipt Verification
+
+### Contract Source Code
+- https://github.com/evolutionlandorg/common-contracts/blob/master/contracts/Issuing.sol
+
+- https://github.com/evolutionlandorg/bank/blob/master/contracts/GringottsBankV2.sol
+
+### Event Spec and Issuing Address
 
 - RING，KTON
 
 ```bash
 event BurnAndRedeem(address indexed token, address indexed from, uint256 amount, bytes receiver);
 ```
-The event generates at Issuing(```token_redeem_address``) [0x49262B932E439271d05634c32978294C7Ea15d0C](https://ropsten.etherscan.io/address/0x49262B932E439271d05634c32978294C7Ea15d0C "0x49262B932E439271d05634c32978294C7Ea15d0C")
+The event generates at Issuing(```token_redeem_address```)
 
 - Deposit
 ```bash
 event BurnAndRedeem(uint256 indexed _depositID,  address _depositor, uint48 _months, uint48 _startAt, uint64 _unitInterest, uint128 _value, bytes _data);
 ```
-The event generates at GringottsBankV2(```deposit_redeem_address``) [0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e](https://ropsten.etherscan.io/address/0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e "0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e")
+The event generates at GringottsBankV2(```deposit_redeem_address```)
 
-#### Ropsten Contract Address
+### Deployed Contract Address and Sample Txs
+
+#### Ethereum Ropsten Testnet
+
+##### Contract Address
 - RING(```ring_token_address```): [0xb52FBE2B925ab79a821b261C82c5Ba0814AAA5e0](https://ropsten.etherscan.io/address/0xb52FBE2B925ab79a821b261C82c5Ba0814AAA5e0 "0xb52FBE2B925ab79a821b261C82c5Ba0814AAA5e0")
 - KTON(```kton_token_address```): [0x1994100c58753793D52c6f457f189aa3ce9cEe94](https://ropsten.etherscan.io/address/0x1994100c58753793D52c6f457f189aa3ce9cEe94 "0x1994100c58753793D52c6f457f189aa3ce9cEe94")
-- GringottsBankV2(```deposit_redeem_address```): [0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e](https://ropsten.etherscan.io/address/0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e "0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e")
 - Issuing(```token_redeem_address```): [0x49262B932E439271d05634c32978294C7Ea15d0C](https://ropsten.etherscan.io/address/0x49262B932E439271d05634c32978294C7Ea15d0C "0x49262B932E439271d05634c32978294C7Ea15d0C")
+- GringottsBankV2(```deposit_redeem_address```): [0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e](https://ropsten.etherscan.io/address/0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e "0x6EF538314829EfA8386Fc43386cB13B4e0A67D1e")
 
-#### Tx on the Ethereum ropsten test network
+##### Sample Txs
 - Redeem RING
 https://ropsten.etherscan.io/tx/0x1d3ef601b9fa4a7f1d6259c658d0a10c77940fa5db9e10ab55397eb0ce88807d
 - Redeem KTON
@@ -239,10 +250,9 @@ https://ropsten.etherscan.io/tx/0x2878ae39a9e0db95e61164528bb1ec8684be194bdcc236
 - Redeem Deposit
 https://ropsten.etherscan.io/tx/0x5a7004126466ce763501c89bcbb98d14f3c328c4b310b1976a38be1183d91919
 
-#### Contract
-- https://github.com/evolutionlandorg/common-contracts/blob/master/contracts/Issuing.sol
+#### Ethereum Mainet
 
-- https://github.com/evolutionlandorg/bank/blob/master/contracts/GringottsBankV2.sol
+[TBD]
 
 ## Contributing
 
