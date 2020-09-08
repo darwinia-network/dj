@@ -1,3 +1,28 @@
+export interface Blocks {
+    lastBlockNumber: number,
+    parsedEventBlockNumber: number
+}
+
+export class BlockInDB {
+    private lastBlockNumber: number = 0;
+    private parsedEventBlockNumber: number = 0;
+
+    setLastBlockNumber(num: number): void {
+        this.lastBlockNumber = num;
+    }
+
+    setParsedEventBlockNumber(num: number): void {
+        this.parsedEventBlockNumber = num;
+    }
+
+    getBlockNumber(): Blocks {
+        return {
+            lastBlockNumber: this.lastBlockNumber,
+            parsedEventBlockNumber: this.parsedEventBlockNumber
+        };
+    }
+}
+
 import { LogType, Log } from "./types";
 
 export class LogInDB {
@@ -17,9 +42,6 @@ export class LogInDB {
                 return this.bankQueue;
         }
     }
-    // getTx(type: LogType, acount: number): Log[] {
-
-    // }
 
     afterTx(type: LogType, logs: Log[]) {
         this.getQueue(type).push(...logs);
@@ -33,6 +55,7 @@ export class LogInDB {
     }
 }
 
+const blockInDB = new BlockInDB();
 const logInDB = new LogInDB();
 
-export { logInDB };
+export { blockInDB, logInDB };

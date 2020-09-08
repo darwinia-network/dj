@@ -1,8 +1,7 @@
 import web3 from "web3";
-import { Blocks, blockInDB } from "./BlockInDB";
-import { logInDB } from "./LogInDB";
+import { Blocks, blockInDB, logInDB } from "./DB";
 import { localConfig as Config } from "./Config";
-import { setDelay } from "./Utils";
+import { delay } from "../../util";
 import { BlockchainState } from "./BlockchainState";
 import { LogsOptions, Log, CoundBeNullLogs } from "./types";
 
@@ -30,7 +29,6 @@ export class EventParser {
 
     startParseNextStepLogs(lastBlock: number, current: number) {
         let next: number = 0;
-
         if (lastBlock - current > this.step) {
             next = current + this.step;
         } else {
@@ -76,14 +74,11 @@ export class EventParser {
                     logInDB.afterTx('bank', [log]);
                 }
             })
-            // console.log('ring', logInDB.getQueue('ring').map((item) => item.transactionHash))
-            // console.log('kton', logInDB.getQueue('kton').map((item) => item.transactionHash))
-            // console.log('bank', logInDB.getQueue('bank').map((item) => item.transactionHash))
 
             blockInDB.setParsedEventBlockNumber(next);
             const blockNumber: Blocks = blockInDB.getBlockNumber();
             if (blockNumber.lastBlockNumber - blockNumber.parsedEventBlockNumber > this.delayBlockNumber) {
-                setDelay(5000).then(() => {
+                delay(5000).then(() => {
                     this.startParseNextStepLogs(blockNumber.lastBlockNumber, blockNumber.parsedEventBlockNumber)
                 })
             } else {
@@ -109,7 +104,7 @@ export class EventParser {
     }
 
     scheduleParsing() {
-        setDelay(30000).then(() => {
+        delay(30000).then(() => {
             this.start(this.blockchainState);
         })
     }

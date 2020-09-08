@@ -16,6 +16,12 @@ export function proposal(api: API, shadow: ShadowAPI) {
                 log.ok("Gameover");
             }
 
+            if (event.method === "PendingHeaderApproved") {
+                log.event(event.method);
+                log.trace(`\t${event.section}:${event.method}:: (phase=${phase.toString()})`);
+                log.trace(`\t\t${event.meta.documentation.toString()}`);
+            }
+
             // Show what we are busy with
             if (event.method === "NewRound") {
                 log.trace(`\t${event.section}:${event.method}:: (phase=${phase.toString()})`);

@@ -17,7 +17,7 @@ export default async function exec() {
 
     // parser
     const _ = yargs
-        .usage("dj <hello...network>")
+        .usage("dj <hello@darwinia.network>")
         .help("help").alias("help", "h")
         .version("version", pj.version).alias("version", "V")
         .command(cmdBalance)
