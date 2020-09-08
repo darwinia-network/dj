@@ -1,4 +1,6 @@
-{
+import { ethereum } from "../listener";
+
+ethereum({
     "RPC_SERVER": "https://ropsten.infura.io/v3/0bfb9acbb13c426097aabb1d81a9d016",
     "START_BLOCK_NUMBER": 8609800,
     "CONTRACT": {
@@ -18,4 +20,6 @@
             "address": "0x49262B932E439271d05634c32978294C7Ea15d0C"
         }
     }
-}
+}, (tx: any) => {
+    console.log('test::callback:', tx)
+});

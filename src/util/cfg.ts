@@ -48,13 +48,13 @@ export class Config {
     }
 
     /// Load and merge config from file
-    static load(path: string, defaultConfig: Record<string, any>): Record<string, any> {
+    static load(p: string, defaultConfig: Record<string, any>): Record<string, any> {
         let json: Record<string, any> = defaultConfig;
-        if (!fs.existsSync(path)) {
-            fs.writeFileSync(path, JSON.stringify(json, null, 2));
+        if (!fs.existsSync(p)) {
+            fs.writeFileSync(p, JSON.stringify(json, null, 2));
         } else {
-            const cur = Object.assign(JSON.parse(fs.readFileSync(path, "utf8")), json);
-            fs.writeFileSync(path, JSON.stringify(cur, null, 2));
+            const cur = Object.assign(json, JSON.parse(fs.readFileSync(p, "utf8")));
+            fs.writeFileSync(p, JSON.stringify(cur, null, 2));
             json = cur;
         }
 
