@@ -47,6 +47,20 @@ export class Config {
         }
     }
 
+    /// Load and merge config from file
+    static load(path: string, defaultConfig: Record<string, any>): Record<string, any> {
+        let json: Record<string, any> = defaultConfig;
+        if (!fs.existsSync(path)) {
+            fs.writeFileSync(path, JSON.stringify(json, null, 2));
+        } else {
+            const cur = Object.assign(JSON.parse(fs.readFileSync(path, "utf8")), json);
+            fs.writeFileSync(path, JSON.stringify(cur, null, 2));
+            json = cur;
+        }
+
+        return json
+    }
+
     public node: string;
     public path: IConfigPath;
     public shadow: string;
@@ -61,7 +75,7 @@ export class Config {
         const types = path.resolve(root, "types.json");
         const ethereumListener = path.resolve(root, "ethereum_listener.json");
 
-        // init pathes
+        // Init pathes
         this.path = {
             conf,
             root,
@@ -69,47 +83,17 @@ export class Config {
             ethereumListener,
         };
 
-        // check root
+        // Check root
         if (!fs.existsSync(root)) {
             fs.mkdirSync(root, { recursive: true });
         }
 
-        // load config.json
-        let cj: IConfig = rawCj;
-        if (!fs.existsSync(conf)) {
-            fs.writeFileSync(conf, JSON.stringify(cj, null, 2));
-        } else {
-            const curConfig = JSON.parse(fs.readFileSync(conf, "utf8"));
-            const mergeConfig = Object.assign(rawCj, curConfig);
-            if (mergeConfig !== curConfig) {
-                fs.writeFileSync(conf, JSON.stringify(mergeConfig, null, 2));
-            }
-
-            // assign cj
-            cj = mergeConfig;
-        }
-
-        // load types.json
-        let tj: Record<string, any> = rawTj;
-        if (!fs.existsSync(types)) {
-            fs.writeFileSync(types, JSON.stringify(tj, null, 2));
-        } else {
-            tj = JSON.parse(fs.readFileSync(types, "utf8"));
-        }
-
-        // Load ethereumListener.json
-        let ej: Record<string, any> = rawEj;
-        if (!fs.existsSync(ethereumListener)) {
-            fs.writeFileSync(ethereumListener, JSON.stringify(ej, null, 2));
-        } else {
-            ej = JSON.parse(fs.readFileSync(ethereumListener, "utf8"));
-        }
-
+        const cj = Config.load(conf, rawCj);
         this.node = cj.node;
         this.seed = cj.seed;
         this.shadow = cj.shadow;
-        this.types = tj;
-        this.ethereumListener = ej;
+        this.types = Config.load(types, rawTj);
+        this.ethereumListener = Config.load(ethereumListener, rawEj);
 
         // Warn config
         Config.warn(this);
