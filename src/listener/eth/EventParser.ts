@@ -17,7 +17,7 @@ export class EventParser {
 
         this.blockchainState?.getState().then(() => {
             const blockNumber: Blocks = blockInDB.getBlockNumber();
-            log.event(`EventParser::starter ${JSON.stringify(blockNumber)}`);
+            log.trace(`EventParser::starter ${JSON.stringify(blockNumber)}`);
             if (blockNumber.lastBlockNumber - blockNumber.parsedEventBlockNumber > this.delayBlockNumber) {
                 this.startParseNextStepLogs(
                     blockNumber.lastBlockNumber,
@@ -37,7 +37,7 @@ export class EventParser {
             next = lastBlock;
         }
 
-        log.event(`EventParser::startParseNextStepLogs: parse block: [${current} - ${next})`);
+        log.trace(`EventParser::startParseNextStepLogs: parse block: [${current} - ${next})`);
         const issuingLogOptions: LogsOptions = {
             fromBlock: current,
             toBlock: next - 1,

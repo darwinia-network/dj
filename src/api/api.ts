@@ -1,5 +1,5 @@
 /* tslint:disable:variable-name */
-import { log } from "../util";
+import { log, delay } from "../util";
 import { ApiPromise, SubmittableResult, WsProvider } from "@polkadot/api";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import Keyring from "@polkadot/keyring";
@@ -8,7 +8,6 @@ import { DispatchError, EventRecord } from "@polkadot/types/interfaces/types";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 import { SignedBlock } from "@polkadot/types/interfaces";
 import {
-    IDarwiniaEthBlock,
     IEthereumHeaderThingWithProof,
     IReceiptWithProof,
 } from "./types";
@@ -192,6 +191,8 @@ export class API {
         } else {
             return new ExResult(false, "", "");
         }
+        log.event(`Approve block ${block}`);
+        await delay(3000);
         return await this.blockFinalized(ex, true);
     }
 
@@ -207,6 +208,8 @@ export class API {
         } else {
             return new ExResult(false, "", "");
         }
+        log.event(`Reject block ${block}`);
+        await delay(3000);
         return await this.blockFinalized(ex);
     }
 
@@ -216,7 +219,9 @@ export class API {
      * @param {IEthHeaderThing} headerThings - Eth Header Things
      */
     public async submitProposal(headerThings: IEthereumHeaderThingWithProof[]): Promise<ExResult> {
+        log.event(`Submit proposal contains block ${headerThings[0].header.number}`);
         const ex = this._.tx.ethereumRelay.submitProposal(headerThings);
+        await delay(3000);
         return await this.blockFinalized(ex);
     }
 
@@ -226,20 +231,9 @@ export class API {
      * @param {DarwiniaEthBlock} block - darwinia style eth block
      */
     public async redeem(act: string, proof: IReceiptWithProof): Promise<ExResult> {
+        log.event(`Redeem tx in block ${proof.header.number}`);
         const ex: SubmittableExtrinsic<"promise"> = this._.tx.ethereumBacking.redeem(act, proof);
-        return await this.blockFinalized(ex);
-    }
-
-    /**
-     * reset darwinia header
-     *
-     * @param {DarwiniaEthBlock} block - darwinia style eth block
-     */
-    public async reset(block: IDarwiniaEthBlock): Promise<ExResult> {
-        const ex: SubmittableExtrinsic<"promise"> = this._.tx.ethRelay.resetGenesisHeader(
-            block, block.difficulty,
-        );
-
+        await delay(3000);
         return await this.blockFinalized(ex);
     }
 
@@ -251,6 +245,7 @@ export class API {
      */
     public async transfer(addr: string, amount: number): Promise<ExResult> {
         const ex = this._.tx.balances.transfer(addr, amount);
+        await delay(3000);
         return await this.blockFinalized(ex);
     }
 

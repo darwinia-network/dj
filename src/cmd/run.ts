@@ -14,6 +14,7 @@ export async function run() {
     const shadow = new ShadowAPI(conf.shadow);
 
     // Start proposal linstener
+    Listener.guard(api, shadow);
     Listener.relay(api, shadow, QUEUE);
     Listener.ethereum(
         conf.ethereumListener,
@@ -25,7 +26,11 @@ export async function run() {
                 await shadow.getProposal([lastConfirm], relayedBlock, blockNumber),
             ]);
 
-            QUEUE.push({ tx, ty, relayedBlock });
+            QUEUE.push({
+                tx,
+                relayedBlock,
+                ty: ty === "bank" ? "Deposit" : "Token",
+            });
         }
     );
 }

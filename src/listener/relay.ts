@@ -13,12 +13,12 @@ export function relay(api: API, shadow: ShadowAPI, queue: ITx[]) {
             const types = event.typeDef;
 
             if (event.method === "GameOver") {
-                log.event("Gameover");
+                log.trace("Gameover");
             }
 
             if (event.method === "PendingHeaderApproved") {
-                log.event(`\t${event.section}:${event.method}:: (phase=${phase.toString()})`);
-                log.event(`\t\t${event.meta.documentation.toString()}`);
+                log.trace(`\t${event.section}:${event.method}:: (phase=${phase.toString()})`);
+                log.trace(`\t\t${event.meta.documentation.toString()}`);
                 const lastConfirmed = await api.lastConfirm();
                 queue.filter((tx) => tx.relayedBlock === lastConfirmed).forEach(async (tx) => {
                     await api.redeem(tx.ty, await shadow.getReceipt(tx.tx, lastConfirmed));
