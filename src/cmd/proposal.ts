@@ -61,10 +61,10 @@ async function guard(api: API, shadow: ShadowAPI) {
                 break;
             }
 
-            const headerThing = (await shadow.getHeaderThing(blockNumber)) as any;
+            const resp = (await shadow.getHeaderThing(blockNumber)) as any;
 
-            const hasEnoughConfirmations = headerThing.confirmations > 12;
-            const isSame = JSON.stringify(headerThing.proof) === JSON.stringify(h[2]);
+            const hasEnoughConfirmations = resp.confirmations > 12;
+            const isSame = JSON.stringify(resp.header_thing) === JSON.stringify(h[2]);
             if ( hasEnoughConfirmations && isSame) {
                 const res: ExResult = await api.approveBlock(blockNumber, perms);
                 if (res.isOk) {
