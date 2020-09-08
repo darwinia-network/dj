@@ -17,12 +17,14 @@ export function relay(api: API, shadow: ShadowAPI, queue: ITx[]) {
             }
 
             if (event.method === "PendingHeaderApproved") {
+                log.event(`\t${event.section}:${event.method}:: (phase=${phase.toString()})`);
+                log.event(`\t\t${event.meta.documentation.toString()}`);
                 const lastConfirmed = await api.lastConfirm();
-                for (const tx of queue) {
-                    if (lastConfirmed > tx.proof.header.number) {
-                        console.log(tx);
-                    }
-                }
+                queue.filter((tx) => tx.relayedBlock === lastConfirmed).forEach(async (tx) => {
+                    await api.redeem(tx.ty, await shadow.getReceipt(tx.tx, lastConfirmed));
+                });
+
+                queue = queue.filter((tx) => tx.relayedBlock !== lastConfirmed);
             }
 
             // Show what we are busy with

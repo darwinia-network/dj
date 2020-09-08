@@ -7,18 +7,16 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { DispatchError, EventRecord } from "@polkadot/types/interfaces/types";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 import { SignedBlock } from "@polkadot/types/interfaces";
-import { IDarwiniaEthBlock, IEthereumHeaderThingWithProof } from "./types";
+import {
+    IDarwiniaEthBlock,
+    IEthereumHeaderThingWithProof,
+    IReceiptWithProof,
+} from "./types";
 
 export interface IErrorDoc {
     name: string;
     section: string;
     documentation: string[];
-}
-
-export interface IReceipt {
-    index: string;
-    proof: string;
-    header_hash: string;
 }
 
 /**
@@ -227,10 +225,8 @@ export class API {
      *
      * @param {DarwiniaEthBlock} block - darwinia style eth block
      */
-    public async redeem(receipt: IReceipt): Promise<ExResult> {
-        const ex: SubmittableExtrinsic<"promise"> = this._.tx.ethRelay.redeem({
-            Ring: receipt,
-        });
+    public async redeem(act: string, proof: IReceiptWithProof): Promise<ExResult> {
+        const ex: SubmittableExtrinsic<"promise"> = this._.tx.ethereumBacking.redeem(act, proof);
         return await this.blockFinalized(ex);
     }
 

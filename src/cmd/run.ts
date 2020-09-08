@@ -1,6 +1,6 @@
 import { autoAPI, ShadowAPI } from "../api";
 import { ITx } from "../api/types";
-import { Config } from "../util";
+import { log, Config } from "../util";
 import * as Listener from "../listener"
 
 const QUEUE: ITx[] = [];
@@ -18,13 +18,14 @@ export async function run() {
     Listener.ethereum(
         conf.ethereumListener,
         async (tx: string, ty: string, blockNumber: number) => {
+            log.trace(`Find darwinia ${ty} tx ${tx} `);
             const lastConfirm = await api.lastConfirm();
-            QUEUE.push({
-                tx,
-                ty,
-                blockNumber,
-                proof: await shadow.getReceipt(tx, lastConfirm),
-            });
+            const relayedBlock = blockNumber + 1;
+            await api.submitProposal([
+                await shadow.getProposal([lastConfirm], relayedBlock, blockNumber),
+            ]);
+
+            QUEUE.push({ tx, ty, relayedBlock });
         }
     );
 }

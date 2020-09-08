@@ -2,8 +2,7 @@
 export interface ITx {
     tx: string,
     ty: string,
-    proof: IReceiptWithProof,
-    blockNumber: number,
+    relayedBlock: number,
 }
 
 /// Darwinia Block
@@ -29,6 +28,13 @@ export interface IDarwiniaEthBlock {
 export interface IDoubleNodeWithMerkleProof {
     dag_nodes: string[],
     proof: string[],
+}
+
+/// Receipt interface
+export interface IReceipt {
+    index: string;
+    proof: string;
+    header_hash: string;
 }
 
 /// Receipt Proof Interface
