@@ -7,7 +7,9 @@ import { LogType } from "./types";
 const blockchainState = new BlockchainState();
 const eventParser = new EventParser();
 
-export function listen(config: any, callback: (tx: string, type: LogType) => void) {
+export function listen(config: any, callback: (
+    tx: string, type: LogType, blockNumber: number,
+) => void) {
     localConfig.setConfig(config);
     blockInDB.setParsedEventBlockNumber(localConfig.info.START_BLOCK_NUMBER);
     logInDB.setCallback(callback);

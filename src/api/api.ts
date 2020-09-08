@@ -148,13 +148,13 @@ export class API {
     /**
      * Get last confirm block
      */
-    public async lastConfirm(): Promise<number | null> {
+    public async lastConfirm(): Promise<number> {
         const res = await this._.query.ethereumRelay.lastConfirmedHeaderInfo();
         if (res.toJSON() === null) {
-            return null;
+            return 0;
         }
 
-        return (res.toJSON() as any)[0];
+        return (res.toJSON() as any)[0] as number;
     }
 
     /**

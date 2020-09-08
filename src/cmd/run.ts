@@ -1,6 +1,9 @@
 import { autoAPI, ShadowAPI } from "../api";
-import { log, Config } from "../util";
+import { ITx } from "../api/types";
+import { Config } from "../util";
 import * as Listener from "../listener"
+
+const QUEUE: ITx[] = [];
 
 // The proposal API
 export async function run() {
@@ -11,9 +14,17 @@ export async function run() {
     const shadow = new ShadowAPI(conf.shadow);
 
     // Start proposal linstener
-    Listener.proposal(api, shadow);
-    Listener.ethereum(conf.ethereumListener, (tx: string, ty: string) => {
-        log(tx);
-        log(ty);
-    })
+    Listener.relay(api, shadow, QUEUE);
+    Listener.ethereum(
+        conf.ethereumListener,
+        async (tx: string, ty: string, blockNumber: number) => {
+            const lastConfirm = await api.lastConfirm();
+            QUEUE.push({
+                tx,
+                ty,
+                blockNumber,
+                proof: await shadow.getReceipt(tx, lastConfirm),
+            });
+        }
+    );
 }

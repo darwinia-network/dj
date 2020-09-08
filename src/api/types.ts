@@ -1,3 +1,11 @@
+/// Transaction stuffs
+export interface ITx {
+    tx: string,
+    ty: string,
+    proof: IReceiptWithProof,
+    blockNumber: number,
+}
+
 /// Darwinia Block
 export interface IDarwiniaEthBlock {
     parent_hash: string;

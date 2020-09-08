@@ -4,5 +4,8 @@ import { ShadowAPI } from "./shadow";
 import { IEthereumHeaderThing, IEthereumHeaderThingWithProof } from "./types";
 
 export {
-    API, autoAPI, ExResult, ShadowAPI, IEthereumHeaderThing, IEthereumHeaderThingWithProof,
+    API, autoAPI,
+    ExResult, ShadowAPI,
+    IEthereumHeaderThing,
+    IEthereumHeaderThingWithProof,
 }

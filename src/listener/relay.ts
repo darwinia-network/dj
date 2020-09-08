@@ -1,11 +1,11 @@
 import { ShadowAPI, API } from "../api";
 import { log } from "../util";
 import { DispatchError } from "@polkadot/types/interfaces/types";
-import { IEthereumHeaderThingWithProof } from "../api/types";
+import { IEthereumHeaderThingWithProof, ITx } from "../api/types";
 import { Cache } from "./"
 
 // Listen and submit proposals
-export function proposal(api: API, shadow: ShadowAPI) {
+export function relay(api: API, shadow: ShadowAPI, queue: ITx[]) {
     // Subscribe to system events via storage
     api._.query.system.events((events: any) => {
         events.forEach(async (record: any) => {
@@ -13,13 +13,16 @@ export function proposal(api: API, shadow: ShadowAPI) {
             const types = event.typeDef;
 
             if (event.method === "GameOver") {
-                log.ok("Gameover");
+                log.event("Gameover");
             }
 
             if (event.method === "PendingHeaderApproved") {
-                log.event(event.method);
-                log.trace(`\t${event.section}:${event.method}:: (phase=${phase.toString()})`);
-                log.trace(`\t\t${event.meta.documentation.toString()}`);
+                const lastConfirmed = await api.lastConfirm();
+                for (const tx of queue) {
+                    if (lastConfirmed > tx.proof.header.number) {
+                        console.log(tx);
+                    }
+                }
             }
 
             // Show what we are busy with
