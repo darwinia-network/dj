@@ -62,6 +62,11 @@ export interface IEthereumHeaderThing {
     mmr_root: string,
 }
 
+export interface IEthereumHeaderThingWithConfirmation {
+    header_thing: IEthereumHeaderThing,
+    confirmation: number,
+}
+
 /// EthHeaderThing Interface
 export interface IEthereumHeaderThingWithProof {
     header: IDarwiniaEthBlock,
