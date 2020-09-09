@@ -1,5 +1,5 @@
 /* tslint:disable:variable-name */
-import { log, IDarwiniaEthBlock } from "../util";
+import { log, delay } from "../util";
 import { ApiPromise, SubmittableResult, WsProvider } from "@polkadot/api";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import Keyring from "@polkadot/keyring";
@@ -7,18 +7,15 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { DispatchError, EventRecord } from "@polkadot/types/interfaces/types";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 import { SignedBlock } from "@polkadot/types/interfaces";
-import { IEthereumHeaderThingWithProof } from "./types/block";
+import {
+    IEthereumHeaderThingWithProof,
+    IReceiptWithProof,
+} from "./types";
 
 export interface IErrorDoc {
     name: string;
     section: string;
     documentation: string[];
-}
-
-export interface IReceipt {
-    index: string;
-    proof: string;
-    header_hash: string;
 }
 
 /**
@@ -148,13 +145,13 @@ export class API {
     /**
      * Get last confirm block
      */
-    public async lastConfirm(): Promise<number | null> {
+    public async lastConfirm(): Promise<number> {
         const res = await this._.query.ethereumRelay.lastConfirmedHeaderInfo();
         if (res.toJSON() === null) {
-            return null;
+            return 0;
         }
 
-        return (res.toJSON() as any)[0];
+        return (res.toJSON() as any)[0] as number;
     }
 
     /**
@@ -194,6 +191,8 @@ export class API {
         } else {
             return new ExResult(false, "", "");
         }
+        log.event(`Approve block ${block}`);
+        await delay(3000);
         return await this.blockFinalized(ex, true);
     }
 
@@ -209,6 +208,8 @@ export class API {
         } else {
             return new ExResult(false, "", "");
         }
+        log.event(`Reject block ${block}`);
+        await delay(3000);
         return await this.blockFinalized(ex);
     }
 
@@ -218,7 +219,9 @@ export class API {
      * @param {IEthHeaderThing} headerThings - Eth Header Things
      */
     public async submitProposal(headerThings: IEthereumHeaderThingWithProof[]): Promise<ExResult> {
+        log.event(`Submit proposal contains block ${headerThings[headerThings.length - 1].header.number}`);
         const ex = this._.tx.ethereumRelay.submitProposal(headerThings);
+        await delay(3000);
         return await this.blockFinalized(ex);
     }
 
@@ -227,23 +230,14 @@ export class API {
      *
      * @param {DarwiniaEthBlock} block - darwinia style eth block
      */
-    public async redeem(receipt: IReceipt): Promise<ExResult> {
-        const ex: SubmittableExtrinsic<"promise"> = this._.tx.ethRelay.redeem({
-            Ring: receipt,
-        });
-        return await this.blockFinalized(ex);
-    }
-
-    /**
-     * reset darwinia header
-     *
-     * @param {DarwiniaEthBlock} block - darwinia style eth block
-     */
-    public async reset(block: IDarwiniaEthBlock): Promise<ExResult> {
-        const ex: SubmittableExtrinsic<"promise"> = this._.tx.ethRelay.resetGenesisHeader(
-            block, block.difficulty,
-        );
-
+    public async redeem(act: string, proof: IReceiptWithProof): Promise<ExResult> {
+        log.event(`Redeem tx in block ${proof.header.number}`);
+        const ex: SubmittableExtrinsic<"promise"> = this._.tx.ethereumBacking.redeem(act, [
+            proof.header,
+            proof.receipt_proof,
+            proof.mmr_proof,
+        ]);
+        await delay(3000);
         return await this.blockFinalized(ex);
     }
 
@@ -255,6 +249,7 @@ export class API {
      */
     public async transfer(addr: string, amount: number): Promise<ExResult> {
         const ex = this._.tx.balances.transfer(addr, amount);
+        await delay(3000);
         return await this.blockFinalized(ex);
     }
 
@@ -315,7 +310,6 @@ export class API {
                         });
                     }
                 } else if (status.isInvalid) {
-                    console.log(res)
                     log.warn("Invalid Extrinsic");
                     reject(res);
                 } else if (status.isRetracted) {

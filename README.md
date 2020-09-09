@@ -1,6 +1,8 @@
 # @darwinia/dj
 
-[![Node.js CI][workflow-badge]][github]
+[![dj][workflow-badge]][github]
+[![dj](https://img.shields.io/npm/v/@darwinia/dj)](https://www.npmjs.com/package/@darwinia/dj)
+[![LICENSE](https://img.shields.io/crates/l/darwinia-shadow.svg)](https://choosealicense.com/licenses/gpl-3.0/)
 
 ## **Introduction**
 
@@ -283,9 +285,6 @@ Before you report a bug, please make sure you've searched existing issues.
 
 [CONTRIBUTING.adoc](https://github.com/darwinia-network/dj/blob/master/CONTRIBUTING.adoc)
 
-## LICENSE
-
-GPL-3.0
 
 [github]: https://github.com/darwinia-network/dj
-[workflow-badge]: https://github.com/darwinia-network/darwinia.js/workflows/nodejs/badge.svg
+[workflow-badge]: https://github.com/darwinia-network/dj/workflows/nodejs/badge.svg
