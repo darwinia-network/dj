@@ -3,8 +3,8 @@ import { whereisPj } from "../util";
 
 import cmdBalance from "./balance";
 import cmdConfig from "./config";
-import cmdProposal from "./proposal";
 import cmdTransfer from "./transfer";
+import { run } from "./run";
 
 // main
 export default async function exec() {
@@ -17,17 +17,16 @@ export default async function exec() {
 
     // parser
     const _ = yargs
-        .usage("dj <hello...network>")
+        .usage("dj <hello@darwinia.network>")
         .help("help").alias("help", "h")
         .version("version", pj.version).alias("version", "V")
         .command(cmdBalance)
         .command(cmdConfig)
-        .command(cmdProposal)
         .command(cmdTransfer)
         .argv;
 
     // show help if no input
     if (process.argv.length < 3) {
-        yargs.showHelp();
+        run();
     }
 }

@@ -15,5 +15,4 @@ export class Config {
 }
 
 const localConfig = new Config();
-
 export { localConfig }

@@ -1,9 +1,7 @@
 import { BlockNumber, Log } from "web3-core";
 
-export * from 'web3-core';
-
+export { Log } from 'web3-core';
 export type Topics = (string | string[] | null)[];
-
 export interface LogsOptions {
     fromBlock: BlockNumber;
     toBlock: BlockNumber;
@@ -12,5 +10,4 @@ export interface LogsOptions {
 }
 
 export type CoundBeNullLogs = null | Log[];
-
 export type LogType = 'ring' | 'kton' | 'bank';

@@ -1,6 +1,7 @@
 # @darwinia/dj
 
 [![dj][workflow-badge]][github]
+[![dj](https://img.shields.io/npm/v/@darwinia/dj)](https://www.npmjs.com/package/@darwinia/dj)
 [![LICENSE](https://img.shields.io/crates/l/darwinia-shadow.svg)](https://choosealicense.com/licenses/gpl-3.0/)
 
 ## **Introduction**
