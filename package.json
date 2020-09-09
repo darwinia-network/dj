@@ -1,4 +1,5 @@
 {
+    "version": "",
     "private": false,
     "name": "@darwinia/dj",
     "description": "darwinia relayer tool",

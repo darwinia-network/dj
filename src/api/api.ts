@@ -219,7 +219,7 @@ export class API {
      * @param {IEthHeaderThing} headerThings - Eth Header Things
      */
     public async submitProposal(headerThings: IEthereumHeaderThingWithProof[]): Promise<ExResult> {
-        log.event(`Submit proposal contains block ${headerThings[0].header.number}`);
+        log.event(`Submit proposal contains block ${headerThings[headerThings.length - 1].header.number}`);
         const ex = this._.tx.ethereumRelay.submitProposal(headerThings);
         await delay(3000);
         return await this.blockFinalized(ex);
