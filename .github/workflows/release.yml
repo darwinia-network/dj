@@ -23,6 +23,8 @@ jobs:
           echo "The Git tag extracted from GitHub Actions: $GIT_TAG_NAME"
           npm version --allow-same-version=true --git-tag-version=false "$GIT_TAG_NAME"
 
+      - name: Build package
+        run: npm i && npm run build
+
       - name: Publish the package
-        run: |
-          npm publish
+        run: npm publish
