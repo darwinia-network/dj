@@ -40,7 +40,7 @@ export interface IReceipt {
 /// Receipt Proof Interface
 export interface IReceiptWithProof {
     header: IDarwiniaEthBlock,
-    receipt_proof: string,
+    receipt_proof: IReceipt,
     mmr_proof: string[],
 }
 

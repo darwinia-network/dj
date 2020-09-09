@@ -232,7 +232,11 @@ export class API {
      */
     public async redeem(act: string, proof: IReceiptWithProof): Promise<ExResult> {
         log.event(`Redeem tx in block ${proof.header.number}`);
-        const ex: SubmittableExtrinsic<"promise"> = this._.tx.ethereumBacking.redeem(act, proof);
+        const ex: SubmittableExtrinsic<"promise"> = this._.tx.ethereumBacking.redeem(act, [
+            proof.header,
+            proof.receipt_proof,
+            proof.mmr_proof,
+        ]);
         await delay(3000);
         return await this.blockFinalized(ex);
     }
