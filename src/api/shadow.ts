@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import { log } from "../util";
 import {
     IReceiptWithProof,
-    IEthereumHeaderThing,
+    IEthereumHeaderThingWithConfirmation,
     IEthereumHeaderThingWithProof,
     IDarwiniaEthBlock,
 } from "./types";
@@ -40,7 +40,7 @@ export class ShadowAPI {
      *
      * @param {number} block - block number
      */
-    async getHeaderThing(block: number | string): Promise<IEthereumHeaderThing> {
+    async getHeaderThing(block: number | string): Promise<IEthereumHeaderThingWithConfirmation> {
         const r: AxiosResponse = await axios.get(
             this.api + "/eth/header/" + block,
         );

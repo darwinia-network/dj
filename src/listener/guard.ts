@@ -30,7 +30,10 @@ export async function guard(api: API, shadow: ShadowAPI) {
             }
 
             const block = (await shadow.getHeaderThing(blockNumber)) as any;
-            if (JSON.stringify(block) === JSON.stringify(h[2])) {
+            if (
+                JSON.stringify(block.header_thing) === JSON.stringify(h[2])
+                && block.confirmation > 6
+            ) {
                 const res: ExResult = await api.approveBlock(blockNumber, perms);
                 if (!res.isOk) {
                     log.err(res.toString())
