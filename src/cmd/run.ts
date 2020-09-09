@@ -19,7 +19,7 @@ export async function run() {
     Listener.ethereum(
         conf.ethereumListener,
         async (tx: string, ty: string, blockNumber: number) => {
-            log.trace(`Find darwinia ${ty} tx ${tx} `);
+            log.trace(`Find darwinia ${ty} tx ${tx} in block ${blockNumber}`);
             const lastConfirm = await api.lastConfirm();
             const relayedBlock = blockNumber + 1;
             await api.submitProposal([
