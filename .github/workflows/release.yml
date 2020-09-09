@@ -1,0 +1,28 @@
+name: Release
+
+on:
+  push:
+    tags: ["*"]
+
+jobs:
+  publish-on-npm:
+    name: Publish on NPM
+    runs-on: ubuntu-latest
+    env:
+      NPM_TOKEN: ${{ secrets.NPM_WRITE_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure NPM token
+        run: |
+          echo //registry.npmjs.org/:_authToken=${NPM_TOKEN} > .npmrc
+
+      - name: Patch the version with current Git tag
+        run: |
+          export GIT_TAG_NAME=${GITHUB_REF/refs\/tags\//}
+          echo "The Git tag extracted from GitHub Actions: $GIT_TAG_NAME"
+          npm version --allow-same-version=true --git-tag-version=false "$GIT_TAG_NAME"
+
+      - name: Publish the package
+        run: |
+          npm publish
