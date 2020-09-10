@@ -10,7 +10,7 @@ import { SignedBlock } from "@polkadot/types/interfaces";
 import {
     IEthereumHeaderThingWithProof,
     IReceiptWithProof,
-} from "./types";
+} from "../types";
 
 export interface IErrorDoc {
     name: string;

@@ -6,7 +6,7 @@ import {
     IEthereumHeaderThingWithConfirmation,
     IEthereumHeaderThingWithProof,
     IDarwiniaEthBlock,
-} from "./types";
+} from "../types";
 
 /**
  * Shadow APIs

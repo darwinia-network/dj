@@ -2,7 +2,7 @@
 export interface ITx {
     tx: string,
     ty: string,
-    relayedBlock: number,
+    blockNumber: number,
 }
 
 /// Darwinia Block

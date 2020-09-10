@@ -1,5 +1,5 @@
 import { autoAPI, ShadowAPI } from "../api";
-import { ITx } from "../api/types";
+import { ITx } from "../types";
 import { log, Config } from "../util";
 import * as Listener from "../listener"
 
@@ -20,17 +20,7 @@ export async function run() {
         conf.eth,
         async (tx: string, ty: string, blockNumber: number) => {
             log.trace(`Find darwinia ${ty} tx ${tx} in block ${blockNumber}`);
-            const lastConfirm = await api.lastConfirm();
-            const relayedBlock = blockNumber + 1;
-            await api.submitProposal([
-                await shadow.getProposal([lastConfirm], relayedBlock, blockNumber),
-            ]);
-
-            QUEUE.push({
-                tx,
-                relayedBlock,
-                ty: ty === "bank" ? "Deposit" : "Token",
-            });
+            QUEUE.push({ blockNumber, tx, ty: ty === "bank" ? "Deposit" : "Token" });
         }
     );
 }

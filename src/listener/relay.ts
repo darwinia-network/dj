@@ -1,7 +1,7 @@
 import { ShadowAPI, API } from "../api";
 import { log } from "../util";
 import { DispatchError } from "@polkadot/types/interfaces/types";
-import { IEthereumHeaderThingWithProof, ITx } from "../api/types";
+import { IEthereumHeaderThingWithProof, ITx } from "../types";
 import { Cache } from "./"
 
 // Listen and submit proposals
@@ -20,11 +20,11 @@ export function relay(api: API, shadow: ShadowAPI, queue: ITx[]) {
                 log.trace(`\t${event.section}:${event.method}:: (phase=${phase.toString()})`);
                 log.trace(`\t\t${event.meta.documentation.toString()}`);
                 const lastConfirmed = await api.lastConfirm();
-                queue.filter((tx) => tx.relayedBlock === lastConfirmed).forEach(async (tx) => {
+                queue.filter((tx) => tx.blockNumber === lastConfirmed).forEach(async (tx) => {
                     await api.redeem(tx.ty, await shadow.getReceipt(tx.tx, lastConfirmed));
                 });
 
-                queue = queue.filter((tx) => tx.relayedBlock !== lastConfirmed);
+                queue = queue.filter((tx) => tx.blockNumber !== lastConfirmed);
             }
 
             // Show what we are busy with
