@@ -161,7 +161,7 @@ export class API {
      */
     public async getBalance(addr: string): Promise<string> {
         const account = await this._.query.system.account(addr);
-        return account.data.free.toString();
+        return JSON.stringify(account.data.toHuman(), null, 2);
     }
 
     /**
@@ -192,7 +192,6 @@ export class API {
             return new ExResult(false, "", "");
         }
         log.event(`Approve block ${block}`);
-        await delay(3000);
         return await this.blockFinalized(ex, true);
     }
 
@@ -209,7 +208,6 @@ export class API {
             return new ExResult(false, "", "");
         }
         log.event(`Reject block ${block}`);
-        await delay(3000);
         return await this.blockFinalized(ex);
     }
 
@@ -221,7 +219,6 @@ export class API {
     public async submitProposal(headerThings: IEthereumHeaderThingWithProof[]): Promise<ExResult> {
         log.event(`Submit proposal contains block ${headerThings[headerThings.length - 1].header.number}`);
         const ex = this._.tx.ethereumRelay.submitProposal(headerThings);
-        await delay(3000);
         return await this.blockFinalized(ex);
     }
 
@@ -237,19 +234,6 @@ export class API {
             proof.receipt_proof,
             proof.mmr_proof,
         ]);
-        await delay(3000);
-        return await this.blockFinalized(ex);
-    }
-
-    /**
-     * transfer ring to address
-     *
-     * @param {String} address - the address of receiver
-     * @param {Number} amount - transfer amount
-     */
-    public async transfer(addr: string, amount: number): Promise<ExResult> {
-        const ex = this._.tx.balances.transfer(addr, amount);
-        await delay(3000);
         return await this.blockFinalized(ex);
     }
 

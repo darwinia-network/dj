@@ -3,7 +3,7 @@ import path from "path";
 import fs from "fs";
 import { IEthereumHeaderThingWithProof } from "../types";
 
-const cache = path.resolve((new Config()).path.root, "cache/blocks");
+const cache = path.resolve((new Config()).path, "../cache/blocks");
 
 // Init Cache
 export function initCache() {

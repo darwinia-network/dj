@@ -3,13 +3,9 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import prompts from "prompts";
-import { download } from "./download";
 import { log } from "./log";
 import rawCj from "./static/config.json";
 import rawTj from "./static/types.json";
-
-// constants
-export const TYPES_URL = "https://raw.githubusercontent.com/darwinia-network/darwinia/master/runtime/crab/darwinia_types.json"
 
 // Interfaces
 // Ethereum Config
@@ -40,12 +36,6 @@ export interface IConfig {
     seed: string;
     shadow: string;
     eth: IEthConfig;
-}
-
-export interface IConfigPath {
-    conf: string;
-    root: string;
-    types: string;
 }
 
 /**
@@ -85,7 +75,7 @@ export class Config {
 
     public eth: IEthConfig;
     public node: string;
-    public path: IConfigPath;
+    public path: string;
     public shadow: string;
     public types: Record<string, any>;
     private seed: string;
@@ -97,11 +87,7 @@ export class Config {
         const types = path.resolve(root, "types.json");
 
         // Init pathes
-        this.path = {
-            conf,
-            root,
-            types,
-        };
+        this.path = conf;
 
         // Check root
         if (!fs.existsSync(root)) {
@@ -137,12 +123,12 @@ export class Config {
             }
         });
 
-        const curConfig: IConfig = JSON.parse(fs.readFileSync(this.path.conf, "utf8"));
+        const curConfig: IConfig = JSON.parse(fs.readFileSync(this.path, "utf8"));
         const seed = String(ans.seed).trim();
         curConfig.seed = seed;
         this.seed = seed;
         fs.writeFileSync(
-            this.path.conf,
+            this.path,
             JSON.stringify(curConfig, null, 2)
         );
 
@@ -153,26 +139,8 @@ export class Config {
      * edit dj.json
      */
     public async edit(): Promise<void> {
-        child_process.spawnSync("vi", [this.path.conf], {
+        child_process.spawnSync("vi", [this.path], {
             stdio: "inherit",
         });
-    }
-
-    /**
-     * update types.json
-     */
-    public async updateTypes(): Promise<void> {
-        await download(this.path.root, TYPES_URL, "types.json");
-    }
-
-    /**
-     * print config to string
-     */
-    public toString(): string {
-        return JSON.stringify(
-            fs.readFileSync(this.path.conf, "utf8"),
-            null,
-            2
-        );
     }
 }

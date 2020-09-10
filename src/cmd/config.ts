@@ -1,7 +1,8 @@
 import yargs from "yargs";
 import {
-    Config, chalk, log, TYPES_URL,
+    Config,
 } from "../util";
+import child_process from "child_process";
 
 const config: yargs.CommandModule = {
     builder: (argv: yargs.Argv) => {
@@ -10,32 +11,15 @@ const config: yargs.CommandModule = {
             describe: "edit the config of darwinia.js",
             default: false,
             type: "boolean",
-        }).positional("update", {
-            alias: "u",
-            describe: "update the types.json of darwinia.js",
-            default: false,
-            type: "boolean",
         });
     },
-    command: "config [edit]",
+    command: "config",
     describe: "Show config",
-    handler: async (args: yargs.Arguments) => {
+    handler: async (_args: yargs.Arguments) => {
         const cfg = new Config();
-
-        if ((args.edit as boolean)) {
-            cfg.edit();
-        } else if ((args.update as boolean)) {
-            await cfg.updateTypes().catch((e: any) => {
-                log.err(e.toString());
-                log.err([
-                    "network connection fail, please check your network: ",
-                    `you can download types.json from ${chalk.cyan.underline(TYPES_URL)}`,
-                    `your self, and put it into ${cfg.path.root}`
-                ].join(""));
-            });
-        } else {
-            log.n(JSON.parse(cfg.toString()));
-        }
+        child_process.spawnSync("vi", [cfg.path], {
+            stdio: "inherit",
+        });
     },
 }
 
