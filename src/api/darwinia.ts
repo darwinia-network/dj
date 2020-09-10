@@ -239,6 +239,14 @@ export class API {
      * @param {DarwiniaEthBlock} block - darwinia style eth block
      */
     public async redeem(act: string, proof: IReceiptWithProof): Promise<ExResult> {
+        // Check verified
+        if ((await this._.query.ethereumBacking.verifiedProof(
+            [proof.receipt_proof.header_hash, Number.parseInt(proof.receipt_proof.index, 16)],
+        )).toJSON()) {
+            return;
+        }
+
+        // Redeem tx
         log.event(`Redeem tx in block ${proof.header.number}`);
         const ex: SubmittableExtrinsic<"promise"> = this._.tx.ethereumBacking.redeem(act, [
             proof.header,

@@ -41,7 +41,7 @@ export function relay(api: API, shadow: ShadowAPI, queue: ITx[]) {
     api._.query.system.events((events: any) => {
         events.forEach(async (record: any) => {
             const { event, phase } = record;
-            const types = event.typeDef;
+            // const types = event.typeDef;
 
             lastConfirmed = await api.lastConfirm();
             switch (event.method) {
@@ -50,7 +50,10 @@ export function relay(api: API, shadow: ShadowAPI, queue: ITx[]) {
                 case "PendingHeaderApproved":
                     approved(event, phase, api, shadow, queue, lastConfirmed);
                 case "NewRound":
-                    await newRound(event, phase, types, api, shadow);
+                // TODO
+                //
+                // Fix the Relayer Game API
+                // await newRound(event, phase, types, api, shadow);
             }
 
             if (event.data[0] && (event.data[0] as DispatchError).isModule) {
@@ -68,7 +71,7 @@ function gameOver() {
 }
 
 /// Approved handler
-function approved(
+async function approved(
     event: any,
     phase: any,
     api: API,
@@ -78,11 +81,11 @@ function approved(
 ) {
     log.trace(`\t${event.section}:${event.method}:: (phase=${phase.toString()})`);
     log.trace(`\t\t${event.meta.documentation.toString()}`);
-    queue.filter((tx) => tx.blockNumber < lastConfirmed).forEach(async (tx: ITx) => {
-        await delay(20000);
+    for (const tx of queue.filter((tx) => tx.blockNumber < lastConfirmed)) {
         lastConfirmed = await api.lastConfirm();
         await api.redeem(tx.ty, await shadow.getReceipt(tx.tx, lastConfirmed));
-    });
+        await delay(20000);
+    };
 
     queue = queue.filter((tx) => tx.blockNumber > lastConfirmed);
 }
@@ -95,7 +98,6 @@ async function newRound(
     api: API,
     shadow: ShadowAPI,
 ) {
-    return;
     log.trace(`\t${event.section}:${event.method}:: (phase=${phase.toString()})`);
     log.trace(`\t\t${event.meta.documentation.toString()}`);
     log.trace(JSON.stringify(event.data.toJSON()));
