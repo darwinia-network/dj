@@ -228,6 +228,14 @@ export class API {
      * @param {IEthHeaderThing} headerThings - Eth Header Things
      */
     public async submitProposal(headerThings: IEthereumHeaderThingWithProof[]): Promise<ExResult> {
+        const latest = headerThings[headerThings.length - 1].header.number;
+        if (((await this._.query.ethereumRelay.confirmedHeadersDoubleMap(
+            [Math.floor(latest / 185142), latest],
+        )).toHuman() as any).timestamp !== 0) {
+            return new ExResult(true, "", "");
+        }
+
+        // Submit new proposal
         log.event(`Submit proposal contains block ${headerThings[headerThings.length - 1].header.number}`);
         const ex = this._.tx.ethereumRelay.submitProposal(headerThings);
         return await this.blockFinalized(ex);
@@ -243,7 +251,7 @@ export class API {
         if ((await this._.query.ethereumBacking.verifiedProof(
             [proof.receipt_proof.header_hash, Number.parseInt(proof.receipt_proof.index, 16)],
         )).toJSON()) {
-            return;
+            return new ExResult(true, "", "");
         }
 
         // Redeem tx
