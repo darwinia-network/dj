@@ -81,7 +81,7 @@ async function approved(
 ) {
     log.trace(`\t${event.section}:${event.method}:: (phase=${phase.toString()})`);
     log.trace(`\t\t${event.meta.documentation.toString()}`);
-    for (const tx of queue.filter((tx) => tx.blockNumber < lastConfirmed)) {
+    for (const tx of queue.filter((ftx) => ftx.blockNumber < lastConfirmed)) {
         lastConfirmed = await api.lastConfirm();
         await api.redeem(tx.ty, await shadow.getReceipt(tx.tx, lastConfirmed));
         await delay(20000);
