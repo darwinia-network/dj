@@ -229,9 +229,10 @@ export class API {
      */
     public async submitProposal(headerThings: IEthereumHeaderThingWithProof[]): Promise<ExResult> {
         const latest = headerThings[headerThings.length - 1].header.number;
-        if (((await this._.query.ethereumRelay.confirmedHeadersDoubleMap(
-            [Math.floor(latest / 185142), latest],
-        )).toHuman() as any).timestamp !== 0) {
+        const cts = ((await this._.query.ethereumRelay.confirmedHeadersDoubleMap(
+            Math.floor(latest / 185142), latest,
+        )).toJSON() as any).timestamp;
+        if (cts !== 0) {
             return new ExResult(true, "", "");
         }
 
