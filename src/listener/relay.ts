@@ -35,7 +35,7 @@ export function relay(api: API, shadow: ShadowAPI, queue: ITx[]) {
 
         // push target to done set
         submitted.push(target);
-    }, 60000);
+    }, 180000);
 
     // Subscribe to system events via storage
     api._.query.system.events((events: any) => {
