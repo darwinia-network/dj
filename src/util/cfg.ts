@@ -7,23 +7,45 @@ import { download } from "./download";
 import { log } from "./log";
 import rawCj from "./static/config.json";
 import rawTj from "./static/types.json";
-import rawEj from "./static/ethereum_listener.json";
 
 // constants
 export const TYPES_URL = "https://raw.githubusercontent.com/darwinia-network/darwinia/master/runtime/crab/darwinia_types.json"
 
-// interfaces
+// Interfaces
+// Ethereum Config
+interface IEthConfig {
+    RPC_SERVER: string;
+    START_BLOCK_NUMBER: number;
+    CONTRACT: {
+        RING: {
+            address: string;
+            burnAndRedeemTopics: string;
+        },
+        KTON: {
+            address: string;
+            burnAndRedeemTopics: string;
+        },
+        BANK: {
+            address: string;
+            burnAndRedeemTopics: string;
+        }
+        ISSUING: {
+            address: string;
+        }
+    }
+}
+
 export interface IConfig {
     node: string;
     seed: string;
     shadow: string;
+    eth: IEthConfig;
 }
 
 export interface IConfigPath {
     conf: string;
     root: string;
     types: string;
-    ethereumListener: string;
 }
 
 /**
@@ -61,11 +83,11 @@ export class Config {
         return json
     }
 
+    public eth: IEthConfig;
     public node: string;
     public path: IConfigPath;
     public shadow: string;
     public types: Record<string, any>;
-    public ethereumListener: Record<string, any>;
     private seed: string;
 
     constructor() {
@@ -73,14 +95,12 @@ export class Config {
         const root = path.resolve(home, ".darwinia");
         const conf = path.resolve(root, "config.json");
         const types = path.resolve(root, "types.json");
-        const ethereumListener = path.resolve(root, "ethereum_listener.json");
 
         // Init pathes
         this.path = {
             conf,
             root,
             types,
-            ethereumListener,
         };
 
         // Check root
@@ -92,8 +112,8 @@ export class Config {
         this.node = cj.node;
         this.seed = cj.seed;
         this.shadow = cj.shadow;
+        this.eth = cj.eth;
         this.types = Config.load(types, rawTj);
-        this.ethereumListener = Config.load(ethereumListener, rawEj);
 
         // Warn config
         Config.warn(this);

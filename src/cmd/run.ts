@@ -17,7 +17,7 @@ export async function run() {
     Listener.guard(api, shadow);
     Listener.relay(api, shadow, QUEUE);
     Listener.ethereum(
-        conf.ethereumListener,
+        conf.eth,
         async (tx: string, ty: string, blockNumber: number) => {
             log.trace(`Find darwinia ${ty} tx ${tx} in block ${blockNumber}`);
             const lastConfirm = await api.lastConfirm();
