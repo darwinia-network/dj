@@ -1,5 +1,5 @@
 /* tslint:disable:variable-name */
-import { log, delay } from "../util";
+import { log, Config } from "../util";
 import { ApiPromise, SubmittableResult, WsProvider } from "@polkadot/api";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import Keyring from "@polkadot/keyring";
@@ -75,6 +75,17 @@ export class ExResult {
  * @property {ApiPromise} ap - raw polkadot api
  */
 export class API {
+    /**
+     * new darwinia API using global `config.json`
+     *
+     * @returns {API} darwinia api
+     */
+    public static async auto(): Promise<API> {
+        const cfg = new Config();
+        const seed = await cfg.checkSeed();
+        return await API.new(seed, cfg.node, cfg.types);
+    }
+
     /**
      * new darwinia account from seed
      *

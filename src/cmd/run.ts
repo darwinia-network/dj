@@ -1,4 +1,4 @@
-import { autoAPI, ShadowAPI } from "../api";
+import { API, ShadowAPI } from "../api";
 import { ITx } from "../types";
 import { Config, log } from "../util";
 import * as Listener from "../listener"
@@ -10,7 +10,7 @@ export async function run() {
     Listener.Cache.initCache();
 
     const conf = new Config();
-    const api = await autoAPI();
+    const api = await API.auto();
     const shadow = new ShadowAPI(conf.shadow);
 
     // Log current account info
