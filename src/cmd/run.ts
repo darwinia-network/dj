@@ -1,6 +1,6 @@
 import { autoAPI, ShadowAPI } from "../api";
 import { ITx } from "../types";
-import { log, Config } from "../util";
+import { Config } from "../util";
 import * as Listener from "../listener"
 
 const QUEUE: ITx[] = [];
@@ -16,11 +16,5 @@ export async function run() {
     // Start proposal linstener
     Listener.guard(api, shadow);
     Listener.relay(api, shadow, QUEUE);
-    Listener.ethereum(
-        conf.eth,
-        async (tx: string, ty: string, blockNumber: number) => {
-            log.trace(`Find darwinia ${ty} tx ${tx} in block ${blockNumber}`);
-            QUEUE.push({ blockNumber, tx, ty: ty === "bank" ? "Deposit" : "Token" });
-        }
-    );
+    Listener.ethereum(conf.eth, QUEUE);
 }
