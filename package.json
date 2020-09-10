@@ -20,11 +20,7 @@
         "@polkadot/keyring": "3.3.1",
         "@polkadot/util-crypto": "3.3.1",
         "axios": "^0.19.2",
-        "got": "^11.5.2",
-        "javascript-stringify": "^2.0.1",
-        "progress": "^2.0.3",
         "prompts": "^2.3.2",
-        "tar": "^6.0.5",
         "web3": "^1.2.11",
         "config": "^3.3.1"
     },
