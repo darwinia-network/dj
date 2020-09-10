@@ -6,7 +6,7 @@ import { IEthereumHeaderThingWithProof } from "../types";
 const cache = path.resolve((new Config()).path, "../cache/blocks");
 
 // Init Cache
-export function initCache() {
+export function init() {
     if (fs.existsSync(cache)) {
         fs.rmdirSync(cache, { recursive: true });
     }
