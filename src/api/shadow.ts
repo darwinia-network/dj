@@ -75,6 +75,7 @@ export class ShadowAPI {
         target: number,
         last_leaf: number,
     ): Promise<IEthereumHeaderThingWithProof> {
+        log.event(`Fetching proposal of ${target}`);
         const r: AxiosResponse = await axios.post(this.api + "/eth/proposal", {
             leaves,
             target,
