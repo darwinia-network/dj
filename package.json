@@ -29,9 +29,7 @@
         "@commitlint/config-conventional": "^8.3.4",
         "@polkadot/types": "1.30.0-beta.0",
         "@types/node": "^13.11.1",
-        "@types/progress": "^2.0.3",
         "@types/prompts": "^2.0.8",
-        "@types/tar": "^4.0.3",
         "husky": "^4.2.5",
         "tslint": "^6.1.1",
         "typescript": "^3.8.3"

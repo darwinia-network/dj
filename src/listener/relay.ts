@@ -6,35 +6,24 @@ import { Cache } from "./"
 
 // Listen and submit proposals
 export function relay(api: API, shadow: ShadowAPI, queue: ITx[]) {
-    let lastConfirmed: number = 0;
-    const submitted: number[] = [];
-
     // Trigger relay every 180s
     setInterval(async () => {
         if (queue.length < 1) return;
 
         /// Check last confirm
-        lastConfirmed = await api.lastConfirm();
-
-        // Refresh target
-        let target = lastConfirmed + 7;
-        for (const tx of queue) {
-            if (lastConfirmed < tx.blockNumber) {
-                target = tx.blockNumber + 1;
-            }
-        }
+        const lastConfirmed = await api.lastConfirm();
+        const target = Math.max(
+            lastConfirmed,
+            queue.sort((p, q) => q.blockNumber - p.blockNumber)[0].blockNumber,
+        ) + 7;
 
         // Submit new proposal
-        if (submitted.indexOf(target) > -1) return;
         log(`Currently we have ${queue.length} txs are waiting to be redeemed`);
         await api.submitProposal([await shadow.getProposal(
             [lastConfirmed],
             target,
             target - 1,
         )]);
-
-        // push target to done set
-        submitted.push(target);
     }, 180000);
 
     // Subscribe to system events via storage
@@ -43,12 +32,11 @@ export function relay(api: API, shadow: ShadowAPI, queue: ITx[]) {
             const { event, phase } = record;
             // const types = event.typeDef;
 
-            lastConfirmed = await api.lastConfirm();
             switch (event.method) {
                 case "GameOver":
                     gameOver();
                 case "PendingHeaderApproved":
-                    approved(event, phase, api, shadow, queue, lastConfirmed);
+                    approved(event, phase, api, shadow, queue);
                 case "NewRound":
                 // TODO
                 //
@@ -77,21 +65,21 @@ async function approved(
     api: API,
     shadow: ShadowAPI,
     queue: ITx[],
-    lastConfirmed: number,
 ) {
+    const lastConfirmed = await api.lastConfirm();
     log.trace(`\t${event.section}:${event.method}:: (phase=${phase.toString()})`);
     log.trace(`\t\t${event.meta.documentation.toString()}`);
     for (const tx of queue.filter((ftx) => ftx.blockNumber < lastConfirmed)) {
-        lastConfirmed = await api.lastConfirm();
-        await api.redeem(tx.ty, await shadow.getReceipt(tx.tx, lastConfirmed));
-        await delay(20000);
+        const curLastConfirmed = await api.lastConfirm();
+        await api.redeem(tx.ty, await shadow.getReceipt(tx.tx, curLastConfirmed));
+        await delay(5000);
     };
 
-    queue = queue.filter((tx) => tx.blockNumber > lastConfirmed);
+    queue = queue.filter((tx) => tx.blockNumber >= lastConfirmed);
 }
 
 /// NewRound handler
-async function newRound(
+async function _newRound(
     event: any,
     phase: any,
     types: any,

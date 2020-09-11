@@ -1,12 +1,12 @@
 /* tslint:disable:variable-name */
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 import { log } from "../util";
 import {
     IReceiptWithProof,
     IEthereumHeaderThingWithConfirmation,
     IEthereumHeaderThingWithProof,
-    IDarwiniaEthBlock,
 } from "../types";
+
 
 /**
  * Shadow APIs
@@ -15,35 +15,22 @@ import {
  * @method getBlockWithProof - get eth header with proof
  */
 export class ShadowAPI {
-    private api: string;
-
     constructor(api: string) {
-        this.api = api;
+        axios.defaults.baseURL = api;
+        axios.defaults.proxy = false;
     }
 
-    /**
-     * Get raw darwinia block
-     *
-     * @param {number} block - block number
-     */
-    public async getBlock(block: number | string): Promise<IDarwiniaEthBlock> {
-        let r: AxiosResponse;
-        r = await axios.get(this.api + "/eth/header/" + block);
-
-        // Trace the back data
-        log.trace(JSON.stringify(r.data.header, null, 2));
-        return r.data.header;
-    }
 
     /**
      * Get darwinia block with eth proof
      *
-     * @param {number} block - block number
+     * @param {number} block | string - block number
      */
     async getHeaderThing(block: number | string): Promise<IEthereumHeaderThingWithConfirmation> {
-        const r: AxiosResponse = await axios.get(
-            this.api + "/eth/header/" + block,
-        );
+        log.event(`Get header thing of ${block}`);
+        const r: any = await axios.get(
+            "/eth/header/" + block,
+        ).catch(log.err);
 
         // Trace the back data
         log.trace(JSON.stringify(r.data, null, 2))
@@ -56,9 +43,10 @@ export class ShadowAPI {
      * @param {number} block - block number
      */
     async getReceipt(tx: string, lastConfirmed: number): Promise<IReceiptWithProof> {
-        const r: AxiosResponse = await axios.get(
-            this.api + "/eth/receipt/" + tx + "/" + lastConfirmed
-        );
+        log.event(`Get receipt of ${tx}`);
+        const r: any = await axios.get(
+            "/eth/receipt/" + tx + "/" + lastConfirmed,
+        ).catch(log.err);
 
         // Trace the back data
         log.trace(JSON.stringify(r.data, null, 2))
@@ -76,11 +64,11 @@ export class ShadowAPI {
         last_leaf: number,
     ): Promise<IEthereumHeaderThingWithProof> {
         log.event(`Fetching proposal of ${target}`);
-        const r: AxiosResponse = await axios.post(this.api + "/eth/proposal", {
+        const r: any = await axios.post("/eth/proposal", {
             leaves,
             target,
             last_leaf,
-        });
+        }).catch(log.err);
 
         // Trace the back data
         log.trace(JSON.stringify(r.data, null, 2));

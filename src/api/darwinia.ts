@@ -176,21 +176,6 @@ export class API {
     }
 
     /**
-     * get the specify block
-     *
-     * @param {string|number} block - hash or number of the block
-     */
-    public async getBlock(block: string | number): Promise<SignedBlock> {
-        let hash: string = "";
-        if (typeof block === "number") {
-            const h = await this._.rpc.chain.getBlockHash(block);
-            hash = h.toHex();
-        }
-
-        return await this._.rpc.chain.getBlock(hash);
-    }
-
-    /**
      * Approve block in relayer game
      */
     public async approveBlock(block: number, perms = 4): Promise<ExResult> {
