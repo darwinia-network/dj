@@ -2,7 +2,7 @@
 import { log, Config } from "../util";
 import { ApiPromise, SubmittableResult, WsProvider } from "@polkadot/api";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
-import Keyring from "@polkadot/keyring";
+import { Keyring, decodeAddress } from "@polkadot/keyring";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { DispatchError, EventRecord } from "@polkadot/types/interfaces/types";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
@@ -83,7 +83,7 @@ export class API {
     public static async auto(): Promise<API> {
         const cfg = new Config();
         const seed = await cfg.checkSeed();
-        return await API.new(seed, cfg.node, cfg.types);
+        return await API.new(seed, cfg.node, cfg.relayer, cfg.types);
     }
 
     /**
@@ -123,6 +123,7 @@ export class API {
     public static async new(
         seed: string,
         node: string,
+        relayer: string,
         types: Record<string, any>,
     ): Promise<API> {
         const api = await ApiPromise.create({
@@ -132,10 +133,11 @@ export class API {
 
         const account = await API.seed(seed);
         log.trace("init darwinia api succeed");
-        return new API(account, (api as ApiPromise), types);
+        return new API(account, (api as ApiPromise), decodeAddress(relayer), types);
     }
 
     public account: KeyringPair;
+    public relayer: Uint8Array;
     public types: Record<string, any>;
     public _: ApiPromise;
 
@@ -147,8 +149,14 @@ export class API {
      * @param {KeyringPair} account - darwinia account
      * @param {ApiPromise} ap - raw polkadot api
      */
-    constructor(account: KeyringPair, ap: ApiPromise, types: Record<string, any>) {
+    constructor(
+        account: KeyringPair,
+        ap: ApiPromise,
+        relayer: Uint8Array,
+        types: Record<string, any>,
+    ) {
         this.account = account;
+        this.relayer = relayer;
         this.types = types;
         this._ = ap;
     }
@@ -223,7 +231,11 @@ export class API {
 
         // Submit new proposal
         log.event(`Submit proposal contains block ${headerThings[headerThings.length - 1].header.number}`);
-        const ex = this._.tx.ethereumRelay.submitProposal(headerThings);
+        let ex = this._.tx.ethereumRelay.submitProposal(headerThings);
+        if (this.relayer.length > 0) {
+            ex = this._.tx.proxy.proxy(this.relayer, "Relayer", ex);
+        }
+
         return await this.blockFinalized(ex);
     }
 
