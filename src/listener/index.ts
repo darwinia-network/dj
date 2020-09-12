@@ -1,4 +1,4 @@
-export { guard } from "./guard";
 export * as Cache from "./cache";
-export { relay } from "./relay";
+export { listen as guard } from "./guard";
+export { listen as relay } from "./relay";
 export { listen as ethereum } from "./eth";

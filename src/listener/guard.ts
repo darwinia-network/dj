@@ -2,7 +2,7 @@ import { ShadowAPI, API, ExResult } from "../api";
 import { log } from "../util";
 
 // Proposal guard
-export async function guard(api: API, shadow: ShadowAPI) {
+export async function listen(api: API, shadow: ShadowAPI) {
     let perms = 4;
     if ((await api._.query.sudo.key()).toJSON().indexOf(api.account.address) > -1) {
         perms = 7;
