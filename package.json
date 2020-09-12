@@ -12,7 +12,8 @@
   "license": "GPL-3.0",
   "main": "lib/index.js",
   "bin": {
-    "dj": "lib/index.js"
+    "dj": "lib/index.js",
+    "dj-proposal": "lib/src/bin/proposal.js"
   },
   "files": ["lib/**/*"],
   "dependencies": {

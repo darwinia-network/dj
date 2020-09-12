@@ -36,7 +36,7 @@ export default async function newRound(
         }
     })
 
-    const newProposal = await shadow.getProposal([newMember], newMember, lastLeaf);
+    const newProposal = await shadow.getProposal(newMember, newMember, lastLeaf);
     Cache.setBlock(newMember, Object.assign(JSON.parse(JSON.stringify(newProposal)), {
         ethash_proof: [],
         mmr_root: "",

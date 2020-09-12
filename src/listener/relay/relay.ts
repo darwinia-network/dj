@@ -27,7 +27,7 @@ export default function relay(api: API, shadow: ShadowAPI, queue: ITx[]) {
         // Submit new proposal
         log(`Currently we have ${queue.length} txs are waiting to be redeemed`);
         await api.submitProposal([await shadow.getProposal(
-            [lastConfirmed],
+            lastConfirmed,
             target,
             target - 1,
         )]).catch(log.err);

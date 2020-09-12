@@ -59,13 +59,13 @@ export class ShadowAPI {
      * @param {number} block - block number
      */
     async getProposal(
-        leaves: number[],
+        member: number,
         target: number,
         last_leaf: number,
     ): Promise<IEthereumHeaderThingWithProof> {
         log.event(`Fetching proposal of ${target}`);
         const r: any = await axios.post("/eth/proposal", {
-            leaves,
+            member,
             target,
             last_leaf,
         }).catch(log.err);
