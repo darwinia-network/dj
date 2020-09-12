@@ -3,7 +3,7 @@ import { Blocks, blockInDB, logInDB } from "./DB";
 import { localConfig as Config } from "./Config";
 import { delay, log } from "../../util";
 import { BlockchainState } from "./BlockchainState";
-import { LogsOptions, Log, CoundBeNullLogs } from "./types";
+import { LogsOptions, Log, CoundBeNullLogs } from "../../types";
 
 export class EventParser {
     private delayBlockNumber: number = 6;

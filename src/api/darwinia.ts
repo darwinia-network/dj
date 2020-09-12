@@ -1,5 +1,5 @@
 /* tslint:disable:variable-name */
-import { log, delay } from "../util";
+import { log, Config } from "../util";
 import { ApiPromise, SubmittableResult, WsProvider } from "@polkadot/api";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import Keyring from "@polkadot/keyring";
@@ -10,7 +10,7 @@ import { SignedBlock } from "@polkadot/types/interfaces";
 import {
     IEthereumHeaderThingWithProof,
     IReceiptWithProof,
-} from "./types";
+} from "../types";
 
 export interface IErrorDoc {
     name: string;
@@ -75,6 +75,17 @@ export class ExResult {
  * @property {ApiPromise} ap - raw polkadot api
  */
 export class API {
+    /**
+     * new darwinia API using global `config.json`
+     *
+     * @returns {API} darwinia api
+     */
+    public static async auto(): Promise<API> {
+        const cfg = new Config();
+        const seed = await cfg.checkSeed();
+        return await API.new(seed, cfg.node, cfg.types);
+    }
+
     /**
      * new darwinia account from seed
      *
@@ -161,22 +172,7 @@ export class API {
      */
     public async getBalance(addr: string): Promise<string> {
         const account = await this._.query.system.account(addr);
-        return account.data.free.toString();
-    }
-
-    /**
-     * get the specify block
-     *
-     * @param {string|number} block - hash or number of the block
-     */
-    public async getBlock(block: string | number): Promise<SignedBlock> {
-        let hash: string = "";
-        if (typeof block === "number") {
-            const h = await this._.rpc.chain.getBlockHash(block);
-            hash = h.toHex();
-        }
-
-        return await this._.rpc.chain.getBlock(hash);
+        return JSON.stringify(account.data.toHuman(), null, 2);
     }
 
     /**
@@ -192,7 +188,6 @@ export class API {
             return new ExResult(false, "", "");
         }
         log.event(`Approve block ${block}`);
-        await delay(3000);
         return await this.blockFinalized(ex, true);
     }
 
@@ -209,7 +204,6 @@ export class API {
             return new ExResult(false, "", "");
         }
         log.event(`Reject block ${block}`);
-        await delay(3000);
         return await this.blockFinalized(ex);
     }
 
@@ -219,9 +213,17 @@ export class API {
      * @param {IEthHeaderThing} headerThings - Eth Header Things
      */
     public async submitProposal(headerThings: IEthereumHeaderThingWithProof[]): Promise<ExResult> {
+        const latest = headerThings[headerThings.length - 1].header.number;
+        const cts = ((await this._.query.ethereumRelay.confirmedHeadersDoubleMap(
+            Math.floor(latest / 185142), latest,
+        )).toJSON() as any).timestamp;
+        if (cts !== 0) {
+            return new ExResult(true, "", "");
+        }
+
+        // Submit new proposal
         log.event(`Submit proposal contains block ${headerThings[headerThings.length - 1].header.number}`);
         const ex = this._.tx.ethereumRelay.submitProposal(headerThings);
-        await delay(3000);
         return await this.blockFinalized(ex);
     }
 
@@ -231,25 +233,20 @@ export class API {
      * @param {DarwiniaEthBlock} block - darwinia style eth block
      */
     public async redeem(act: string, proof: IReceiptWithProof): Promise<ExResult> {
+        // Check verified
+        if ((await this._.query.ethereumBacking.verifiedProof(
+            [proof.receipt_proof.header_hash, Number.parseInt(proof.receipt_proof.index, 16)],
+        )).toJSON()) {
+            return new ExResult(true, "", "");
+        }
+
+        // Redeem tx
         log.event(`Redeem tx in block ${proof.header.number}`);
         const ex: SubmittableExtrinsic<"promise"> = this._.tx.ethereumBacking.redeem(act, [
             proof.header,
             proof.receipt_proof,
             proof.mmr_proof,
         ]);
-        await delay(3000);
-        return await this.blockFinalized(ex);
-    }
-
-    /**
-     * transfer ring to address
-     *
-     * @param {String} address - the address of receiver
-     * @param {Number} amount - transfer amount
-     */
-    public async transfer(addr: string, amount: number): Promise<ExResult> {
-        const ex = this._.tx.balances.transfer(addr, amount);
-        await delay(3000);
         return await this.blockFinalized(ex);
     }
 

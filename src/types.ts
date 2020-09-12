@@ -1,8 +1,23 @@
+/// Web3 types
+import { BlockNumber, Log } from "web3-core";
+
+export { Log } from 'web3-core';
+export type Topics = (string | string[] | null)[];
+export interface LogsOptions {
+    fromBlock: BlockNumber;
+    toBlock: BlockNumber;
+    address: string | string[];
+    topics: (string | string[] | null)[];
+}
+
+export type CoundBeNullLogs = null | Log[];
+export type LogType = 'ring' | 'kton' | 'bank';
+
 /// Transaction stuffs
 export interface ITx {
     tx: string,
     ty: string,
-    relayedBlock: number,
+    blockNumber: number,
 }
 
 /// Darwinia Block

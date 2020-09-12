@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import exec from "./src/cmd";
+import main from "./src";
 
 (async () => {
-    exec();
+    await main();
 })();

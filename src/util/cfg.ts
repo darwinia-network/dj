@@ -3,27 +3,39 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import prompts from "prompts";
-import { download } from "./download";
 import { log } from "./log";
 import rawCj from "./static/config.json";
 import rawTj from "./static/types.json";
-import rawEj from "./static/ethereum_listener.json";
 
-// constants
-export const TYPES_URL = "https://raw.githubusercontent.com/darwinia-network/darwinia/master/runtime/crab/darwinia_types.json"
+// Interfaces
+// Ethereum Config
+interface IEthConfig {
+    RPC_SERVER: string;
+    START_BLOCK_NUMBER: number;
+    CONTRACT: {
+        RING: {
+            address: string;
+            burnAndRedeemTopics: string;
+        },
+        KTON: {
+            address: string;
+            burnAndRedeemTopics: string;
+        },
+        BANK: {
+            address: string;
+            burnAndRedeemTopics: string;
+        }
+        ISSUING: {
+            address: string;
+        }
+    }
+}
 
-// interfaces
 export interface IConfig {
     node: string;
     seed: string;
     shadow: string;
-}
-
-export interface IConfigPath {
-    conf: string;
-    root: string;
-    types: string;
-    ethereumListener: string;
+    eth: IEthConfig;
 }
 
 /**
@@ -61,11 +73,11 @@ export class Config {
         return json
     }
 
+    public eth: IEthConfig;
     public node: string;
-    public path: IConfigPath;
+    public path: string;
     public shadow: string;
     public types: Record<string, any>;
-    public ethereumListener: Record<string, any>;
     private seed: string;
 
     constructor() {
@@ -73,15 +85,9 @@ export class Config {
         const root = path.resolve(home, ".darwinia");
         const conf = path.resolve(root, "config.json");
         const types = path.resolve(root, "types.json");
-        const ethereumListener = path.resolve(root, "ethereum_listener.json");
 
         // Init pathes
-        this.path = {
-            conf,
-            root,
-            types,
-            ethereumListener,
-        };
+        this.path = conf;
 
         // Check root
         if (!fs.existsSync(root)) {
@@ -92,8 +98,8 @@ export class Config {
         this.node = cj.node;
         this.seed = cj.seed;
         this.shadow = cj.shadow;
+        this.eth = cj.eth;
         this.types = Config.load(types, rawTj);
-        this.ethereumListener = Config.load(ethereumListener, rawEj);
 
         // Warn config
         Config.warn(this);
@@ -117,12 +123,12 @@ export class Config {
             }
         });
 
-        const curConfig: IConfig = JSON.parse(fs.readFileSync(this.path.conf, "utf8"));
+        const curConfig: IConfig = JSON.parse(fs.readFileSync(this.path, "utf8"));
         const seed = String(ans.seed).trim();
         curConfig.seed = seed;
         this.seed = seed;
         fs.writeFileSync(
-            this.path.conf,
+            this.path,
             JSON.stringify(curConfig, null, 2)
         );
 
@@ -133,26 +139,8 @@ export class Config {
      * edit dj.json
      */
     public async edit(): Promise<void> {
-        child_process.spawnSync("vi", [this.path.conf], {
+        child_process.spawnSync("vi", [this.path], {
             stdio: "inherit",
         });
-    }
-
-    /**
-     * update types.json
-     */
-    public async updateTypes(): Promise<void> {
-        await download(this.path.root, TYPES_URL, "types.json");
-    }
-
-    /**
-     * print config to string
-     */
-    public toString(): string {
-        return JSON.stringify(
-            fs.readFileSync(this.path.conf, "utf8"),
-            null,
-            2
-        );
     }
 }

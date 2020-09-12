@@ -1,3 +1,5 @@
+import { LogType, Log } from "../../types";
+
 export interface Blocks {
     lastBlockNumber: number,
     parsedEventBlockNumber: number
@@ -22,8 +24,6 @@ export class BlockInDB {
         };
     }
 }
-
-import { LogType, Log } from "./types";
 
 export class LogInDB {
     private ringQueue: Log[] = [];

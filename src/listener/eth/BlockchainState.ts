@@ -2,8 +2,8 @@ import { localConfig as Config } from "./Config";
 import { blockInDB } from "./DB";
 
 export class BlockchainState {
-    getState(): Promise<any> {
-        return BlockchainState.getBlockState().then(([blockInChain, latestBlockInDB]) => {
+    async getState(): Promise<any> {
+        return BlockchainState.getBlockState().then(([blockInChain, _latestBlockInDB]) => {
             blockInDB.setLastBlockNumber(blockInChain);
         })
     }

@@ -20,6 +20,4 @@ ethereum({
             "address": "0x49262B932E439271d05634c32978294C7Ea15d0C"
         }
     }
-}, (tx: any) => {
-    console.log('test::callback:', tx)
-});
+}, []);

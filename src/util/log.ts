@@ -1,5 +1,4 @@
 import chalk from "chalk";
-import { stringify } from "javascript-stringify";
 
 const l = chalk.dim("[ ");
 const r = chalk.dim(" ]: ");
@@ -125,15 +124,12 @@ function flush(label: string, context: any): void {
 
     if (typeof (context) === "string") {
         plain += context;
-    } else if (typeof (context) === "object" && Object.keys(context).length > 0) {
-        plain += JSON.stringify(context);
     } else {
-        plain += stringify(context);
+        plain += JSON.stringify(context);
     }
 
     // output
-    const sl = stringify(label);
-    if (sl && sl.indexOf("error") > -1) {
+    if (label && label.indexOf("error") > -1) {
         console.error(plain);
     } else {
         console.log(plain);

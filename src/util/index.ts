@@ -1,5 +1,4 @@
-import { Config, TYPES_URL } from "./cfg";
-import { download } from "./download";
+import { Config } from "./cfg";
 import { log } from "./log";
 import { whereisPj } from "./pj";
 import { delay } from "./delay";
@@ -10,8 +9,6 @@ export {
     Config,
     delay,
     chalk,
-    download,
     log,
-    TYPES_URL,
     whereisPj,
 }
