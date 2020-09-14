@@ -10,14 +10,12 @@ export default async function approved(
     shadow: ShadowAPI,
     queue: ITx[],
 ) {
-    const lastConfirmed = await api.lastConfirm();
     log.trace(`\t${event.section}:${event.method}:: (phase=${phase.toString()})`);
     log.trace(`\t\t${event.meta.documentation.toString()}`);
-    for (const tx of queue.filter((ftx) => ftx.blockNumber < lastConfirmed)) {
+
+    for (const tx of queue) {
         const curLastConfirmed = await api.lastConfirm();
         await api.redeem(tx.ty, await shadow.getReceipt(tx.tx, curLastConfirmed));
-        await delay(5000);
+        await delay(10000);
     };
-
-    queue = queue.filter((tx) => tx.blockNumber >= lastConfirmed);
 }

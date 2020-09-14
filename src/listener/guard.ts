@@ -13,20 +13,17 @@ export async function listen(api: API, shadow: ShadowAPI) {
     }
 
     // start listening
-    let lock = false;
     const handled: number[] = [];
     setInterval(async () => {
-        if (lock) { return; }
         const headers = (await api._.query.ethereumRelayerGame.pendingHeaders()).toJSON() as string[][];
         if (headers.length === 0) {
             return;
         }
 
-        lock = true;
         for (const h of headers) {
             const blockNumber = Number.parseInt(h[1], 10);
             if (handled.indexOf(blockNumber) > -1) {
-                break;
+                continue;
             }
 
             const block = (await shadow.getHeaderThing(blockNumber)) as any;
@@ -47,7 +44,5 @@ export async function listen(api: API, shadow: ShadowAPI) {
             }
             handled.push(blockNumber);
         }
-
-        lock = false;
     }, 10000);
 }

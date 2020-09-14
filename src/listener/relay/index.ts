@@ -19,12 +19,17 @@ export function listen(api: API, shadow: ShadowAPI, queue: ITx[]) {
                 case "GameOver":
                     log.event("GameOver");
                 case "PendingHeaderApproved":
-                    approve(event, phase, api, shadow, queue);
+                    const lastConfirmed = await api.lastConfirm();
+                    await approve(
+                        event, phase, api, shadow,
+                        queue.filter((ftx) => ftx.blockNumber < lastConfirmed),
+                    );
+                    queue = queue.filter((ftx) => ftx.blockNumber >= lastConfirmed);
                 case "NewRound":
-                    // TODO
-                    //
-                    // Fix the Relayer Game API
-                    // await newRound(event, phase, types, api, shadow);
+                // TODO
+                //
+                // Fix the Relayer Game API
+                // await newRound(event, phase, types, api, shadow);
             }
 
             if (event.data[0] && (event.data[0] as DispatchError).isModule) {

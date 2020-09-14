@@ -2,8 +2,6 @@ import { ShadowAPI, API } from "../../api";
 import { log } from "../../util";
 import { ITx } from "../../types";
 
-
-
 // Listen and submit proposals
 export default function relay(api: API, shadow: ShadowAPI, queue: ITx[]) {
     const submitted: number[] = [];
@@ -14,17 +12,13 @@ export default function relay(api: API, shadow: ShadowAPI, queue: ITx[]) {
 
         // Check last confirm
         const lastConfirmed = await api.lastConfirm();
-        let target = Math.max(
-            lastConfirmed + 1,
-            queue.sort((p, q) => q.blockNumber - p.blockNumber)[0].blockNumber,
-        );
-
-        // Check target
-        while (submitted.indexOf(target) > -1) {
-            target += 1;
+        const maxBlock = queue.sort((p, q) => q.blockNumber - p.blockNumber)[0].blockNumber;
+        if (lastConfirmed === maxBlock + 1) {
+            return;
         }
 
         // Submit new proposal
+        const target = Math.max(lastConfirmed, maxBlock) + 1;
         log(`Currently we have ${queue.length} txs are waiting to be redeemed`);
         await api.submitProposal([await shadow.getProposal(
             lastConfirmed,
@@ -34,5 +28,5 @@ export default function relay(api: API, shadow: ShadowAPI, queue: ITx[]) {
 
         // Refresh target
         submitted.push(target);
-    }, 180000);
+    }, 60000);
 }

@@ -1,7 +1,7 @@
 {
     "private": false,
     "name": "@darwinia/dj",
-    "version": "",
+    "version": "0.2.3-beta.0",
     "description": "Darwinia bridge relayer tool",
     "homepage": "https://github.com/darwinia-network/dj",
     "repository": {
