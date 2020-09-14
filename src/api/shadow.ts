@@ -7,7 +7,6 @@ import {
     IEthereumHeaderThingWithProof,
 } from "../types";
 
-
 /**
  * Shadow APIs
  *
@@ -19,7 +18,6 @@ export class ShadowAPI {
         axios.defaults.baseURL = api;
         axios.defaults.proxy = false;
     }
-
 
     /**
      * Get darwinia block with eth proof
@@ -61,13 +59,13 @@ export class ShadowAPI {
     async getProposal(
         member: number,
         target: number,
-        last_leaf: number,
+        leaf: number,
     ): Promise<IEthereumHeaderThingWithProof> {
         log.event(`Fetching proposal of ${target}`);
         const r: any = await axios.post("/eth/proposal", {
             member,
             target,
-            last_leaf,
+            leaf,
         }).catch(log.err);
 
         // Trace the back data
