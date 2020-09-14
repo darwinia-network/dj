@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { Config, log } from "../util";
 import { API, ShadowAPI } from "../api";
 
