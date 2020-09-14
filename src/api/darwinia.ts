@@ -217,6 +217,15 @@ export class API {
     }
 
     /**
+     * Set confirmed block with sudo privilege
+     */
+    public async setConfirmed(headerThing: IEthereumHeaderThingWithProof): Promise<ExResult> {
+        log.event(`Set confirmed block ${headerThing.header.number}`);
+        const ex = this._.tx.ethereumRelay.setConfirmed(headerThing);
+        return await this.blockFinalized(this._.tx.sudo.sudo(ex));
+    }
+
+    /**
      * get the specify block
      *
      * @param {IEthHeaderThing} headerThings - Eth Header Things
@@ -230,7 +239,7 @@ export class API {
         }
 
         // Submit new proposal
-        log.event(`Submit proposal contains block ${headerThings[headerThings.length - 1].header.number}`);
+        log.event(`Submit proposal contains block ${latest}`);
         let ex = this._.tx.ethereumRelay.submitProposal(headerThings);
         if (this.relayer.length > 0) {
             ex = this._.tx.proxy.proxy(this.relayer, "EthereumBridge", ex);

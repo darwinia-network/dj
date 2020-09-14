@@ -4,7 +4,7 @@ import { API, ShadowAPI } from "../api";
 (async () => {
     const args = process.argv.slice(2);
     if (args.length !== 1) {
-        log.warn("Usage: dj-proposal <number>");
+        log.warn("Usage: dj-confirm <number>");
         return;
     }
 
@@ -20,13 +20,13 @@ import { API, ShadowAPI } from "../api";
     // Trigger relay
     const lastConfirmed = await api.lastConfirm();
     try {
-        await api.submitProposal([await shadow.getProposal(
+        await api.setConfirmed(await shadow.getProposal(
             lastConfirmed,
             target,
             target - 1,
-        )]);
+        ));
 
-        log.ox(`Submitted proposal ${target}`);
+        log.ox(`Set confirmed block ${target} succeed!`);
     } catch (e) {
         log.ex(e);
     }
