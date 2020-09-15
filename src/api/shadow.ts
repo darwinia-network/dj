@@ -7,6 +7,12 @@ import {
     IEthereumHeaderThingWithProof,
 } from "../types";
 
+/// Disable Proxy
+process.env.HTTP_PROXY = ""
+process.env.HTTPS_PROXY = ""
+process.env.http_proxy = ""
+process.env.https_proxy = ""
+
 /**
  * Shadow APIs
  *
@@ -16,7 +22,7 @@ import {
 export class ShadowAPI {
     constructor(api: string) {
         axios.defaults.baseURL = api;
-        axios.defaults.proxy = false;
+        // axios.defaults.proxy = false;
     }
 
     /**
@@ -62,6 +68,9 @@ export class ShadowAPI {
         last_leaf: number,
     ): Promise<IEthereumHeaderThingWithProof> {
         log.event(`Fetching proposal of ${target}`);
+        if (member === undefined) {
+            member = 0;
+        }
         const r: any = await axios.post("/eth/proposal", {
             member,
             target,
