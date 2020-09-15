@@ -2,7 +2,7 @@ import { ShadowAPI, API, ExResult } from "../api";
 import { log } from "../util";
 
 // Proposal guard
-export async function guard(api: API, shadow: ShadowAPI) {
+export async function listen(api: API, shadow: ShadowAPI) {
     let perms = 4;
     if ((await api._.query.sudo.key()).toJSON().indexOf(api.account.address) > -1) {
         perms = 7;
@@ -13,20 +13,17 @@ export async function guard(api: API, shadow: ShadowAPI) {
     }
 
     // start listening
-    let lock = false;
     const handled: number[] = [];
     setInterval(async () => {
-        if (lock) { return; }
         const headers = (await api._.query.ethereumRelayerGame.pendingHeaders()).toJSON() as string[][];
         if (headers.length === 0) {
             return;
         }
 
-        lock = true;
         for (const h of headers) {
             const blockNumber = Number.parseInt(h[1], 10);
             if (handled.indexOf(blockNumber) > -1) {
-                break;
+                continue;
             }
 
             const block = (await shadow.getHeaderThing(blockNumber)) as any;
@@ -47,7 +44,5 @@ export async function guard(api: API, shadow: ShadowAPI) {
             }
             handled.push(blockNumber);
         }
-
-        lock = false;
     }, 10000);
 }

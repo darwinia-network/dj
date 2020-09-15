@@ -56,7 +56,13 @@ export interface IReceipt {
 export interface IReceiptWithProof {
     header: IDarwiniaEthBlock,
     receipt_proof: IReceipt,
-    mmr_proof: string[],
+    mmr_proof: IMMRProof,
+}
+
+export interface IMMRProof {
+	member_leaf_index: number,
+	last_leaf_index: number,
+	proof: string[]
 }
 
 /// Proposal Header Interface
@@ -64,7 +70,7 @@ export interface IProposalHeader {
     eth_header: IDarwiniaEthBlock,
     ethash_proof: IDoubleNodeWithMerkleProof[],
     mmr_root: string,
-    mmr_proof: string[]
+    mmr_proof: string[],
 }
 
 // Proposal Headers Interface

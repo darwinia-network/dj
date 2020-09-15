@@ -2,11 +2,10 @@
 import { log, Config } from "../util";
 import { ApiPromise, SubmittableResult, WsProvider } from "@polkadot/api";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
-import Keyring from "@polkadot/keyring";
+import { Keyring, decodeAddress } from "@polkadot/keyring";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { DispatchError, EventRecord } from "@polkadot/types/interfaces/types";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
-import { SignedBlock } from "@polkadot/types/interfaces";
 import {
     IEthereumHeaderThingWithProof,
     IReceiptWithProof,
@@ -83,7 +82,7 @@ export class API {
     public static async auto(): Promise<API> {
         const cfg = new Config();
         const seed = await cfg.checkSeed();
-        return await API.new(seed, cfg.node, cfg.types);
+        return await API.new(seed, cfg.node, cfg.relayer, cfg.types);
     }
 
     /**
@@ -123,6 +122,7 @@ export class API {
     public static async new(
         seed: string,
         node: string,
+        relayer: string,
         types: Record<string, any>,
     ): Promise<API> {
         const api = await ApiPromise.create({
@@ -132,10 +132,12 @@ export class API {
 
         const account = await API.seed(seed);
         log.trace("init darwinia api succeed");
-        return new API(account, (api as ApiPromise), types);
+        const relayerAddr = relayer.length > 0 ? decodeAddress(relayer) : new Uint8Array();
+        return new API(account, (api as ApiPromise), relayerAddr, types);
     }
 
     public account: KeyringPair;
+    public relayer: Uint8Array;
     public types: Record<string, any>;
     public _: ApiPromise;
 
@@ -147,8 +149,14 @@ export class API {
      * @param {KeyringPair} account - darwinia account
      * @param {ApiPromise} ap - raw polkadot api
      */
-    constructor(account: KeyringPair, ap: ApiPromise, types: Record<string, any>) {
+    constructor(
+        account: KeyringPair,
+        ap: ApiPromise,
+        relayer: Uint8Array,
+        types: Record<string, any>,
+    ) {
         this.account = account;
+        this.relayer = relayer;
         this.types = types;
         this._ = ap;
     }
@@ -157,12 +165,13 @@ export class API {
      * Get last confirm block
      */
     public async lastConfirm(): Promise<number> {
-        const res = await this._.query.ethereumRelay.lastConfirmedHeaderInfo();
+        const res = await this._.query.ethereumRelay.confirmedBlockNumbers();
         if (res.toJSON() === null) {
             return 0;
         }
 
-        return (res.toJSON() as any)[0] as number;
+        const blocks = res.toJSON() as number[];
+        return blocks[blocks.length - 1];
     }
 
     /**
@@ -208,22 +217,34 @@ export class API {
     }
 
     /**
+     * Set confirmed block with sudo privilege
+     */
+    public async setConfirmed(headerThing: IEthereumHeaderThingWithProof): Promise<ExResult> {
+        log.event(`Set confirmed block ${headerThing.header.number}`);
+        const ex = this._.tx.ethereumRelay.setConfirmed(headerThing);
+        return await this.blockFinalized(this._.tx.sudo.sudo(ex));
+    }
+
+    /**
      * get the specify block
      *
      * @param {IEthHeaderThing} headerThings - Eth Header Things
      */
     public async submitProposal(headerThings: IEthereumHeaderThingWithProof[]): Promise<ExResult> {
         const latest = headerThings[headerThings.length - 1].header.number;
-        const cts = ((await this._.query.ethereumRelay.confirmedHeadersDoubleMap(
-            Math.floor(latest / 185142), latest,
-        )).toJSON() as any).timestamp;
-        if (cts !== 0) {
+        const confirmed = await this._.query.ethereumRelay.confirmedHeaders(latest);
+        if (confirmed.toJSON()) {
+            log.event(`Proposal ${latest} has been submitted yet`);
             return new ExResult(true, "", "");
         }
 
         // Submit new proposal
-        log.event(`Submit proposal contains block ${headerThings[headerThings.length - 1].header.number}`);
-        const ex = this._.tx.ethereumRelay.submitProposal(headerThings);
+        log.event(`Submit proposal contains block ${latest}`);
+        let ex = this._.tx.ethereumRelay.submitProposal(headerThings);
+        if (this.relayer.length > 0) {
+            ex = this._.tx.proxy.proxy(this.relayer, "EthereumBridge", ex);
+        }
+
         return await this.blockFinalized(ex);
     }
 

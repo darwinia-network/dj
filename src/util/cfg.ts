@@ -33,6 +33,7 @@ interface IEthConfig {
 
 export interface IConfig {
     node: string;
+    relayer: string;
     seed: string;
     shadow: string;
     eth: IEthConfig;
@@ -76,6 +77,7 @@ export class Config {
     public eth: IEthConfig;
     public node: string;
     public path: string;
+    public relayer: string;
     public shadow: string;
     public types: Record<string, any>;
     private seed: string;
@@ -96,6 +98,7 @@ export class Config {
 
         const cj = Config.load(conf, rawCj);
         this.node = cj.node;
+        this.relayer = cj.relayer;
         this.seed = cj.seed;
         this.shadow = cj.shadow;
         this.eth = cj.eth;

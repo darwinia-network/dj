@@ -1,7 +1,7 @@
 {
     "private": false,
     "name": "@darwinia/dj",
-    "version": "",
+    "version": "0.2.3-beta.2",
     "description": "Darwinia bridge relayer tool",
     "homepage": "https://github.com/darwinia-network/dj",
     "repository": {
@@ -12,12 +12,14 @@
     "license": "GPL-3.0",
     "main": "lib/index.js",
     "bin": {
-        "dj": "lib/index.js"
+        "dj": "lib/index.js",
+        "dj-proposal": "lib/src/bin/proposal.js",
+        "dj-confirm": "lib/src/bin/confirm.js"
     },
     "files": ["lib/**/*"],
     "dependencies": {
-        "@polkadot/api": "1.30.0-beta.0",
-        "@polkadot/keyring": "3.3.1",
+        "@polkadot/api": "1.32.1",
+        "@polkadot/keyring": "3.4.1",
         "@polkadot/util-crypto": "3.3.1",
         "axios": "^0.19.2",
         "prompts": "^2.3.2",
@@ -27,7 +29,7 @@
     "devDependencies": {
         "@commitlint/cli": "^8.3.5",
         "@commitlint/config-conventional": "^8.3.4",
-        "@polkadot/types": "1.30.0-beta.0",
+        "@polkadot/types": "1.32.1",
         "@types/node": "^13.11.1",
         "@types/prompts": "^2.0.8",
         "husky": "^4.2.5",
