@@ -19,6 +19,11 @@ export default function relay(api: API, shadow: ShadowAPI, queue: ITx[]) {
 
         // Submit new proposal
         const target = Math.max(lastConfirmed, maxBlock) + 1;
+        if (submitted.indexOf(target) > -1) {
+            return;
+        }
+
+        // Relay txs
         log(`Currently we have ${queue.length} txs are waiting to be redeemed`);
         await api.submitProposal([await shadow.getProposal(
             lastConfirmed,
