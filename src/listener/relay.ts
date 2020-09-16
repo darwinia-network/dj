@@ -1,9 +1,9 @@
-import { ShadowAPI, API } from "../../api";
-import { log } from "../../util";
-import { ITx } from "../../types";
+import { ShadowAPI, API } from "../api";
+import { log } from "../util";
+import { ITx } from "../types";
 
 // Listen and submit proposals
-export default function relay(api: API, shadow: ShadowAPI, queue: ITx[]) {
+export function listen(api: API, shadow: ShadowAPI, queue: ITx[]) {
     setInterval(async () => {
         if (queue.length < 1) return;
 

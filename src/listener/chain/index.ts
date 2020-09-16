@@ -1,31 +1,19 @@
 import { ShadowAPI, API } from "../../api";
 import { log } from "../../util";
 import { DispatchError } from "@polkadot/types/interfaces/types";
-import { ITx } from "../../types";
+import game from "./game";
 
-import approve from "./approve";
-import relay from "./relay";
-import newRound from "./new_round";
-
-export function listen(api: API, shadow: ShadowAPI, queue: ITx[]) {
-    relay(api, shadow, queue);
-
+export function listen(api: API, shadow: ShadowAPI) {
     // Subscribe to system events via storage
     api._.query.system.events((events: any) => {
         events.forEach(async (record: any) => {
             const { event, phase } = record;
             const types = event.typeDef;
 
+            // Chain events
             switch (event.method) {
-                case "PendingHeaderApproved":
-                    const lastConfirmed = await api.lastConfirm();
-                    await approve(
-                        event, phase, api, shadow,
-                        queue.filter((ftx) => ftx.blockNumber < lastConfirmed),
-                    );
-                    queue = queue.filter((ftx) => ftx.blockNumber >= lastConfirmed);
                 case "NewRound":
-                    await newRound(event, phase, types, api, shadow);
+                    await game(event, phase, types, api, shadow);
             }
 
             if (event.data[0] && (event.data[0] as DispatchError).isModule) {

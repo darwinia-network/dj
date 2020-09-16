@@ -8,6 +8,7 @@ import { DispatchError, EventRecord } from "@polkadot/types/interfaces/types";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 import {
     IEthereumHeaderThingWithProof,
+    IEthereumHeaderThingWithConfirmation,
     IReceiptWithProof,
 } from "../types";
 
@@ -221,9 +222,9 @@ export class API {
     /**
      * Set confirmed block with sudo privilege
      */
-    public async setConfirmed(headerThing: IEthereumHeaderThingWithProof): Promise<ExResult> {
-        log.event(`Set confirmed block ${headerThing.header.number}`);
-        const ex = this._.tx.ethereumRelay.setConfirmed(headerThing);
+    public async setConfirmed(headerThing: IEthereumHeaderThingWithConfirmation): Promise<ExResult> {
+        log.event(`Set confirmed block ${headerThing.header_thing.header.number}`);
+        const ex = this._.tx.ethereumRelay.setConfirmed(headerThing.header_thing);
         return await this.blockFinalized(this._.tx.sudo.sudo(ex));
     }
 
@@ -236,6 +237,7 @@ export class API {
         const latest = headerThings[headerThings.length - 1].header.number;
 
         // Check if has confirmed
+        log.trace("Check if proposal has been confirmed");
         const confirmed = await this._.query.ethereumRelay.confirmedHeaders(latest);
         if (confirmed.toJSON()) {
             log.event(`Proposal ${latest} has been submitted yet`);
@@ -243,13 +245,11 @@ export class API {
         }
 
         // Check if is pendding
+        log.trace("Check if proposal is pending");
         const pendingHeaders = (
-            await this._.query.ethereumRelayGame.pendHeaders()
-        ).toJSON() as any[];
-        if (
-            pendingHeaders
-            && (pendingHeaders.filter((h: any) => Number.parseInt(h[1], 10) === latest).length > 0)
-        ) {
+            await this._.query.ethereumRelayerGame.pendingHeaders()
+        ).toJSON() as string[][];
+        if (pendingHeaders.filter((h: any) => Number.parseInt(h[1], 10) === latest).length > 0) {
             log.event(`Proposal ${latest} has been submitted yet`);
             return new ExResult(true, "", "");
         }
@@ -257,18 +257,20 @@ export class API {
         // Check if target contains in the current Game
         //
         // Storage Key: `0xcdacb51c37fcd27f3b87230d9a1c265088c2f7188c6fdd1dffae2fa0d171f440`
+        log.trace("Check if proposal is in the relayer game");
         const proposals = (await this._.rpc.state.getKeysPaged(
             "0xcdacb51c37fcd27f3b87230d9a1c265088c2f7188c6fdd1dffae2fa0d171f440",
             32,
         )).toJSON() as any[];
-        for (const p of proposals) {
-            for (const q of p.bonded_proposal) {
-                if (q[1].header.number >= latest) {
-                    log.event(`Proposal ${latest} is in RelayerGame now`);
-                    return new ExResult(true, "", "");
-                }
-            }
-        }
+        // console.log(proposals);
+        // for (const p of proposals) {
+        //     for (const q of p.bonded_proposal) {
+        //         if (q[1].header.number >= latest) {
+        //             log.event(`Proposal ${latest} is in RelayerGame now`);
+        //             return new ExResult(true, "", "");
+        //         }
+        //     }
+        // }
 
         // Submit new proposal
         log.event(`Submit proposal contains block ${latest}`);

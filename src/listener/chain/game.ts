@@ -4,7 +4,7 @@ import { IEthereumHeaderThingWithProof } from "../../types";
 import { Cache } from "../"
 
 /// NewRound handler
-export default async function newRound(
+export default async function game(
     event: any,
     phase: any,
     types: any,

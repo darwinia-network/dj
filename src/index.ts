@@ -29,6 +29,7 @@ export default async function main() {
     // Start proposal linstener
     Listener.guard(api, shadow);
     Listener.relay(api, shadow, QUEUE);
+    Listener.redeem(api, shadow, QUEUE);
     Listener.ethereum(conf.eth, QUEUE);
 }
 
