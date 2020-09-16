@@ -41,7 +41,7 @@ function check(arg: string): boolean {
 /// Run and exit
 async function cmdOnce(): Promise<boolean> {
     if (check("--version")) {
-        console.log(whereisPj());
+        console.log(whereisPj().version);
         return true;
     } else if (check("-h") || check("--help")) {
         console.log("dj: illegal option -- -");
