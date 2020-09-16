@@ -5,7 +5,7 @@ import { API, ShadowAPI } from "../api";
 (async () => {
     const args = process.argv.slice(2);
     if (args.length !== 1) {
-        log.warn("Usage: dj-confirm <number>");
+        console.log("Usage: dj-confirm <number>");
         return;
     }
 
