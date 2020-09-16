@@ -18,13 +18,13 @@ import { API, ShadowAPI } from "../api";
     const conf = new Config();
     const api = await API.auto();
     const shadow = new ShadowAPI(conf.shadow);
-    const target = args[0].slice("/");
+    const target = args[0].split("/");
 
     // Trigger relay
     try {
         await api.redeem(
-            args.contains("-d")? "Deposit": "Token",
-            await shadow.getReceipt(target[0], target[1])
+            args.indexOf("-d") > -1? "Deposit": "Token",
+            await shadow.getReceipt(target[0], Number.parseInt(target[1], 10))
         );
         log.ox(`Redeem tx ${target} succeed!`);
     } catch (e) {

@@ -14,7 +14,8 @@
     "bin": {
         "dj": "lib/index.js",
         "dj-proposal": "lib/src/bin/proposal.js",
-        "dj-confirm": "lib/src/bin/confirm.js"
+        "dj-confirm": "lib/src/bin/confirm.js",
+        "dj-verify": "lib/src/bin/verify.js"
     },
     "files": ["lib/**/*"],
     "dependencies": {
