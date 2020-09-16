@@ -263,7 +263,7 @@ export class API {
         )).toJSON() as any[]) {
             const codec: string = (await this._.rpc.state.getStorage(key) as any).toJSON();
             const proposal = this._.createType("Vec<RelayProposalT>" as any, codec);
-            for (const bonded of proposal.toHuman()[0]['bonded_proposal']) {
+            for (const bonded of proposal.toHuman()[0].bonded_proposal) {
                 if (Number.parseInt(bonded[1].header.number.replace(/,/g, ""), 10) >= target) {
                     return false;
                 }
