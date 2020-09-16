@@ -196,6 +196,7 @@ export class API {
         } else {
             return new ExResult(false, "", "");
         }
+
         log.event(`Approve block ${block}`);
         return await this.blockFinalized(ex, true);
     }
@@ -212,6 +213,7 @@ export class API {
         } else {
             return new ExResult(false, "", "");
         }
+
         log.event(`Reject block ${block}`);
         return await this.blockFinalized(ex);
     }
@@ -232,10 +234,40 @@ export class API {
      */
     public async submitProposal(headerThings: IEthereumHeaderThingWithProof[]): Promise<ExResult> {
         const latest = headerThings[headerThings.length - 1].header.number;
+
+        // Check if has confirmed
         const confirmed = await this._.query.ethereumRelay.confirmedHeaders(latest);
         if (confirmed.toJSON()) {
             log.event(`Proposal ${latest} has been submitted yet`);
             return new ExResult(true, "", "");
+        }
+
+        // Check if is pendding
+        const pendingHeaders = (
+            await this._.query.ethereumRelayGame.pendHeaders()
+        ).toJSON() as any[];
+        if (
+            pendingHeaders
+            && (pendingHeaders.filter((h: any) => Number.parseInt(h[1], 10) === latest).length > 0)
+        ) {
+            log.event(`Proposal ${latest} has been submitted yet`);
+            return new ExResult(true, "", "");
+        }
+
+        // Check if target contains in the current Game
+        //
+        // Storage Key: `0xcdacb51c37fcd27f3b87230d9a1c265088c2f7188c6fdd1dffae2fa0d171f440`
+        const proposals = (await this._.rpc.state.getKeysPaged(
+            "0xcdacb51c37fcd27f3b87230d9a1c265088c2f7188c6fdd1dffae2fa0d171f440",
+            32,
+        )).toJSON() as any[];
+        for (const p of proposals) {
+            for (const q of p.bonded_proposal) {
+                if (q[1].header.number >= latest) {
+                    log.event(`Proposal ${latest} is in RelayerGame now`);
+                    return new ExResult(true, "", "");
+                }
+            }
         }
 
         // Submit new proposal

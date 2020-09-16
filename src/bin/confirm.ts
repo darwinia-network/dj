@@ -21,12 +21,7 @@ import { API, ShadowAPI } from "../api";
     // Trigger relay
     const lastConfirmed = await api.lastConfirm();
     try {
-        await api.setConfirmed(await shadow.getProposal(
-            lastConfirmed,
-            target,
-            target - 1,
-        ));
-
+        await api.setConfirmed(await shadow.getHeaderThing(target));
         log.ox(`Set confirmed block ${target} succeed!`);
     } catch (e) {
         log.ex(e);

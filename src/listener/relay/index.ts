@@ -5,6 +5,7 @@ import { ITx } from "../../types";
 
 import approve from "./approve";
 import relay from "./relay";
+import newRound from "./new_round";
 
 export function listen(api: API, shadow: ShadowAPI, queue: ITx[]) {
     relay(api, shadow, queue);
@@ -13,11 +14,9 @@ export function listen(api: API, shadow: ShadowAPI, queue: ITx[]) {
     api._.query.system.events((events: any) => {
         events.forEach(async (record: any) => {
             const { event, phase } = record;
-            // const types = event.typeDef;
+            const types = event.typeDef;
 
             switch (event.method) {
-                case "GameOver":
-                    log.event("GameOver");
                 case "PendingHeaderApproved":
                     const lastConfirmed = await api.lastConfirm();
                     await approve(
@@ -26,10 +25,7 @@ export function listen(api: API, shadow: ShadowAPI, queue: ITx[]) {
                     );
                     queue = queue.filter((ftx) => ftx.blockNumber >= lastConfirmed);
                 case "NewRound":
-                // TODO
-                //
-                // Fix the Relayer Game API
-                // await newRound(event, phase, types, api, shadow);
+                    await newRound(event, phase, types, api, shadow);
             }
 
             if (event.data[0] && (event.data[0] as DispatchError).isModule) {
