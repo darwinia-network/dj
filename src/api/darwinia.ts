@@ -229,19 +229,17 @@ export class API {
     }
 
     /**
-     * get the specify block
+     * Check if should relay target
      *
-     * @param {IEthHeaderThing} headerThings - Eth Header Things
+     * @param {number} target - target header
      */
-    public async submitProposal(headerThings: IEthereumHeaderThingWithProof[]): Promise<ExResult> {
-        const latest = headerThings[headerThings.length - 1].header.number;
-
+    public async shouldRelay(target: number): Promise<boolean> {
         // Check if has confirmed
         log.trace("Check if proposal has been confirmed");
-        const confirmed = await this._.query.ethereumRelay.confirmedHeaders(latest);
+        const confirmed = await this._.query.ethereumRelay.confirmedHeaders(target);
         if (confirmed.toJSON()) {
-            log.event(`Proposal ${latest} has been submitted yet`);
-            return new ExResult(true, "", "");
+            log.event(`Proposal ${target} has been submitted yet`);
+            return false;
         }
 
         // Check if is pendding
@@ -249,28 +247,39 @@ export class API {
         const pendingHeaders = (
             await this._.query.ethereumRelayerGame.pendingHeaders()
         ).toJSON() as string[][];
-        if (pendingHeaders.filter((h: any) => Number.parseInt(h[1], 10) === latest).length > 0) {
-            log.event(`Proposal ${latest} has been submitted yet`);
-            return new ExResult(true, "", "");
+        if (pendingHeaders.filter((h: any) => Number.parseInt(h[1], 10) === target).length > 0) {
+            log.event(`Proposal ${target} has been submitted yet`);
+            // return new ExResult(true, "", "");
+            return false;
         }
 
         // Check if target contains in the current Game
         //
         // Storage Key: `0xcdacb51c37fcd27f3b87230d9a1c265088c2f7188c6fdd1dffae2fa0d171f440`
         log.trace("Check if proposal is in the relayer game");
-        const proposals = (await this._.rpc.state.getKeysPaged(
+        for (const key of (await this._.rpc.state.getKeysPaged(
             "0xcdacb51c37fcd27f3b87230d9a1c265088c2f7188c6fdd1dffae2fa0d171f440",
             32,
-        )).toJSON() as any[];
-        // console.log(proposals);
-        // for (const p of proposals) {
-        //     for (const q of p.bonded_proposal) {
-        //         if (q[1].header.number >= latest) {
-        //             log.event(`Proposal ${latest} is in RelayerGame now`);
-        //             return new ExResult(true, "", "");
-        //         }
-        //     }
-        // }
+        )).toJSON() as any[]) {
+            const codec: string = (await this._.rpc.state.getStorage(key) as any).toJSON();
+            const proposal = this._.createType("Vec<RelayProposalT>" as any, codec);
+            for (const bonded of proposal.toHuman()[0]['bonded_proposal']) {
+                if (Number.parseInt(bonded[1].header.number.replace(/,/g, ""), 10) >= target) {
+                    return false;
+                }
+            }
+        };
+
+        return true;
+    }
+
+    /**
+     * get the specify block
+     *
+     * @param {IEthHeaderThing} headerThings - Eth Header Things
+     */
+    public async submitProposal(headerThings: IEthereumHeaderThingWithProof[]): Promise<ExResult> {
+        const latest = headerThings[headerThings.length - 1].header.number;
 
         // Submit new proposal
         log.event(`Submit proposal contains block ${latest}`);

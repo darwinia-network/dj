@@ -16,6 +16,9 @@ export function listen(api: API, shadow: ShadowAPI, queue: ITx[]) {
 
         // Submit new proposal
         const target = Math.max(lastConfirmed, maxBlock) + 1;
+        if (!(await api.shouldRelay(target))) {
+            return;
+        };
 
         // Relay txs
         log(`Currently we have ${queue.length} txs are waiting to be redeemed`);
