@@ -21,7 +21,7 @@
     "dependencies": {
         "@polkadot/api": "1.32.1",
         "@polkadot/keyring": "3.4.1",
-        "@polkadot/util-crypto": "3.3.1",
+        "@polkadot/util-crypto": "3.4.1",
         "axios": "^0.19.2",
         "prompts": "^2.3.2",
         "web3": "^1.2.11",
