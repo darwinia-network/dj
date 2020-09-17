@@ -15,7 +15,9 @@ export async function listen(api: API, shadow: ShadowAPI) {
     // start listening
     const handled: number[] = [];
     setInterval(async () => {
-        const headers = (await api._.query.ethereumRelayerGame.pendingHeaders()).toJSON() as string[][];
+        const headers = (
+            await api._.query.ethereumRelayerGame.pendingHeaders()
+        ).toJSON() as string[][];
         if (headers.length === 0) {
             return;
         }

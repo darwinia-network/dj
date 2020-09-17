@@ -8,6 +8,7 @@ import { DispatchError, EventRecord } from "@polkadot/types/interfaces/types";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 import {
     IEthereumHeaderThingWithProof,
+    IEthereumHeaderThingWithConfirmation,
     IReceiptWithProof,
 } from "../types";
 
@@ -196,6 +197,7 @@ export class API {
         } else {
             return new ExResult(false, "", "");
         }
+
         log.event(`Approve block ${block}`);
         return await this.blockFinalized(ex, true);
     }
@@ -212,6 +214,7 @@ export class API {
         } else {
             return new ExResult(false, "", "");
         }
+
         log.event(`Reject block ${block}`);
         return await this.blockFinalized(ex);
     }
@@ -219,10 +222,60 @@ export class API {
     /**
      * Set confirmed block with sudo privilege
      */
-    public async setConfirmed(headerThing: IEthereumHeaderThingWithProof): Promise<ExResult> {
-        log.event(`Set confirmed block ${headerThing.header.number}`);
-        const ex = this._.tx.ethereumRelay.setConfirmed(headerThing);
+    public async setConfirmed(headerThing: IEthereumHeaderThingWithConfirmation): Promise<ExResult> {
+        log.event(`Set confirmed block ${headerThing.header_thing.header.number}`);
+        const ex = this._.tx.ethereumRelay.setConfirmed(headerThing.header_thing);
         return await this.blockFinalized(this._.tx.sudo.sudo(ex));
+    }
+
+    /**
+     * Check if should relay target
+     *
+     * @param {number} target - target header
+     */
+    public async shouldRelay(target: number): Promise<boolean> {
+        log.trace("Check if target block less than the last confirmed block");
+        const lastConfirmed = await this.lastConfirm();
+        if (target < lastConfirmed) {
+            return false;
+        }
+        // Check if has confirmed
+        log.trace("Check if proposal has been confirmed");
+        const confirmed = await this._.query.ethereumRelay.confirmedHeaders(target);
+        if (confirmed.toJSON()) {
+            log.event(`Proposal ${target} has been submitted yet`);
+            return false;
+        }
+
+        // Check if is pendding
+        log.trace("Check if proposal is pending");
+        const pendingHeaders = (
+            await this._.query.ethereumRelayerGame.pendingHeaders()
+        ).toJSON() as string[][];
+        if (pendingHeaders.filter((h: any) => Number.parseInt(h[1], 10) === target).length > 0) {
+            log.event(`Proposal ${target} has been submitted yet`);
+            // return new ExResult(true, "", "");
+            return false;
+        }
+
+        // Check if target contains in the current Game
+        //
+        // Storage Key: `0xcdacb51c37fcd27f3b87230d9a1c265088c2f7188c6fdd1dffae2fa0d171f440`
+        log.trace("Check if proposal is in the relayer game");
+        for (const key of (await this._.rpc.state.getKeysPaged(
+            "0xcdacb51c37fcd27f3b87230d9a1c265088c2f7188c6fdd1dffae2fa0d171f440",
+            32,
+        )).toJSON() as any[]) {
+            const codec: string = (await this._.rpc.state.getStorage(key) as any).toJSON();
+            const proposal = this._.createType("Vec<RelayProposalT>" as any, codec);
+            for (const bonded of proposal.toHuman()[0].bonded_proposal) {
+                if (Number.parseInt(bonded[1].header.number.replace(/,/g, ""), 10) >= target) {
+                    return false;
+                }
+            }
+        };
+
+        return true;
     }
 
     /**
@@ -232,11 +285,6 @@ export class API {
      */
     public async submitProposal(headerThings: IEthereumHeaderThingWithProof[]): Promise<ExResult> {
         const latest = headerThings[headerThings.length - 1].header.number;
-        const confirmed = await this._.query.ethereumRelay.confirmedHeaders(latest);
-        if (confirmed.toJSON()) {
-            log.event(`Proposal ${latest} has been submitted yet`);
-            return new ExResult(true, "", "");
-        }
 
         // Submit new proposal
         log.event(`Submit proposal contains block ${latest}`);
