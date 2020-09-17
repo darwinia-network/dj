@@ -1,7 +1,7 @@
 {
     "private": false,
     "name": "@darwinia/dj",
-    "version": "0.2.5-alpha.1",
+    "version": "0.2.5-alpha.3",
     "description": "Darwinia bridge relayer tool",
     "homepage": "https://github.com/darwinia-network/dj",
     "repository": {
@@ -39,6 +39,7 @@
     },
     "scripts": {
         "build": "tsc --strict",
-        "lint": "tsc --noEmit --strict && tslint --project ./tsconfig.json"
+        "lint": "tsc --noEmit --strict && tslint --project ./tsconfig.json",
+        "postinstall": "rm -f ~/.darwinia/types.json"
     }
 }
