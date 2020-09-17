@@ -234,6 +234,11 @@ export class API {
      * @param {number} target - target header
      */
     public async shouldRelay(target: number): Promise<boolean> {
+        log.trace("Check if target block less than the last confirmed block");
+        const lastConfirmed = await this.lastConfirm();
+        if (target < lastConfirmed) {
+            return false;
+        }
         // Check if has confirmed
         log.trace("Check if proposal has been confirmed");
         const confirmed = await this._.query.ethereumRelay.confirmedHeaders(target);
