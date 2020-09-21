@@ -1,15 +1,15 @@
 import { ShadowAPI, API } from "../api";
 import { log } from "../util";
-import { ITx } from "../types";
+import Cache from "./cache";
 
 // Listen and submit proposals
-export function listen(api: API, shadow: ShadowAPI, queue: ITx[]) {
+export function listen(api: API, shadow: ShadowAPI) {
     setInterval(async () => {
-        if (queue.length < 1) return;
+        if (Cache.txs.length < 1) return;
 
         // Check last confirm
         const lastConfirmed = await api.lastConfirm();
-        const maxBlock = queue.sort((p, q) => q.blockNumber - p.blockNumber)[0].blockNumber;
+        const maxBlock = Cache.supTx(lastConfirmed);
         if (lastConfirmed >= maxBlock + 1) {
             return;
         }
@@ -21,7 +21,7 @@ export function listen(api: API, shadow: ShadowAPI, queue: ITx[]) {
         };
 
         // Relay txs
-        log(`Currently we have ${queue.length} txs are waiting to be redeemed`);
+        log(`Currently we have ${Cache.txs.length} txs are waiting to be redeemed`);
         await api.submitProposal([await shadow.getProposal(
             lastConfirmed,
             target,

@@ -1,7 +1,6 @@
 import { whereisPj, Config, log } from "./util";
 import child_process from "child_process";
 import { API, ShadowAPI } from "./api";
-import { ITx } from "./types";
 import * as Listener from "./listener"
 
 // main
@@ -15,8 +14,6 @@ export default async function main() {
         process.env.LOGGER = "INFO";
     }
 
-    Listener.Cache.init();
-    const QUEUE: ITx[] = [];
     const conf = new Config();
     const api = await API.auto();
     const shadow = new ShadowAPI(conf.shadow);
@@ -28,9 +25,9 @@ export default async function main() {
 
     // Start proposal linstener
     Listener.guard(api, shadow);
-    Listener.relay(api, shadow, QUEUE);
-    Listener.redeem(api, shadow, QUEUE);
-    Listener.ethereum(conf.eth, QUEUE);
+    Listener.relay(api, shadow);
+    Listener.redeem(api, shadow);
+    Listener.ethereum(conf.eth);
 }
 
 /// Check if has arg

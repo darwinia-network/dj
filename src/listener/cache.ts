@@ -1,30 +1,63 @@
-import { Config } from "../util";
-import path from "path";
-import fs from "fs";
-import { IEthereumHeaderThingWithProof } from "../types";
+import { IEthereumHeaderThingWithProof, ITx } from "../types";
 
-const cache = path.resolve((new Config()).path, "../cache/blocks");
+/**
+ * Memory database for relay process
+ */
+class Cache {
+    public blocks: IEthereumHeaderThingWithProof[] = [];
+    public txs: ITx[] = [];
 
-// Init Cache
-export function init() {
-    if (fs.existsSync(cache)) {
-        fs.rmdirSync(cache, { recursive: true });
-    }
+    /**
+     * Get block with proof from cache
+     */
+    getBlock(n: number): IEthereumHeaderThingWithProof | null {
+        for (const b of this.blocks) {
+            if (b.header.number === n) {
+                return b;
+            }
+        }
 
-    fs.mkdirSync(cache, { recursive: true });
-}
-
-// Get block from cache
-export function getBlock(block: number): IEthereumHeaderThingWithProof | null {
-    const f = path.resolve(cache, `${block}.block`);
-    if (fs.existsSync(f)) {
-        return JSON.parse(fs.readFileSync(f).toString());
-    } else {
         return null;
     }
+
+    /**
+     * Set block with proof into cache
+     */
+    setBlock(headerThing: IEthereumHeaderThingWithProof) {
+        this.blocks.push(headerThing);
+        return;
+    }
+
+    /**
+     * Push tx into cache
+     */
+    pushTx(tx: ITx) {
+        this.txs.push(tx);
+    }
+
+    /**
+     * Get the highest tx
+     */
+    supTx(block: number): number {
+        const blocks = this.txs.filter((t) => t.blockNumber < block).sort(
+            (p, q) => q.blockNumber - p.blockNumber,
+        );
+
+        if (!blocks || blocks.length === 0) {
+            return 0;
+        }
+        return blocks[0].blockNumber;
+    }
+
+    /**
+     * Slice transactions
+     */
+    trimTxs(block: number): ITx[] {
+        const txs = this.txs.filter((t) => t.blockNumber < block);
+        this.txs = this.txs.filter((t) => t.blockNumber >= block)
+        return txs;
+    }
 }
 
-// Get block from cache
-export function setBlock(block: number, headerThing: IEthereumHeaderThingWithProof) {
-    fs.writeFileSync(path.resolve(cache, `${block}.block`), JSON.stringify(headerThing));
-}
+const cache = new Cache();
+export default cache;

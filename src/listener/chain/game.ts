@@ -1,7 +1,7 @@
 import { ShadowAPI, API } from "../../api";
 import { log } from "../../util";
 import { IEthereumHeaderThingWithProof } from "../../types";
-import { Cache } from "../"
+import Cache from "../cache"
 
 /// NewRound handler
 export default async function game(
@@ -37,11 +37,11 @@ export default async function game(
     })
 
     const newProposal = await shadow.getProposal(newMember, newMember, lastLeaf);
-    Cache.setBlock(newMember, Object.assign(JSON.parse(JSON.stringify(newProposal)), {
+    Cache.setBlock(Object.assign({
         ethash_proof: [],
         mmr_root: "",
         mmr_proof: [],
-    }));
+    }, JSON.parse(JSON.stringify(newProposal))));
     proposals = proposals.concat(newProposal);
 
     // Submit new proposals
