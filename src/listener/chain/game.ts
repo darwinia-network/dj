@@ -17,7 +17,7 @@ export default async function game(
 
     // Samples
     const lastLeaf = Math.max(...(event.data[2].toJSON() as number[]));
-    let members: number[] = event.data[2].toJSON() as number[];
+    const members: number[] = event.data[2].toJSON() as number[];
     if (members === undefined) {
         return
     }
