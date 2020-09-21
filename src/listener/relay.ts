@@ -9,23 +9,24 @@ export function listen(api: API, shadow: ShadowAPI) {
 
         // Check last confirm
         const lastConfirmed = await api.lastConfirm();
-        const maxBlock = Cache.supTx(lastConfirmed);
+        const maxBlock = Cache.supTx();
+        log(`Current maxBlock in tx pool is ${maxBlock}, lastConfirmed in darwinia is ${lastConfirmed}`);
         if (lastConfirmed >= maxBlock + 1) {
             return;
         }
 
         // Submit new proposal
+        log(`Currently we have ${Cache.txs.length} txs are waiting to be redeemed`);
         const target = Math.max(lastConfirmed, maxBlock) + 1;
         if (!(await api.shouldRelay(target))) {
             return;
         };
 
         // Relay txs
-        log(`Currently we have ${Cache.txs.length} txs are waiting to be redeemed`);
         await api.submitProposal([await shadow.getProposal(
             lastConfirmed,
             target,
             target - 1,
         )]).catch(log.err);
-    }, 60000);
+    }, 30000);
 }

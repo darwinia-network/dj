@@ -234,33 +234,36 @@ export class API {
      * @param {number} target - target header
      */
     public async shouldRelay(target: number): Promise<boolean> {
-        log.trace("Check if target block less than the last confirmed block");
+        log("Check if target block less than the last confirmed block");
         const lastConfirmed = await this.lastConfirm();
         if (target < lastConfirmed) {
+            log("...target is less than lastConfirmed");
             return false;
         }
         // Check if has confirmed
+        log("...target block is great than lastConfirmed");
         log.trace("Check if proposal has been confirmed");
         const confirmed = await this._.query.ethereumRelay.confirmedHeaders(target);
         if (confirmed.toJSON()) {
-            log.event(`Proposal ${target} has been submitted yet`);
+            log(`Proposal ${target} has been submitted yet`);
             return false;
         }
 
         // Check if is pendding
+        log("...target block has not been submitted");
         log.trace("Check if proposal is pending");
         const pendingHeaders = (
             await this._.query.ethereumRelayerGame.pendingHeaders()
         ).toJSON() as string[][];
         if (pendingHeaders.filter((h: any) => Number.parseInt(h[1], 10) === target).length > 0) {
-            log.event(`Proposal ${target} has been submitted yet`);
-            // return new ExResult(true, "", "");
+            log(`Proposal ${target} is pending`);
             return false;
         }
 
         // Check if target contains in the current Game
         //
         // Storage Key: `0xcdacb51c37fcd27f3b87230d9a1c265088c2f7188c6fdd1dffae2fa0d171f440`
+        log("...target block is not pending");
         log.trace("Check if proposal is in the relayer game");
         for (const key of (await this._.rpc.state.getKeysPaged(
             "0xcdacb51c37fcd27f3b87230d9a1c265088c2f7188c6fdd1dffae2fa0d171f440",
@@ -275,6 +278,7 @@ export class API {
             }
         };
 
+        log("...target block is relayable");
         return true;
     }
 

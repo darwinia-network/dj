@@ -12,7 +12,7 @@ export function listen(config: any) {
     localConfig.setConfig(config);
     blockInDB.setParsedEventBlockNumber(localConfig.info.START_BLOCK_NUMBER);
     logInDB.setCallback(async (tx: string, ty: string, blockNumber: number) => {
-        log.trace(`Find darwinia ${ty} tx ${tx} in block ${blockNumber}`);
+        log(`Find darwinia ${ty} tx ${tx} in block ${blockNumber}`);
         Cache.pushTx({ blockNumber, tx, ty: ty === "bank" ? "Deposit" : "Token" });
     });
     blockchainState.getState().then(() => {

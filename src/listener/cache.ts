@@ -38,8 +38,8 @@ class Cache {
     /**
      * Get the highest tx
      */
-    supTx(block: number): number {
-        const blocks = this.txs.filter((t) => t.blockNumber < block).sort(
+    supTx(): number {
+        const blocks = this.txs.sort(
             (p, q) => q.blockNumber - p.blockNumber,
         );
 

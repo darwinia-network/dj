@@ -16,18 +16,16 @@ export default async function game(
     log.trace(JSON.stringify(event.data.toJSON()));
 
     // Samples
-    const lastLeaf = Math.max(...(event.data[0].toJSON() as number[]));
-    let members: number[] | number = event.data[0].toJSON() as number[];
+    const lastLeaf = Math.max(...(event.data[2].toJSON() as number[]));
+    let members: number[] = event.data[2].toJSON() as number[];
     if (members === undefined) {
         return
-    } else if (!Array.isArray(members)) {
-        members = [members as number];
     }
 
     // Get proposals
     let newMember: number = 0;
     let proposals: IEthereumHeaderThingWithProof[] = [];
-    (members as number[]).forEach((i: number) => {
+    members.forEach((i: number) => {
         const block = Cache.getBlock(i);
         if (block) {
             proposals.push(block);
