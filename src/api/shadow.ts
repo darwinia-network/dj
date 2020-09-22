@@ -67,7 +67,7 @@ export class ShadowAPI {
         target: number,
         last_leaf: number,
     ): Promise<IEthereumHeaderThingWithProof> {
-        log.event(`Fetching proposal of ${target}`);
+        log(`Fetching proposal of ${target}`);
         if (member === undefined) {
             member = 0;
         }

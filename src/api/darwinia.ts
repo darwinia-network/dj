@@ -311,7 +311,6 @@ export class API {
             return false;
         }
 
-        log(`...tx ${tx.tx} has not been redeemed`);
         return true;
     }
 

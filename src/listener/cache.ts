@@ -60,13 +60,6 @@ class Cache {
     }
 
     /**
-     * Txs which are handled
-     */
-    outdatedTx(tx: ITx) {
-        this.outdateTxs.push(tx);
-    }
-
-    /**
      * Check if a tx has been redeemed
      */
     redeemAble(tx: ITx): boolean {

@@ -15,12 +15,10 @@ export async function listen(api: API, shadow: ShadowAPI) {
     // start listening
     const handled: number[] = [];
     setInterval(async () => {
-        log("Getting pending headers");
         const headers = (
             await api._.query.ethereumRelayerGame.pendingHeaders()
         ).toJSON() as string[][];
         if (headers.length === 0) {
-            log("...no pending headers needs to be handled");
             return;
         }
 

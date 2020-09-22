@@ -17,7 +17,7 @@ export function listen(config: any) {
         blockNumber: number,
         redeemAble: [string, number],
     ) => {
-        log(`Find darwinia ${ty} tx ${tx} in block ${blockNumber}`);
+        log(`Found darwinia ${ty} tx ${tx} in block ${blockNumber}`);
         Cache.pushTx({
             blockNumber,
             tx,
