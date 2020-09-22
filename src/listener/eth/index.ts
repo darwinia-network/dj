@@ -25,7 +25,8 @@ export function listen(config: any) {
             redeemAble,
         });
     });
+
     blockchainState.getState().then(() => {
         eventParser.start(blockchainState);
-    })
+    });
 }

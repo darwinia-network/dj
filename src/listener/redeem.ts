@@ -1,5 +1,5 @@
 import { ShadowAPI, API } from "../api";
-import { delay } from "../util";
+import { delay, log } from "../util";
 import Cache from "./cache";
 
 /// Approved handler
@@ -8,6 +8,7 @@ export async function listen(
     shadow: ShadowAPI,
 ) {
     setInterval(async () => {
+        log.interval("Check if there is any tx wating to be redeemed");
         const lastConfirmed = await api.lastConfirm();
         for (const tx of Cache.trimTxs(lastConfirmed)) {
             if (!(await api.redeemAble(tx))) {

@@ -5,7 +5,11 @@ import Cache from "./cache";
 // Listen and submit proposals
 export function listen(api: API, shadow: ShadowAPI) {
     setInterval(async () => {
-        if (Cache.txs.length < 1) return;
+        log.interval("Check if dj needs to relay a new block");
+        if (Cache.txs.length < 1) {
+            log("No txs are waiting to be redeemed");
+            return;
+        }
 
         // Check last confirm
         const lastConfirmed = await api.lastConfirm();
@@ -28,5 +32,5 @@ export function listen(api: API, shadow: ShadowAPI) {
             target,
             target - 1,
         )]).catch(log.err);
-    }, 30000);
+    }, 60000);
 }
