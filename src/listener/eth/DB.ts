@@ -45,8 +45,8 @@ export class LogInDB {
 
     afterTx(type: LogType, logs: Log[], blockNumber: number) {
         this.getQueue(type).push(...logs);
-        logs.map((log) => {
-            this.callback(log.transactionHash, type, blockNumber);
+        logs.map((l) => {
+            this.callback(l.transactionHash, type, blockNumber);
         })
     }
 

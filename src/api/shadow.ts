@@ -31,7 +31,7 @@ export class ShadowAPI {
      * @param {number} block | string - block number
      */
     async getHeaderThing(block: number | string): Promise<IEthereumHeaderThingWithConfirmation> {
-        log.event(`Get header thing of ${block}`);
+        log(`Get header thing of ${block}`);
         const r: any = await axios.get(
             "/eth/header/" + block,
         ).catch(log.err);
@@ -47,7 +47,7 @@ export class ShadowAPI {
      * @param {number} block - block number
      */
     async getReceipt(tx: string, lastConfirmed: number): Promise<IReceiptWithProof> {
-        log.event(`Get receipt of ${tx}`);
+        log(`Get receipt of ${tx}`);
         const r: any = await axios.get(
             "/eth/receipt/" + tx + "/" + lastConfirmed,
         ).catch(log.err);

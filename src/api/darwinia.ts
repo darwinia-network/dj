@@ -242,7 +242,7 @@ export class API {
         }
         // Check if has confirmed
         log("...target block is great than lastConfirmed");
-        log.trace("Check if proposal has been confirmed");
+        log("Check if proposal has been confirmed");
         const confirmed = await this._.query.ethereumRelay.confirmedHeaders(target);
         if (confirmed.toJSON()) {
             log(`Proposal ${target} has been submitted yet`);
@@ -251,7 +251,7 @@ export class API {
 
         // Check if is pendding
         log("...target block has not been submitted");
-        log.trace("Check if proposal is pending");
+        log("Check if proposal is pending");
         const pendingHeaders = (
             await this._.query.ethereumRelayerGame.pendingHeaders()
         ).toJSON() as string[][];
@@ -264,7 +264,7 @@ export class API {
         //
         // Storage Key: `0xcdacb51c37fcd27f3b87230d9a1c265088c2f7188c6fdd1dffae2fa0d171f440`
         log("...target block is not pending");
-        log.trace("Check if proposal is in the relayer game");
+        log("Check if proposal is in the relayer game");
         for (const key of (await this._.rpc.state.getKeysPaged(
             "0xcdacb51c37fcd27f3b87230d9a1c265088c2f7188c6fdd1dffae2fa0d171f440",
             32,

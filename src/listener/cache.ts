@@ -6,6 +6,7 @@ import { IEthereumHeaderThingWithProof, ITx } from "../types";
 class Cache {
     public blocks: IEthereumHeaderThingWithProof[] = [];
     public txs: ITx[] = [];
+    public outdateTxs: ITx[] = [];
 
     /**
      * Get block with proof from cache
@@ -56,6 +57,25 @@ class Cache {
         const txs = this.txs.filter((t) => t.blockNumber < block);
         this.txs = this.txs.filter((t) => t.blockNumber >= block)
         return txs;
+    }
+
+    /**
+     * Txs which are handled
+     */
+    outdatedTx(tx: ITx) {
+        this.outdateTxs.push(tx);
+    }
+
+    /**
+     * Check if a tx has been redeemed
+     */
+    redeemAble(tx: ITx): boolean {
+        for (const t of this.outdateTxs) {
+            if (t === tx) {
+                return false;
+            }
+        }
+        return true;
     }
 }
 
