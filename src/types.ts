@@ -18,6 +18,7 @@ export interface ITx {
     tx: string,
     ty: string,
     blockNumber: number,
+    redeemAble: [string, number],
 }
 
 /// Darwinia Block
@@ -60,9 +61,9 @@ export interface IReceiptWithProof {
 }
 
 export interface IMMRProof {
-	member_leaf_index: number,
-	last_leaf_index: number,
-	proof: string[]
+    member_leaf_index: number,
+    last_leaf_index: number,
+    proof: string[]
 }
 
 /// Proposal Header Interface

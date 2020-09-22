@@ -10,6 +10,9 @@ export async function listen(
     setInterval(async () => {
         const lastConfirmed = await api.lastConfirm();
         for (const tx of Cache.trimTxs(lastConfirmed)) {
+            if (!(await api.redeemAble(tx))) {
+                continue;
+            }
             await api.redeem(tx.ty, await shadow.getReceipt(tx.tx, lastConfirmed));
             await delay(10000);
         };

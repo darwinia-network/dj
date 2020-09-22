@@ -7,6 +7,7 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { DispatchError, EventRecord } from "@polkadot/types/interfaces/types";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 import {
+    ITx,
     IEthereumHeaderThingWithProof,
     IEthereumHeaderThingWithConfirmation,
     IReceiptWithProof,
@@ -301,19 +302,25 @@ export class API {
     }
 
     /**
+     * Check if a tx is redeemable
+     */
+    public async redeemAble(tx: ITx): Promise<boolean> {
+        log(`Check if tx ${tx.tx} has been redeemed`);
+        if ((await this._.query.ethereumBacking.verifiedProof(tx.redeemAble)).toJSON()) {
+            log(`...tx ${tx.tx} has been redeemed`);
+            return false;
+        }
+
+        log(`...tx ${tx.tx} has not been redeemed`);
+        return true;
+    }
+
+    /**
      * relay darwinia header
      *
      * @param {DarwiniaEthBlock} block - darwinia style eth block
      */
     public async redeem(act: string, proof: IReceiptWithProof): Promise<ExResult> {
-        // Check verified
-        if ((await this._.query.ethereumBacking.verifiedProof(
-            [proof.receipt_proof.header_hash, Number.parseInt(proof.receipt_proof.index, 16)],
-        )).toJSON()) {
-            return new ExResult(true, "", "");
-        }
-
-        // Redeem tx
         log.event(`Redeem tx in block ${proof.header.number}`);
         const ex: SubmittableExtrinsic<"promise"> = this._.tx.ethereumBacking.redeem(act, [
             proof.header,

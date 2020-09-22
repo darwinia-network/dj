@@ -1,5 +1,12 @@
 import { LogType, Log } from "../../types";
 
+type CallBack = (
+    tx: string,
+    type: LogType,
+    blockNumber: number,
+    redeemAble: [string, number],
+) => void;
+
 export interface Blocks {
     lastBlockNumber: number,
     parsedEventBlockNumber: number
@@ -30,7 +37,7 @@ export class LogInDB {
     private ktonQueue: Log[] = [];
     private bankQueue: Log[] = [];
     // @ts-nocheck
-    private callback: (tx: string, type: LogType, blockNumber: number) => void = () => undefined;
+    private callback: CallBack = () => undefined;
 
     getQueue(type: LogType): Log[] {
         switch (type) {
@@ -43,14 +50,17 @@ export class LogInDB {
         }
     }
 
-    afterTx(type: LogType, logs: Log[], blockNumber: number) {
-        this.getQueue(type).push(...logs);
-        logs.map((l) => {
-            this.callback(l.transactionHash, type, blockNumber);
-        })
+    afterTx(type: LogType, l: Log) {
+        this.getQueue(type).push(l);
+        this.callback(
+            l.transactionHash,
+            type,
+            l.blockNumber,
+            [l.blockHash, l.transactionIndex],
+        );
     }
 
-    setCallback(callback: (tx: string, type: LogType, blockNumber: number) => void) {
+    setCallback(callback: CallBack) {
         this.callback = callback;
     }
 }
