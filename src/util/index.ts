@@ -1,14 +1,5 @@
-import { Config } from "./cfg";
-import { log } from "./log";
-import { whereisPj } from "./pj";
-import { delay } from "./delay";
-import chalk from "chalk";
+export { Config } from "./cfg";
+export { log } from "./log";
+export { whereisPj } from "./pj";
+export { delay } from "./delay";
 
-// exports
-export {
-    Config,
-    delay,
-    chalk,
-    log,
-    whereisPj,
-}

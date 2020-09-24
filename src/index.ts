@@ -27,6 +27,7 @@ export default async function main() {
     Listener.guard(api, shadow);
     Listener.relay(api, shadow);
     Listener.redeem(api, shadow);
+    Listener.darwinia(api, shadow);
     Listener.ethereum(conf.eth);
 }
 
