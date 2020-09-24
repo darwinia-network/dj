@@ -1,6 +1,6 @@
 import { ShadowAPI, API } from "../api";
 import { delay, log } from "../util";
-import Cache from "./cache";
+import Cache from "../cache";
 
 /// Approved handler
 export async function listen(
