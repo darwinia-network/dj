@@ -79,10 +79,13 @@ export class ExResult {
  * @class API - darwinia api
  *
  * @method getBalance - get account balance
- * @method reset - reset eth relay header
- * @method relay - relay eth relay header
- * @method redeem - redeem ring
- * @method transfer - transfer ring
+ * @method setConfirmed - reset the confirmed block in darwinia
+ * @method submitProposal - submit a proposal to darwinia
+ * @method redeem - redeem darwinia transactions
+ * @method approveBlock - approve pending block
+ * @method rejectBlock - reject pending block
+ * @method shouldRelay - if a block should relay
+ * @method isRedeemAble - if a transaction is redeemable
  *
  * @property {KeyringPair} account - darwinia account
  * @property {Uint8Array} relayer - darwinia relayer account

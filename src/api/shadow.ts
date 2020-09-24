@@ -16,21 +16,22 @@ process.env.https_proxy = ""
 /**
  * Shadow APIs
  *
- * @method getBlock - get raw eth block
- * @method getBlockWithProof - get eth header with proof
+ * @method getHeaderThing - get ethereum headerthing
+ * @method getReceipt - get ethereum transaction receipt
+ * @method getProposal - get darwinia proposal
  */
 export class ShadowAPI {
     constructor(api: string) {
         axios.defaults.baseURL = api;
-        // axios.defaults.proxy = false;
     }
 
     /**
      * Get darwinia block with eth proof
      *
-     * @param {number} block | string - block number
+     * @param {number} block - block number
+     * @returns {Promise<IEthereumHeaderThingWithConfirmation>} ethereum headerthing with confirmation
      */
-    async getHeaderThing(block: number | string): Promise<IEthereumHeaderThingWithConfirmation> {
+    async getHeaderThing(block: number): Promise<IEthereumHeaderThingWithConfirmation> {
         log(`Get header thing of ${block}`);
         const r: any = await axios.get(
             "/eth/header/" + block,
@@ -44,7 +45,9 @@ export class ShadowAPI {
     /**
      * Get darwinia block with eth proof
      *
-     * @param {number} block - block number
+     * @param {string} tx - block number
+     * @param {number} lastConfirmed - block number
+     * @returns {Promise<IReceiptWithProof>} receipt with proof
      */
     async getReceipt(tx: string, lastConfirmed: number): Promise<IReceiptWithProof> {
         log(`Get receipt of ${tx}`);
@@ -60,7 +63,10 @@ export class ShadowAPI {
     /**
      * Get darwinia block with eth proof
      *
-     * @param {number} block - block number
+     * @param {number} member - the block needs to be verified
+     * @param {number} target - target proposal block
+     * @param {number} last_leaf - last leaf of blocks
+     * @returns {Promise<IEthereumHeaderThingWithProof>} Ethereum headerthing with proof
      */
     async getProposal(
         member: number,
