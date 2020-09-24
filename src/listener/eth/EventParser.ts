@@ -66,13 +66,13 @@ export class EventParser {
                 if (l.topics.includes(
                     web3.utils.padLeft(Config.contracts.RING.address.toLowerCase(), 64)
                 )) {
-                    logInDB.afterTx('ring', [l], l.blockNumber);
+                    logInDB.afterTx('ring', l);
                 }
 
                 if (l.topics.includes(
                     web3.utils.padLeft(Config.contracts.KTON.address.toLowerCase(), 64)
                 )) {
-                    logInDB.afterTx('kton', [l], l.blockNumber);
+                    logInDB.afterTx('kton', l);
                 }
             })
 
@@ -80,7 +80,7 @@ export class EventParser {
                 if (l.topics.includes(
                     web3.utils.padLeft(Config.contracts.BANK.burnAndRedeemTopics.toLowerCase(), 64)
                 )) {
-                    logInDB.afterTx('bank', [l], l.blockNumber);
+                    logInDB.afterTx('bank', l);
                 }
             })
 

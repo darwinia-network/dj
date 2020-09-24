@@ -1,7 +1,7 @@
 import { ShadowAPI, API } from "../../api";
 import { log } from "../../util";
 import { IEthereumHeaderThingWithProof } from "../../types";
-import { Cache } from "../"
+import Cache from "../cache"
 
 /// NewRound handler
 export default async function game(
@@ -16,18 +16,16 @@ export default async function game(
     log.trace(JSON.stringify(event.data.toJSON()));
 
     // Samples
-    const lastLeaf = Math.max(...(event.data[0].toJSON() as number[]));
-    let members: number[] | number = event.data[0].toJSON() as number[];
+    const lastLeaf = Math.max(...(event.data[2].toJSON() as number[]));
+    const members: number[] = event.data[2].toJSON() as number[];
     if (members === undefined) {
         return
-    } else if (!Array.isArray(members)) {
-        members = [members as number];
     }
 
     // Get proposals
     let newMember: number = 0;
     let proposals: IEthereumHeaderThingWithProof[] = [];
-    (members as number[]).forEach((i: number) => {
+    members.forEach((i: number) => {
         const block = Cache.getBlock(i);
         if (block) {
             proposals.push(block);
@@ -37,11 +35,11 @@ export default async function game(
     })
 
     const newProposal = await shadow.getProposal(newMember, newMember, lastLeaf);
-    Cache.setBlock(newMember, Object.assign(JSON.parse(JSON.stringify(newProposal)), {
+    Cache.setBlock(Object.assign({
         ethash_proof: [],
         mmr_root: "",
         mmr_proof: [],
-    }));
+    }, JSON.parse(JSON.stringify(newProposal))));
     proposals = proposals.concat(newProposal);
 
     // Submit new proposals

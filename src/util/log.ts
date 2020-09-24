@@ -11,6 +11,7 @@ export enum Logger {
     Trace,
     Wait,
     Warn,
+    Interval,
 }
 
 export enum LoggerEnv {
@@ -29,6 +30,7 @@ const INFO_LOGS = [
     Logger.Info,
     Logger.Wait,
     Logger.Warn,
+    Logger.Interval,
     Logger.Ok,
 ];
 
@@ -244,5 +246,14 @@ log.wait = (s: any): void => {
 log.warn = (s: any): void => {
     if (shouldOutputLog(Logger.Warn)) {
         flush(chalk.yellow("warn"), s);
+    }
+};
+
+/**
+ * @param {String} s - the log out string
+ */
+log.interval = (s: any): void => {
+    if (shouldOutputLog(Logger.Interval)) {
+        flush(chalk.cyanBright("interval"), s);
     }
 };

@@ -7,6 +7,7 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { DispatchError, EventRecord } from "@polkadot/types/interfaces/types";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 import {
+    ITx,
     IEthereumHeaderThingWithProof,
     IEthereumHeaderThingWithConfirmation,
     IReceiptWithProof,
@@ -234,34 +235,37 @@ export class API {
      * @param {number} target - target header
      */
     public async shouldRelay(target: number): Promise<boolean> {
-        log.trace("Check if target block less than the last confirmed block");
+        log("Check if target block less than the last confirmed block");
         const lastConfirmed = await this.lastConfirm();
         if (target < lastConfirmed) {
+            log("...target is less than lastConfirmed");
             return false;
         }
         // Check if has confirmed
-        log.trace("Check if proposal has been confirmed");
+        log("...target block is great than lastConfirmed");
+        log("Check if proposal has been confirmed");
         const confirmed = await this._.query.ethereumRelay.confirmedHeaders(target);
         if (confirmed.toJSON()) {
-            log.event(`Proposal ${target} has been submitted yet`);
+            log(`Proposal ${target} has been submitted yet`);
             return false;
         }
 
         // Check if is pendding
-        log.trace("Check if proposal is pending");
+        log("...target block has not been submitted");
+        log("Check if proposal is pending");
         const pendingHeaders = (
             await this._.query.ethereumRelayerGame.pendingHeaders()
         ).toJSON() as string[][];
         if (pendingHeaders.filter((h: any) => Number.parseInt(h[1], 10) === target).length > 0) {
-            log.event(`Proposal ${target} has been submitted yet`);
-            // return new ExResult(true, "", "");
+            log(`Proposal ${target} is pending`);
             return false;
         }
 
         // Check if target contains in the current Game
         //
         // Storage Key: `0xcdacb51c37fcd27f3b87230d9a1c265088c2f7188c6fdd1dffae2fa0d171f440`
-        log.trace("Check if proposal is in the relayer game");
+        log("...target block is not pending");
+        log("Check if proposal is in the relayer game");
         for (const key of (await this._.rpc.state.getKeysPaged(
             "0xcdacb51c37fcd27f3b87230d9a1c265088c2f7188c6fdd1dffae2fa0d171f440",
             32,
@@ -275,6 +279,7 @@ export class API {
             }
         };
 
+        log("...target block is relayable");
         return true;
     }
 
@@ -297,19 +302,24 @@ export class API {
     }
 
     /**
+     * Check if a tx is redeemable
+     */
+    public async isRedeemAble(tx: ITx): Promise<boolean> {
+        log(`Check if tx ${tx.tx} has been redeemed`);
+        if ((await this._.query.ethereumBacking.verifiedProof(tx.redeemAble)).toJSON()) {
+            log(`...tx ${tx.tx} has been redeemed`);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * relay darwinia header
      *
      * @param {DarwiniaEthBlock} block - darwinia style eth block
      */
     public async redeem(act: string, proof: IReceiptWithProof): Promise<ExResult> {
-        // Check verified
-        if ((await this._.query.ethereumBacking.verifiedProof(
-            [proof.receipt_proof.header_hash, Number.parseInt(proof.receipt_proof.index, 16)],
-        )).toJSON()) {
-            return new ExResult(true, "", "");
-        }
-
-        // Redeem tx
         log.event(`Redeem tx in block ${proof.header.number}`);
         const ex: SubmittableExtrinsic<"promise"> = this._.tx.ethereumBacking.redeem(act, [
             proof.header,
