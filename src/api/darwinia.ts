@@ -304,7 +304,7 @@ export class API {
     /**
      * Check if a tx is redeemable
      */
-    public async redeemAble(tx: ITx): Promise<boolean> {
+    public async isRedeemAble(tx: ITx): Promise<boolean> {
         log(`Check if tx ${tx.tx} has been redeemed`);
         if ((await this._.query.ethereumBacking.verifiedProof(tx.redeemAble)).toJSON()) {
             log(`...tx ${tx.tx} has been redeemed`);

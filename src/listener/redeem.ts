@@ -11,7 +11,7 @@ export async function listen(
         log.interval("Check if there is any tx wating to be redeemed");
         const lastConfirmed = await api.lastConfirm();
         for (const tx of Cache.trimTxs(lastConfirmed)) {
-            if (!(await api.redeemAble(tx))) {
+            if (!(await api.isRedeemAble(tx))) {
                 continue;
             }
             await api.redeem(tx.ty, await shadow.getReceipt(tx.tx, lastConfirmed));
