@@ -40,18 +40,9 @@ yarn global add @darwinia/dj
 Now you can type `dj` in your command-line:
 
 ```bash
-> dj
-dj <hello@darwinia.network>
-
-Commands:
-	dj balance [address]            Get balance of account address
-  dj config [edit]                Show config
-  dj proposal <block>             Submit a relay proposal to darwinia
-  dj transfer <address> <amount>  Transfer RING to darwinia account
-
-Options:
-  --help, -h     Show help                                             [boolean]
-  --version, -V  Show version number
+> dj -h
+dj: illegal option -- -
+usage: dj [-v verbose-mode] [-c edit-config]
 ```
 
 ## Usage
@@ -59,34 +50,17 @@ Options:
 By default, `dj` is configured to point to the Infura Ethereum node and the official Darwinia crab network node. So you can immediately start using `dj` to submit Ethereum block headers to the Darwinia crab network and get rewards.
 
 ```bash
-dj
+dj -v
 ```
 
 When the `dj` command is executed for the first time, you will be asked to input a seed. At this time, you need to enter the seed you have prepared and press Enter to continue.
 
 You can see the submission result in a few minutes. If `ok` appears, it means the submission is successful. If `reject` appears, xxx.
 
-### Util subcommands
-
-- dj proposal <block>
-
-    Submit a proposal  to darwinia network. The proposal includes the target block header with its proof.
-
-- dj balance
-
-    Get the `RING` balance of your seed account.
-
-- dj transfer <address> <amount>
-
-    Transfor `RING` to `address` from your seed account
-
-- dj config
-
-    Show your `dj`'s current config.
 
 ### Change seed
 
-If you want to change your seed, you need to find the configuration file `<your home directory>/.darwinia/config.json` . Open this file with an editor, replace the original seed and save it.
+If you want to change your seed, run `dj -e`, replace the original seed and save it.
 
 For more information about configuration, see the configuration section.
 
@@ -137,7 +111,7 @@ As mentioned earlier,  `dj` configuration file is `<your home directory>/.darwin
     ```bash
     {
       "node": "ws://127.0.0.1:9944",
-    	"seed": "...",
+      "seed": "...",
       "shadow": "..."
     }
     ```
@@ -152,7 +126,7 @@ Shadow is a service used by `dj` to retrieve header data and generate proof. Sha
 
 `dj` uses the official shadow service by default, if you don’t want to use the official service, you can run the service yourself, and then configure `dj` to use it.
 
-- Install
+n- Install
 
     ```bash
     # install rust and cargo
@@ -173,7 +147,7 @@ Shadow is a service used by `dj` to retrieve header data and generate proof. Sha
     ```bash
     {
       "node": "...",
-    	"seed": "...",
+      "seed": "...",
       "shadow": "http://0.0.0.0:3000/api/v1"
     }
     ```
@@ -199,7 +173,7 @@ Shadow is a service used by `dj` to retrieve header data and generate proof. Sha
     ```json
     {
       "node": "ws://0.0.0.0:9944",
-    	"seed": "//Alice",
+      "seed": "//Alice",
       "shadow": "http://0.0.0.0:3000/api/v1"
     }
     ```
@@ -207,7 +181,7 @@ Shadow is a service used by `dj` to retrieve header data and generate proof. Sha
 4. Run dj to submit header to your local dev node
 
     ```bash
-    dj
+    dj -v
     ```
 
 ------------

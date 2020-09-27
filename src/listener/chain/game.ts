@@ -1,7 +1,7 @@
 import { ShadowAPI, API } from "../../api";
 import { log } from "../../util";
 import { IEthereumHeaderThingWithProof } from "../../types";
-import Cache from "../cache"
+import Cache from "../../cache"
 
 /// NewRound handler
 export default async function game(

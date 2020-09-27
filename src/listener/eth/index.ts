@@ -3,7 +3,7 @@ import { EventParser } from "./EventParser";
 import { blockInDB, logInDB } from "./DB";
 import { localConfig } from "./Config";
 import { log } from "../../util";
-import Cache from "../cache";
+import Cache from "../../cache";
 
 const blockchainState = new BlockchainState();
 const eventParser = new EventParser();

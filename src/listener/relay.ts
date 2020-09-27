@@ -1,6 +1,6 @@
 import { ShadowAPI, API } from "../api";
 import { log } from "../util";
-import Cache from "./cache";
+import Cache from "../cache";
 
 // Listen and submit proposals
 export function listen(api: API, shadow: ShadowAPI) {

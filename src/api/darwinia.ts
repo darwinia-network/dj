@@ -13,6 +13,13 @@ import {
     IReceiptWithProof,
 } from "../types";
 
+/**
+ * Documentation of substrate error
+ *
+ * @property {string} name - error name
+ * @property {string} section - error section
+ * @property {string} documentation: error documentation
+ */
 export interface IErrorDoc {
     name: string;
     section: string;
@@ -22,10 +29,10 @@ export interface IErrorDoc {
 /**
  * Extrinsic Result
  *
- * @property {String} isOk - If extrinsic is ok
- * @property {String} isErr - If extrinsic is error
- * @property {String} blockHash - the hash of the block which contains our extrinsic
- * @property {String} exHash - Extrinsic hash
+ * @property {string} isOk - If extrinsic is ok
+ * @property {string} isErr - If extrinsic is error
+ * @property {string} blockHash - the hash of the block which contains our extrinsic
+ * @property {string} exHash - Extrinsic hash
  * @property {IErrorDoc | undefined} docs - Extrinsic error doc
  */
 export class ExResult {
@@ -38,9 +45,9 @@ export class ExResult {
     /**
      * Extrinsic Result
      *
-     * @param {String} isOk - if extrinsic is ok
-     * @param {String} blockHash - the hash of the block which contains our extrinsic
-     * @param {String} exHash - Extrinsic hash
+     * @param {string} isOk - if extrinsic is ok
+     * @param {string} blockHash - the hash of the block which contains our extrinsic
+     * @param {string} exHash - Extrinsic hash
      * @param {IErrorDoc | undefined} docs - Extrinsic error doc
      */
     constructor(isOk: boolean, blockHash: string, exHash: string, docs?: IErrorDoc) {
@@ -51,6 +58,11 @@ export class ExResult {
         this.docs = docs;
     }
 
+    /**
+     * Convert `ExResult` to `string`
+     *
+     * @returns {string} `ExResult` string
+     */
     public toString(): string {
         if (this.docs) {
             return [
@@ -67,13 +79,18 @@ export class ExResult {
  * @class API - darwinia api
  *
  * @method getBalance - get account balance
- * @method reset - reset eth relay header
- * @method relay - relay eth relay header
- * @method redeem - redeem ring
- * @method transfer - transfer ring
+ * @method setConfirmed - reset the confirmed block in darwinia
+ * @method submitProposal - submit a proposal to darwinia
+ * @method redeem - redeem darwinia transactions
+ * @method approveBlock - approve pending block
+ * @method rejectBlock - reject pending block
+ * @method shouldRelay - if a block should relay
+ * @method isRedeemAble - if a transaction is redeemable
  *
  * @property {KeyringPair} account - darwinia account
- * @property {ApiPromise} ap - raw polkadot api
+ * @property {Uint8Array} relayer - darwinia relayer account
+ * @property {ApiPromise} _ - raw polkadot api
+ * @property {Record<string, any>} types - darwinia types.json
  */
 export class API {
     /**
@@ -91,20 +108,11 @@ export class API {
      * new darwinia account from seed
      *
      * @param {String} seed - seed of darwinia account
+     * @returns {KeyringPair} keyring pair
      */
-    public static async seed(seed: string) {
+    public static async seed(seed: string): Promise<KeyringPair> {
         await cryptoWaitReady();
         return new Keyring({ type: "sr25519" }).addFromUri(seed);
-    }
-
-    /**
-     * new darwinia account from mnemonic
-     *
-     * @param {String} mnemonic - mnemonic of darwinia account
-     */
-    public static async memrics(mnemonic: string) {
-        await cryptoWaitReady();
-        return new Keyring({ type: "sr25519" }).addFromMnemonic(mnemonic);
     }
 
     /**
@@ -118,7 +126,7 @@ export class API {
      * ```js
      * const cfg = new Config();
      * const seed = await API.seed(cfg.seed);
-     * const api = await API.new(seed, cfg.node, cfg.types);
+     * const api = await API.new(seed, cfg.node, cfg.relayer, cfg.types);
      * ```
      */
     public static async new(
@@ -150,6 +158,8 @@ export class API {
      *
      * @param {KeyringPair} account - darwinia account
      * @param {ApiPromise} ap - raw polkadot api
+     * @param {Uint8Array} relayer - darwinia relayer account
+     * @param {Record<string, any>} types - darwinia types.json
      */
     constructor(
         account: KeyringPair,
@@ -165,6 +175,8 @@ export class API {
 
     /**
      * Get last confirm block
+     *
+     * @returns {Promise<number>} Ethereum block number
      */
     public async lastConfirm(): Promise<number> {
         const res = await this._.query.ethereumRelay.confirmedBlockNumbers();
@@ -180,6 +192,7 @@ export class API {
      * get ring balance by darwinia account address
      *
      * @param {string} addr - account address of darwinia
+     * @returns {Promise<string>} account balance
      */
     public async getBalance(addr: string): Promise<string> {
         const account = await this._.query.system.account(addr);
@@ -188,8 +201,19 @@ export class API {
 
     /**
      * Approve block in relayer game
+     *
+     * @description
+     *
+     * ## permission
+     * + 7 for root
+     * + 5 for council
+     * + 4 for normal account
+     *
+     * @param {number} block - block number
+     * @param {number} perms - permission
+     * @returns {Promise<ExResult>} the result of `approveBlock` ex
      */
-    public async approveBlock(block: number, perms = 4): Promise<ExResult> {
+    public async approveBlock(block: number, perms: number = 4): Promise<ExResult> {
         let ex = this._.tx.ethereumRelay.approvePendingHeader(block);
         if (perms === 7) {
             ex = this._.tx.sudo.sudo(ex);
@@ -200,13 +224,24 @@ export class API {
         }
 
         log.event(`Approve block ${block}`);
-        return await this.blockFinalized(ex, true);
+        return this.blockFinalized(ex, true);
     }
 
     /**
      * Approve block in relayer game
+     *
+     * @description
+     *
+     * ## permission
+     * + 7 for root
+     * + 5 for council
+     * + 4 for normal account
+     *
+     * @param {number} block - block number
+     * @param {number} perms - permission
+     * @returns {Promise<ExResult>} the result of `rejectBlock` ex
      */
-    public async rejectBlock(block: string | number, perms = 4): Promise<ExResult> {
+    public async rejectBlock(block: string | number, perms: number = 4): Promise<ExResult> {
         let ex = this._.tx.ethereumRelay.rejectPendingHeader(block);
         if (perms === 7) {
             ex = this._.tx.sudo.sudo(ex);
@@ -222,8 +257,13 @@ export class API {
 
     /**
      * Set confirmed block with sudo privilege
+     *
+     * @param {IEthereumHeaderThingWithConfirmation} headerThing - The Ethereum headerthing
+     * @returns {Promise<ExResult>} the result of `setConfirm` ex
      */
-    public async setConfirmed(headerThing: IEthereumHeaderThingWithConfirmation): Promise<ExResult> {
+    public async setConfirmed(
+        headerThing: IEthereumHeaderThingWithConfirmation,
+    ): Promise<ExResult> {
         log.event(`Set confirmed block ${headerThing.header_thing.header.number}`);
         const ex = this._.tx.ethereumRelay.setConfirmed(headerThing.header_thing);
         return await this.blockFinalized(this._.tx.sudo.sudo(ex));
@@ -233,6 +273,7 @@ export class API {
      * Check if should relay target
      *
      * @param {number} target - target header
+     * @returns {Promise<boolean>} the result of `shouldRelay`
      */
     public async shouldRelay(target: number): Promise<boolean> {
         log("Check if target block less than the last confirmed block");
@@ -286,7 +327,8 @@ export class API {
     /**
      * get the specify block
      *
-     * @param {IEthHeaderThing} headerThings - Eth Header Things
+     * @param {IEthereumHeaderThingWithProof[]} headerThings - EthereumHeaderThings
+     * @returns {Promise<ExResult>} The result of `submitProposal` ex
      */
     public async submitProposal(headerThings: IEthereumHeaderThingWithProof[]): Promise<ExResult> {
         const latest = headerThings[headerThings.length - 1].header.number;
@@ -303,6 +345,9 @@ export class API {
 
     /**
      * Check if a tx is redeemable
+     *
+     * @param {ITx} tx - ethereum tx
+     * @returns {Promise<boolean>} The result of `isRedeemAble`
      */
     public async isRedeemAble(tx: ITx): Promise<boolean> {
         log(`Check if tx ${tx.tx} has been redeemed`);
@@ -318,6 +363,7 @@ export class API {
      * relay darwinia header
      *
      * @param {DarwiniaEthBlock} block - darwinia style eth block
+     * @returns {Promise<ExResult>} The result of `redeem` ex
      */
     public async redeem(act: string, proof: IReceiptWithProof): Promise<ExResult> {
         log.event(`Redeem tx in block ${proof.header.number}`);
@@ -334,10 +380,11 @@ export class API {
      *
      * @param {SubmittableExtrinsic<"promise">} ex - extrinsic
      * @param {Boolean} inBlock - if resolve when inBlock
+     * @returns {Promise<ExResult>} The result of any ex
      */
     private blockFinalized(
         ex: SubmittableExtrinsic<"promise">,
-        inFinialize = false,
+        inFinialize: boolean = false,
     ): Promise<ExResult> {
         const res = new ExResult(
             false,

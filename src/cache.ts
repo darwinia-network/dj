@@ -1,4 +1,4 @@
-import { IEthereumHeaderThingWithProof, ITx } from "../types";
+import { IEthereumHeaderThingWithProof, ITx } from "./types";
 
 /**
  * Memory database for relay process
